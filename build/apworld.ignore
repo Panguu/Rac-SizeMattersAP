@@ -1,0 +1,6 @@
+.git*
+__pycache__
+build
+requirements.txt
+Ratchet & Clank Size Matters.yaml
+*.iso
