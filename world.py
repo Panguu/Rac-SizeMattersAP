@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar, Dict, List
+from typing import Any, ClassVar
 
 from BaseClasses import Item, ItemClassification, Location, Tutorial
 
@@ -55,11 +55,11 @@ class RACSizeMatterWorld(World):
     options_dataclass = RACSizeMatterOptions
     options: RACSizeMatterOptions
 
-    item_name_to_id: Dict[str, int] = {name: data.code for name, data in ALL_ITEMS.items()}
-    location_name_to_id: Dict[str, int] = {name: data.code for name, data in ALL_LOCATIONS.items()}
+    item_name_to_id: dict[str, int] = {name: data.code for name, data in ALL_ITEMS.items()}
+    location_name_to_id: dict[str, int] = {name: data.code for name, data in ALL_LOCATIONS.items()}
 
     using_ut: bool = False
-    passthrough: Dict[str, Any]
+    passthrough: dict[str, Any]
     ut_can_gen_without_yaml: bool = True
     disable_ut: bool = False
     tracker_world: ClassVar = tracker_world
@@ -88,7 +88,7 @@ class RACSizeMatterWorld(World):
         set_rules(self)
 
     def create_items(self) -> None:
-        pool: List[str] = []
+        pool: list[str] = []
 
         if self.options.progressive_weapons:
             for display, steps in WEAPON_PROGRESSIVE_STEPS.items():
@@ -140,7 +140,7 @@ class RACSizeMatterWorld(World):
             for name in self.random.sample(pool, min(gadget_count, len(pool))):
                 self._precollect(name)
 
-    def fill_slot_data(self) -> Dict[str, Any]:
+    def fill_slot_data(self) -> dict[str, Any]:
         return {
             "death_link": bool(self.options.death_link.value),
             "skill_points_as_checks": bool(self.options.skill_points_as_checks.value),
@@ -154,7 +154,7 @@ class RACSizeMatterWorld(World):
         }
 
     @staticmethod
-    def interpret_slot_data(slot_data: Dict[str, Any]) -> Dict[str, Any]:
+    def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
         return slot_data
 
     def get_filler_item_name(self) -> str:

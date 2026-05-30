@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .locations import VENDOR_WEAPON_PLANET, VENDOR_GADGET_PLANET, VENDOR_WEAPON_MOD_PLANET
+from .locations import (
+    VENDOR_GADGET_PLANET,
+    VENDOR_WEAPON_MOD_PLANET,
+    VENDOR_WEAPON_PLANET,
+)
 
 if TYPE_CHECKING:
     from .world import RACSizeMatterWorld
@@ -105,6 +109,8 @@ def set_rules(world: RACSizeMatterWorld) -> None:
             lambda state: _has_projectile_weapon(state, player) and (
                 state.has("Mootator", player) or state.has("Mootator Progressive Weapon", player)
             )
+        multiworld.get_location("Skill Point Bury The Pygmies", player).access_rule = \
+            lambda state: state.has("Sprout-O-Matic", player) and state.has("Hypershot", player)
 
     _ryllus_full = lambda state: state.has("Hypershot", player) and state.has("Sprout-O-Matic", player)
     _kalidon = lambda state: state.has("Shrink Ray", player)
@@ -121,7 +127,7 @@ def set_rules(world: RACSizeMatterWorld) -> None:
     multiworld.get_location("Challax Titanium Bolt Hidden Room", player).access_rule = \
         lambda state: state.has("Polarizer", player) and state.has("Shrink Ray", player)
     multiworld.get_location("Challax Titanium Bolt Mimic Plant Lob", player).access_rule = \
-        lambda state: state.has("Polarizer", player) and state.has("Shrink Ray", player) and state.has("Sprout-O-Matic", player)
+        lambda state: state.has("Polarizer", player) and state.has("Shrink Ray", player) and state.has("Sprout-O-Matic", player)  # noqa: E501
     for _loc in (
         "Kalidon Titanium Bolt Side of Mechanoid Factory",
         "Kalidon Titanium Bolt Grav-Ramps",

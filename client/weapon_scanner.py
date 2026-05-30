@@ -4,9 +4,13 @@ import json
 
 from CommonClient import logger
 
-from ..size_matters.data.weapons import build_weapons
-from ..size_matters.memory import GADGETS, WEAPONS
-from ..size_matters.weapons import WEAPON_MIN_CONSECUTIVE, WEAPON_STRUCT_SIZE, is_ps2_weapon_candidate
+from ..core.data import (
+    WEAPON_MIN_CONSECUTIVE,
+    WEAPON_STRUCT_SIZE,
+    is_ps2_weapon_candidate,
+)
+from ..core.data.weapons import build_weapons
+from ..core.memory import GADGETS, WEAPONS
 from .constants import CACHE_FILE, WEAPON_SCAN_LENGTH, WEAPON_SCAN_START
 
 

@@ -13,17 +13,17 @@ class TitaniumBolt:
 
 
 TITANIUM_BOLTS: dict[str, TitaniumBolt] = {
-    "Pokitaru Titanium Bolt Above Zipline":                      TitaniumBolt(0x01,  0, "Pokitaru"),       # estimated
-    "Pokitaru Titanium Bolt Behind Hut":                         TitaniumBolt(0x01,  1, "Pokitaru"),       # estimated
+    "Pokitaru Titanium Bolt Above Zipline":                      TitaniumBolt(0x01,  0, "Pokitaru"),
+    "Pokitaru Titanium Bolt Behind Hut":                         TitaniumBolt(0x01,  1, "Pokitaru"),
     "Ryllus Titanium Bolt Down The Cliff":                       TitaniumBolt(0x02,  4, "Ryllus"),
     "Ryllus Titanium Bolt After the Wall":                       TitaniumBolt(0x02,  5, "Ryllus"),
     "Kalidon Titanium Bolt Behind The Ship":                     TitaniumBolt(0x03,  8, "Kalidon"),
     "Kalidon Titanium Bolt Side of Mechanoid Factory":           TitaniumBolt(0x03, 10, "Kalidon"),
-    "Kalidon Titanium Bolt Grav-Ramps":                          TitaniumBolt(0x03, 11, "Kalidon"),        # estimated
+    "Kalidon Titanium Bolt Grav-Ramps":                          TitaniumBolt(0x03, 11, "Kalidon"),
     "Metalis Titanium Bolt Behind the Polarized Door":           TitaniumBolt(0x04, 12, "Metalis"),
-    "Dreamtime Titanium Bolt Jump Across three moving parasols": TitaniumBolt(0x05, 16, "Dreamtime"),      # estimated
+    "Dreamtime Titanium Bolt Jump Across three moving parasols": TitaniumBolt(0x05, 16, "Dreamtime"),
     "Dreamtime Titanium Bolt To the left of Ratchets Garage":   TitaniumBolt(0x05, 17, "Dreamtime"),
-    "Dreamtime Titanium Bolt Apparition of the Scuttle Crab":   TitaniumBolt(0x05, 18, "Dreamtime"),      # estimated
+    "Dreamtime Titanium Bolt Apparition of the Scuttle Crab":   TitaniumBolt(0x05, 18, "Dreamtime"),
     "Outpost Omega Titanium Bolt Near the Entrance to DreamTime":TitaniumBolt(0x06, 20, "Outpost Omega"),
     "Challax Titanium Bolt Beside The Ultra Mech Pad":           TitaniumBolt(0x07, 24, "Challax"),
     "Challax Titanium Bolt Hidden Room":                         TitaniumBolt(0x07, 25, "Challax"),

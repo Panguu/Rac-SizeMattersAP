@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import random
 import time
 from typing import Any
 
 from CommonClient import logger
 
-from ..size_matters.data.addresses import PLAYER_ADDRS, PLAYER_HEALTH, PLAYER_STATE
-from ..size_matters.data.planets import BY_ID as PLANETS_BY_ID
-
+from ..core.data import BY_ID as PLANETS_BY_ID
+from ..core.data import PLAYER_ADDRS, PLAYER_HEALTH, PLAYER_STATE
 
 _DEATH_CAUSES: dict[int, str] = {
     0x29: "got eaten by a fish",
@@ -51,7 +51,10 @@ class DeathLinkMixin:
                     "data": {
                         "time": now,
                         "source": source,
-                        "cause": f"{source} {_death_cause(player_state)} on {planet_name} in Ratchet & Clank: Size Matters.",
+                        "cause": (
+                            f"{source} {_death_cause(player_state)} on {planet_name}"
+                            " in Ratchet & Clank: Size Matters."
+                        ),
                     },
                 }
             ])
@@ -72,5 +75,8 @@ class DeathLinkMixin:
             await loop.run_in_executor(None, self._kill_player_sync)
 
     def _kill_player_sync(self) -> None:
+        state_addr  = PLAYER_ADDRS.get(self._prev_planet, (PLAYER_STATE, PLAYER_HEALTH))[0]
         health_addr = PLAYER_ADDRS.get(self._prev_planet, (PLAYER_STATE, PLAYER_HEALTH))[1]
+        death_state = random.choice(list(_DEATH_CAUSES))
+        self.pine.write_int16(state_addr, death_state)
         self.pine.write_int16(health_addr, 0)

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import time
 from typing import Any
 
 tracker_loaded: bool = False
 try:
-    from worlds.tracker.TrackerClient import TrackerCommandProcessor as ClientCommandProcessor
+    from worlds.tracker.TrackerClient import (
+        TrackerCommandProcessor as ClientCommandProcessor,
+    )
     from worlds.tracker.TrackerClient import TrackerGameContext as CommonContext
     tracker_loaded = True
 except ImportError:
@@ -13,25 +16,22 @@ except ImportError:
 from CommonClient import logger
 from NetUtils import ClientStatus
 
-from ..locations import ALL_LOCATIONS
-from ..size_matters.data.addresses import (
+from ..core.data import (
+    ARMOUR_FLAG_TO_LOCATION,
+    ARMOUR_SET_CHECKS,
+    BOLT_BY_PLANET_AND_DELTA,
     CURRENT_PLANET_ADDRESS,
-    PLAYER_ADDRS,
-    PLAYER_STATE,
-    SKILL_POINTS as SKILL_POINT_ADDRESS,
-)
-from ..size_matters.data.armour_pickups import ARMOUR_FLAG_TO_LOCATION
-from ..size_matters.data.cutscenes import (
     CUTSCENE_BEFORE_SPROUT_O_MATIC,
     CUTSCENES,
     ENTER_CUTSCENES,
+    LOCATION_SKILL_POINTS,
+    PLAYER_ADDRS,
+    PLAYER_STATE,
+    SKILL_POINT_ADDRESS,
     SPROUT_O_MATIC_CUTSCENE,
     arm_cutscenes,
 )
-from ..size_matters.data.armour_set_checks import ARMOUR_SET_CHECKS
-from ..size_matters.data.skill_points import LOCATION_SKILL_POINTS
-from ..size_matters.data.titanium_bolts import BOLT_BY_PLANET_AND_DELTA
-from ..size_matters.memory import (
+from ..core.memory import (
     ARMOUR_ADDRESSES,
     BOLTS,
     GADGETS,
@@ -40,11 +40,12 @@ from ..size_matters.memory import (
     ItemScanner,
     MemoryState,
 )
+from ..core.state import GameState
+from ..core.vendor import VendorPoller, VendorSession
+from ..locations import ALL_LOCATIONS
 from ..pypine.pypine.pine import Pine
-from ..size_matters.state import GameState
-from ..size_matters.vendor import VendorPoller, VendorSession
-from .constants import EXPECTED_GAME_ID, GAME_NAME, POLL_INTERVAL
 from ..universal_tracker import PLANET_ID_TO_REGION
+from .constants import EXPECTED_GAME_ID, GAME_NAME, POLL_INTERVAL
 from .deathlink import DeathLinkMixin, _dead, _death_cause
 from .inventory import InventoryMixin
 from .vendor_handler import VendorHandlerMixin
@@ -55,7 +56,7 @@ _SLOT_STATE = MemoryState(lambda: PLAYER_ARMOUR_SLOTS.values())
 
 
 class RACCommandProcessor(ClientCommandProcessor):
-    ctx: "RACContext"
+    ctx: RACContext
 
     def _cmd_reconnect(self) -> bool:
         """Reconnect to PCSX2 and re-apply received Archipelago items."""
@@ -104,7 +105,7 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
         self._expected_weapons: dict[str, int] = {}
         self._expected_weapon_mods: dict[str, int] = {}
         self._expected_gadgets: dict[str, int] = {}
-        self._expected_armour: dict[str, int] = {name: 0 for name in ARMOUR_ADDRESSES}
+        self._expected_armour: dict[str, int] = dict.fromkeys(ARMOUR_ADDRESSES, 0)
         self._processed_item_count = 0
         self._starting_bolts_granted = False
         self._death_count = 0
@@ -121,6 +122,8 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
         self._vendor_poller = VendorPoller(self._gs)
         self._scanners = self._build_scanners()
         self._armour_scanner = self._scanners[0]
+
+        self._planet_change_time: float | None = None
 
         self._death_link_enabled = False
         self._last_death_link = 0.0
@@ -292,6 +295,10 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
             "operations": [{"operation": "replace", "value": planet}],
         }])
 
+    @property
+    def _on_known_planet(self) -> bool:
+        return self._prev_planet in PLANET_ID_TO_REGION
+
     def _poll_game_sync(self) -> list[int]:
         new_checks: list[int] = []
 
@@ -304,13 +311,20 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
             self._gs.state_addr = self._state_addr
             arm_cutscenes(self.pine, planet, "armed")
             self._prev_bolt_pickup = self.pine.read_int64(BOLTS.pickup) & 0x000000FFFFFFFFFF
-            try:
-                self._sync_weapons_cached(force_scan=True)
-            except Exception as exc:
-                logger.warning(f"[RAC] Weapon rescan on planet change failed: {exc}")
-            _SLOT_STATE.take(self.pine)
-            self._apply_expected_inventory_sync(clear_unreceived=True)
-            _SLOT_STATE.restore(self.pine)
+            self._planet_change_time = time.monotonic()
+
+        if self._planet_change_time is not None and time.monotonic() - self._planet_change_time >= 2.0:
+            self._planet_change_time = None
+            if self._on_known_planet:
+                try:
+                    self._sync_weapons_cached(force_scan=True)
+                except Exception as exc:
+                    logger.warning(f"[RAC] Weapon rescan on planet change failed: {exc}")
+                _SLOT_STATE.take(self.pine)
+                self._apply_expected_inventory_sync(clear_unreceived=True)
+                _SLOT_STATE.restore(self.pine)
+            else:
+                logger.info(f"[RAC] Unknown planet {self._prev_planet:#04x} — skipping inventory writes.")
 
         player_state = self.pine.read_int16(self._state_addr)
         if not _dead(self._prev_player_state) and _dead(player_state):
@@ -330,7 +344,9 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
         skill_points = self.pine.read_int64(SKILL_POINT_ADDRESS)
         new_skill_bits = skill_points & ~self._prev_skill_points
         if new_skill_bits:
-            logger.info(f"[RAC] Skill point address changed by 0x{new_skill_bits:016X} (raw value 0x{skill_points:016X})")
+            logger.info(
+                f"[RAC] Skill point address changed by 0x{new_skill_bits:016X} (raw value 0x{skill_points:016X})"
+            )
         for name, mask in LOCATION_SKILL_POINTS.items():
             if new_skill_bits & mask:
                 self._append_location(new_checks, name, "Skill point")
@@ -344,7 +360,9 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
             if name:
                 self._append_location(new_checks, name, "Titanium bolt")
         elif bolt_delta > 0:
-            logger.warning(f"[RAC] Titanium bolt delta {bolt_delta} is not a power of 2 — ignoring (likely init noise).")
+            logger.warning(
+                f"[RAC] Titanium bolt delta {bolt_delta} is not a power of 2 — ignoring (likely init noise)."
+            )
         self._prev_bolt_pickup = bolt_pickup
 
         for set_key, address in ARMOUR_ADDRESSES.items():
@@ -436,7 +454,9 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
             self.pine.write_int8(address, 0)
         _SLOT_STATE.take(self.pine)
         if self._death_count > amnesty:
-            logger.info(f"[RAC] Death {self._death_count} (Ratchet {cause}): amnesty exceeded ({amnesty}), DeathLink sent.")
+            logger.info(
+                f"[RAC] Death {self._death_count} (Ratchet {cause}): amnesty exceeded ({amnesty}), DeathLink sent."
+            )
             self._send_death_link_from_sync(player_state)
         else:
             logger.info(f"[RAC] Death {self._death_count} (Ratchet {cause}): within amnesty ({amnesty}).")
@@ -485,7 +505,7 @@ class RACContext(DeathLinkMixin, VendorHandlerMixin, WeaponScannerMixin, Invento
         _SLOT_STATE.restore(self.pine)
 
     def _enforce_locks(self) -> None:
-        if self._gs.is_dead or self._gs.is_picking_up:
+        if self._gs.is_dead or self._gs.is_picking_up or not self._on_known_planet:
             return
         if (self._gs.is_in_menu or self._gs.is_preloaded) and self._gs.tracked_vendor is not None:
             self._gs.vendor_session.enforce(self.pine)

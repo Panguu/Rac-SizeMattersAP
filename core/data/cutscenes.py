@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from CommonClient import logger
+
 if TYPE_CHECKING:
     from ...pypine.pypine.pine import Pine
 
@@ -11,7 +13,7 @@ def arm_cutscenes(ipc: Pine, planet_id: int, label: str) -> None:
     for c in CUTSCENES:
         if c.planet_id == planet_id:
             ipc.write_int32(c.address, c.init_val)
-            print(f"  Cutscene {label}: {c.name} @ {c.address:#010x} = {c.init_val:#04x}")
+            logger.debug(f"  Cutscene {label}: {c.name} @ {c.address:#010x} = {c.init_val:#04x}")
 
 
 @dataclass(frozen=True)

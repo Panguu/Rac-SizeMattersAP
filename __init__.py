@@ -1,12 +1,18 @@
 """Archipelago world for Ratchet & Clank: Size Matters (PSP/PS2)"""
-from typing import Optional
+from worlds.LauncherComponents import (
+    Component,
+    SuffixIdentifier,
+    Type,
+    components,
+    icon_paths,
+    launch_subprocess,
+)
+from worlds.rac_size_matters.world import (
+    RACSizeMatterWorld,  # noqa: F401 — registers world
+)
 
-from worlds.LauncherComponents import Component, components, icon_paths, launch_subprocess, SuffixIdentifier, Type
 
-from worlds.rac_size_matters.world import RACSizeMatterWorld  # noqa: F401 — registers world
-
-
-def run_client(_url: Optional[str] = None):
+def run_client(_url: str | None = None):
     """Launch the R&C: Size Matters Archipelago client."""
     from worlds.rac_size_matters.client import run_client as _run
     launch_subprocess(_run, name="RACSmClient")

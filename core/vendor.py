@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+
+from CommonClient import logger
+
 from ..pypine.pypine.pine import Pine
-from .memory import WEAPONS, GADGETS, zero_weapon, restore_tracked_weapon_state
-from .weapons import WEAPON_MOD_COUNTS
-from .data.addresses import PRELOAD_MENU_ADDR_BY_PLANET_ID
-from .data.planets import BY_ID
+from .data import BY_ID, WEAPON_MOD_COUNTS, TextBoxDisplayAddrs
+from .memory import GADGETS, WEAPONS, restore_tracked_weapon_state, zero_weapon
+
+_TEXTBOX_BY_PLANET: dict[int, object] = {tb.planet_id: tb for tb in TextBoxDisplayAddrs}
+
 from .state import GameState
 
 
@@ -89,17 +93,17 @@ class VendorSession:
     def _add_weapon(self, name: str) -> None:
         if name not in self.purchased_weapons:
             self.purchased_weapons.append(name)
-            print(f"  Purchase detected: weapon {name}")
+            logger.info(f"  Purchase detected: weapon {name}")
 
     def _add_gadget(self, name: str) -> None:
         if name not in self.purchased_gadgets:
             self.purchased_gadgets.append(name)
-            print(f"  Purchase detected: gadget {name}")
+            logger.info(f"  Purchase detected: gadget {name}")
 
     def _add_mod(self, weapon: str, slot: str) -> None:
         if (weapon, slot) not in self.purchased_mods:
             self.purchased_mods.append((weapon, slot))
-            print(f"  Purchase detected: mod {weapon} slot {slot}")
+            logger.info(f"  Purchase detected: mod {weapon} slot {slot}")
 
     def total(self) -> int:
         return len(self.purchased_weapons) + len(self.purchased_gadgets) + len(self.purchased_mods)
@@ -116,10 +120,13 @@ class VendorPoller:
         planet_obj   = BY_ID.get(gs.current_planet)
         menu_addr    = planet_obj.menu_addr if planet_obj else None
         menu_state   = ipc.read_int8(menu_addr) if menu_addr else 0
-        preload_addr = PRELOAD_MENU_ADDR_BY_PLANET_ID.get(gs.current_planet)
-        preload_val  = ipc.read_int8(preload_addr) if preload_addr else 0
-
-        is_preloaded  = preload_val == 0x13
+        textbox      = _TEXTBOX_BY_PLANET.get(gs.current_planet)
+        if textbox:
+            raw      = ipc.read_int16(textbox.message_str_pointer)
+            msg_val  = ((raw & 0xFF) << 8) | (raw >> 8)  # byte-swap: pine reads little-endian, PS2 is big-endian
+            is_preloaded = msg_val == textbox.vendor_value and bool(ipc.read_int8(textbox.is_visible))
+        else:
+            is_preloaded = False
         is_in_menu    = menu_state in (0x09, 0x0E)
         was_preloaded = gs.is_preloaded
         was_in_menu   = gs.is_in_menu
@@ -127,34 +134,37 @@ class VendorPoller:
         # Stage 1: preload rising edge
         if is_preloaded and not was_preloaded and not is_in_menu and not gs.is_dead and not gs.is_picking_up:
             if not WEAPONS:
-                print("Vendor preload: WEAPONS empty. Use /scan after the game is loaded.")
+                logger.warning("Vendor preload: WEAPONS empty. Use /scan after the game is loaded.")
                 return
             if gs.tracked_vendor is None:
                 gs.tracked_vendor = gs.current_planet
                 gs.vendor_session.refresh(gs.tracked_vendor_weapons, gs.tracked_vendor_gadgets, gs.tracked_vendor_mods)
-                print("Vendor preload detected.")
+                logger.info("Vendor preload detected.")
             else:
-                print("Vendor re-preloaded (session preserved).")
+                logger.info("Vendor re-preloaded (session preserved).")
             gs.vendor_session.apply(ipc)
-            print("Vendor state applied.")
+            logger.info(
+                f"Vendor state applied: {len(gs.vendor_session.weapons)} weapons, "
+                f"{len(gs.vendor_session.gadgets)} gadgets."
+            )
 
         # Stage 1: falling edge — player left without opening menu
         if was_preloaded and not is_preloaded and not is_in_menu and not was_in_menu:
             gs.tracked_vendor = None
             restore_tracked_weapon_state(gs)
-            print("Vendor area left. State restored.")
+            logger.info("Vendor area left. State restored.")
 
         # Stage 2: menu opened
         if is_in_menu and not was_in_menu and not gs.is_dead and not gs.is_picking_up:
-            print(f"Vendor menu opened (menu={menu_state:#04x}).")
+            logger.info(f"Vendor menu opened (menu={menu_state:#04x}).")
             if not WEAPONS:
-                print("Vendor menu: WEAPONS empty. Use /scan after the game is loaded.")
+                logger.warning("Vendor menu: WEAPONS empty. Use /scan after the game is loaded.")
                 return
             gs.vendor_session.apply(ipc)
             if menu_addr:
                 ipc.write_int8(menu_addr, 0x01)
                 ipc.write_int8(menu_addr, menu_state)
-                print("Vendor menu refreshed.")
+                logger.info("Vendor menu refreshed.")
 
         # Stage 2: ongoing purchase detection
         # Allow detection even during is_picking_up — vendor purchases trigger the 0x43 pickup
@@ -172,21 +182,21 @@ class VendorPoller:
     def _process_close(self, gs: GameState, ipc: Pine) -> None:
         vs    = gs.vendor_session
         total = vs.total()
-        print(f"Vendor closed. Processing {total} purchase(s)…")
+        logger.info(f"Vendor closed. Processing {total} purchase(s)…")
         if total == 0:
-            print("  No purchases detected.")
+            logger.info("  No purchases detected.")
         for name in vs.purchased_weapons:
-            print(f"  Purchased weapon: {name}")
+            logger.info(f"  Purchased weapon: {name}")
             gs.tracked_vendor_weapons[name] = 1
             if gs.on_reward:
                 gs.on_reward()
         for name in vs.purchased_gadgets:
-            print(f"  Purchased gadget: {name}")
+            logger.info(f"  Purchased gadget: {name}")
             gs.tracked_vendor_gadgets[name] = 1
             if gs.on_reward:
                 gs.on_reward()
         for weapon, slot in vs.purchased_mods:
-            print(f"  Purchased mod: {weapon} slot {slot}")
+            logger.info(f"  Purchased mod: {weapon} slot {slot}")
             gs.tracked_vendor_mods.setdefault(weapon, set()).add(slot)
             if gs.on_reward:
                 gs.on_reward()
@@ -194,4 +204,4 @@ class VendorPoller:
             gs.on_vendor_close()
         gs.tracked_vendor = None
         restore_tracked_weapon_state(gs)
-        print("Vendor state restored.")
+        logger.info("Vendor state restored.")

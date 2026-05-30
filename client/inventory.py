@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections import defaultdict
 
 from CommonClient import logger
 
@@ -11,14 +12,44 @@ from ..items import (
     GADGET_DISPLAY_TO_INTERNAL,
     WEAPON_DISPLAY_TO_INTERNAL,
 )
-from ..size_matters.data.addresses import PLAYER_BOLT_COUNT
-from ..size_matters.memory import (
+from ..locations import (
+    VENDOR_GADGET_PLANET,
+    VENDOR_WEAPON_MOD_PLANET,
+    VENDOR_WEAPON_PLANET,
+)
+
+# ── Vendor location → internal name lookups ───────────────────────────────────
+
+_VENDOR_WEAPON_LOC: dict[str, str] = {
+    f"Purchase {display}": WEAPON_DISPLAY_TO_INTERNAL[display]
+    for display in VENDOR_WEAPON_PLANET
+    if display in WEAPON_DISPLAY_TO_INTERNAL
+}
+
+_VENDOR_GADGET_LOC: dict[str, str] = {
+    f"Purchase {display}": GADGET_DISPLAY_TO_INTERNAL[display]
+    for display in VENDOR_GADGET_PLANET
+    if display in GADGET_DISPLAY_TO_INTERNAL
+}
+
+_SLOTS = ("one", "two", "three")
+_by_weapon: dict[str, list[str]] = defaultdict(list)
+for (_wd, _mn) in VENDOR_WEAPON_MOD_PLANET:
+    _by_weapon[_wd].append(_mn)
+_VENDOR_MOD_LOC: dict[str, tuple[str, str]] = {}
+for _wd, _mns in _by_weapon.items():
+    _int = WEAPON_DISPLAY_TO_INTERNAL.get(_wd)
+    if _int:
+        for _i, _mn in enumerate(_mns):
+            if _i < len(_SLOTS):
+                _VENDOR_MOD_LOC[f"Purchase {_wd} {_mn}"] = (_int, _SLOTS[_i])
+from ..core.data import PLAYER_BOLT_COUNT, WEAPON_MOD_COUNTS
+from ..core.memory import (
     ARMOUR_ADDRESSES,
     GADGETS,
     WEAPONS,
     apply_tracked_weapons,
 )
-from ..size_matters.weapons import WEAPON_MOD_COUNTS
 from .constants import BOLT_ITEM_AMOUNT
 
 
@@ -48,7 +79,7 @@ class InventoryMixin:
         self._expected_weapons = {}
         self._expected_weapon_mods = {}
         self._expected_gadgets = {}
-        self._expected_armour = {name: 0 for name in ARMOUR_ADDRESSES}
+        self._expected_armour = dict.fromkeys(ARMOUR_ADDRESSES, 0)
 
         weapon_prog_counts: dict[str, int] = {}
         armour_prog_counts: dict[str, int] = {}
@@ -60,7 +91,7 @@ class InventoryMixin:
                 display = item_name[: -len(" Progressive Weapon")]
                 weapon_prog_counts[display] = weapon_prog_counts.get(display, 0) + 1
                 continue
-            elif item_name.endswith(" Progressive Pickup"):
+            if item_name.endswith(" Progressive Pickup"):
                 display = item_name[: -len(" Progressive Pickup")]
                 armour_prog_counts[display] = armour_prog_counts.get(display, 0) + 1
                 continue
@@ -98,6 +129,28 @@ class InventoryMixin:
         self._gs.tracked_weapons = self._expected_weapons.copy()
         self._gs.tracked_gadgets = self._expected_gadgets.copy()
         self._gs.tracked_armour = self._expected_armour.copy()
+        # Vendor baseline: derived from completed vendor location checks, not received items.
+        # "Purchase Lacerator" checked → lacerator was bought → show as already purchased.
+        # This is correct in multiworld where the item received != the item purchased.
+        checked = self.checked_locations | self._locally_checked_locations
+        vendor_weapons: dict[str, int] = {}
+        vendor_gadgets: dict[str, int] = {}
+        vendor_mods: dict[str, set[str]] = {}
+        for loc_name, internal in _VENDOR_WEAPON_LOC.items():
+            loc_id = self._location_name_to_id.get(loc_name)
+            if loc_id and loc_id in checked:
+                vendor_weapons[internal] = 1
+        for loc_name, internal in _VENDOR_GADGET_LOC.items():
+            loc_id = self._location_name_to_id.get(loc_name)
+            if loc_id and loc_id in checked:
+                vendor_gadgets[internal] = 1
+        for loc_name, (internal, slot) in _VENDOR_MOD_LOC.items():
+            loc_id = self._location_name_to_id.get(loc_name)
+            if loc_id and loc_id in checked:
+                vendor_mods.setdefault(internal, set()).add(slot)
+        self._gs.tracked_vendor_weapons = vendor_weapons
+        self._gs.tracked_vendor_gadgets = vendor_gadgets
+        self._gs.tracked_vendor_mods = vendor_mods
 
     def _apply_expected_inventory_sync(self, clear_unreceived: bool = False) -> None:
         if not WEAPONS:

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Options import DefaultOnToggle, Range, DeathLink, PerGameCommonOptions, Toggle
+from Options import DeathLink, DefaultOnToggle, PerGameCommonOptions, Range, Toggle
 
 
 class ProgressiveWeapons(Toggle):
@@ -14,12 +14,12 @@ class ProgressiveArmour(Toggle):
 
 
 
-class ArmourSetChecks(Toggle):
+class ArmourSetChecks(DefaultOnToggle):
     """Treat equipping a complete armour set as a location check. Adds 13 locations to the pool."""
     display_name = "Armour Set Checks"
 
 
-class SkillPointsAsChecks(DefaultOnToggle):
+class SkillPointsAsChecks(Toggle):
     """Treat skill point unlocks as location checks. Adds 25 locations to the pool."""
     display_name = "Skill Points as Checks"
 
@@ -40,14 +40,6 @@ class StartingGadgets(Range):
     default = 1
 
 
-class StartingBolts(Range):
-    """Number of bolts the player begins the game with."""
-    display_name = "Starting Bolts"
-    range_start = 0
-    range_end = 100_000
-    default = 0
-
-
 class DeathAmnesty(Range):
     """Number of deaths allowed before items are removed from the player's inventory on death.
     Higher values are more forgiving."""
@@ -57,14 +49,22 @@ class DeathAmnesty(Range):
     default = 0
 
 
+class StartingBolts(Range):
+    """Number of bolts the player begins the game with."""
+    display_name = "Starting Bolts"
+    range_start = 0
+    range_end = 100_000
+    default = 0
+
+
 @dataclass
 class RACSizeMatterOptions(PerGameCommonOptions):
     progressive_weapons: ProgressiveWeapons
     progressive_armour: ProgressiveArmour
     death_link: DeathLink
+    death_amnesty: DeathAmnesty
     skill_points_as_checks: SkillPointsAsChecks
     armour_set_checks: ArmourSetChecks
     starting_weapons: StartingWeapons
     starting_gadgets: StartingGadgets
     starting_bolts: StartingBolts
-    death_amnesty: DeathAmnesty
