@@ -14,15 +14,23 @@ class ProgressiveArmour(Toggle):
 
 
 
-class ClankChallenges(Toggle):
-    """Include Clank challenge arenas as location checks. Adds 9 locations and makes
-    challenge-exclusive items (Polarizer, Shrink Ray, and several armour pieces) accessible."""
+class ClankChallenges(Choice):
+    """Controls how Clank challenge arenas are included as location checks.
+    item_challenges: only the armour/gadget reward for each challenge arena (default).
+    all_challenges: every individual challenge completion is a separate check."""
     display_name = "Clank Challenges"
+    option_off             = 0
+    option_item_challenges = 1
+    option_all_challenges  = 2
+    default = 1
 
 
-class SkyboardChallenges(Toggle):
-    """Include Skyboard race challenges as location checks."""
-    display_name = "Skyboard Challenges"
+
+
+class VendorModsRandomized(DefaultOnToggle):
+    """Include vendor mod purchases as randomized location checks.
+    When off, mods can be bought freely at vendors without AP involvement."""
+    display_name = "Vendor Mods Randomized"
 
 
 class ArmourSetChecks(DefaultOnToggle):
@@ -81,7 +89,7 @@ class RACSizeMatterOptions(PerGameCommonOptions):
     death_link: DeathLink
     death_amnesty: DeathAmnesty
     clank_challenges: ClankChallenges
-    skyboard_challenges: SkyboardChallenges
+    vendor_mods_randomized: VendorModsRandomized
     skill_points_as_checks: SkillPointsAsChecks
     armour_set_checks: ArmourSetChecks
     starting_weapons: StartingWeapons

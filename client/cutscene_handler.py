@@ -7,6 +7,7 @@ from NetUtils import ClientStatus
 from ..core.data import (
     CUTSCENE_BEFORE_SPROUT_O_MATIC,
     CUTSCENES,
+    ELECTROSHOCK_GLOVES_CUTSCENE,
     ENTER_CUTSCENES,
     SPROUT_O_MATIC_CUTSCENE,
     Planets,
@@ -45,6 +46,15 @@ class CutsceneHandlerMixin:
             self._prev_ryllus_enter = None
             self._prev_before_sprout_cutscene = None
             self._prev_sprout_cutscene = None
+
+        if planet == Planets.METALIS.planet_id:
+            electroshock_val = self.pine.read_int32(ELECTROSHOCK_GLOVES_CUTSCENE)
+            if self._prev_electroshock_cutscene is not None \
+                    and self._prev_electroshock_cutscene != 0 and electroshock_val == 0:
+                self._append_location(new_checks, "Metalis Electroshock Gloves", "Cutscene")
+            self._prev_electroshock_cutscene = electroshock_val
+        else:
+            self._prev_electroshock_cutscene = None
 
     async def _send_goal_status(self) -> None:
         if not self.finished_game:

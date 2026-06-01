@@ -33,7 +33,8 @@ ARMOUR_PICKUPS: list[ArmourPickup] = [
     ArmourPickup("sludge",   ArmourPiece.CHESTPLATE, "Kalidon Sludge Mk9 Chestplate",  "Kalidon"),
     ArmourPickup("wildfire", ArmourPiece.BOOTS,      "Kalidon Wildfire Boots",         "Kalidon"),
     # Metalis
-    ArmourPickup("electroshock", ArmourPiece.GLOVES, "Metalis Electroshock Gloves",    "Metalis"),
+    # ArmourPickup("electroshock", ArmourPiece.GLOVES, "Metalis Electroshock Gloves",
+    #              "Metalis"),  # currently unreachable
     # Dreamtime
     ArmourPickup("crystallix", ArmourPiece.CHESTPLATE, "Dreamtime Crystallix Chestplate", "Dreamtime"),
     # Outpost Omega
@@ -44,7 +45,8 @@ ARMOUR_PICKUPS: list[ArmourPickup] = [
     # Dayni Moon
     ArmourPickup("mega_bomb", ArmourPiece.HELMET,    "Dayni Moon Mega Bomb Helmet",    "Dayni Moon"),
     # Inside Clank
-    ArmourPickup("mega_bomb", ArmourPiece.CHESTPLATE, "Inside Clank Mega Bomb Chestplate", "Inside Clank"),
+    # ArmourPickup("mega_bomb", ArmourPiece.CHESTPLATE, "Inside Clank Mega Bomb Chestplate",
+    #              "Inside Clank"),  # cutscene address not yet found
 ]
 
 # (set_key, piece_bitmask) → location name — used by the client to map a

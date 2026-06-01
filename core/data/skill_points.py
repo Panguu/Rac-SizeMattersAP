@@ -31,51 +31,51 @@ class SkillPoint:
 
 SKILL_POINTS: dict[str, SkillPoint] = {
     # Pokitaru
-    "Skill Point Train Faster":                  SkillPoint(0x01,  0, "Pokitaru"),
-    "Skill Point Dont Rock The Boat":            SkillPoint(0x01,  1, "Pokitaru"),
-    "Skill Point Do Cows Get Crabby":            SkillPoint(0x01,  2, "Pokitaru"),
+    "Train Faster (SP)":                  SkillPoint(0x01,  0, "Pokitaru"),
+    "Dont Rock The Boat (SP)":            SkillPoint(0x01,  1, "Pokitaru"),
+    "Do Cows Get Crabby (SP)":            SkillPoint(0x01,  2, "Pokitaru"),
     # Ryllus
-    "Skill Point Bury The Pygmies":              SkillPoint(0x02,  4, "Ryllus"),
-    "Skill Point Lights Camera Action":          SkillPoint(0x02,  5, "Ryllus"),
-    "Skill Point Ship It":                       SkillPoint(0x02,  6, "Ryllus"),
+    "Bury The Pygmies (SP)":              SkillPoint(0x02,  4, "Ryllus"),
+    "Lights Camera Action (SP)":          SkillPoint(0x02,  5, "Ryllus"),
+    "Ship It (SP)":                       SkillPoint(0x02,  6, "Ryllus"),
     # Kalidon
-    "Skill Point Explosive Ordnance Disposal":   SkillPoint(0x03,  8, "Kalidon"),
-    "Skill Point Super Lombax":                  SkillPoint(0x03,  9, "Kalidon"),
-    "Skill Point Be A Cool Skyboarder":          SkillPoint(0x03, 10, "Kalidon"),
+    "Explosive Ordnance Disposal (SP)":   SkillPoint(0x03,  8, "Kalidon"),
+    "Super Lombax (SP)":                  SkillPoint(0x03,  9, "Kalidon"),
+    "Be A Cool Skyboarder (SP)":          SkillPoint(0x03, 10, "Kalidon"),
     # Metalis
-    "Skill Point Shutout":                       SkillPoint(0x04, 12, "Metalis"),
-    "Skill Point Terror of the Skies":           SkillPoint(0x04, 13, "Metalis"),
-    "Skill Point Ultimate Gladiator":            SkillPoint(0x04, 14, "Metalis"),
+    "Shutout (SP)":                       SkillPoint(0x04, 12, "Metalis"),
+    "Terror of the Skies (SP)":           SkillPoint(0x04, 13, "Metalis"),
+    "Ultimate Gladiator (SP)":            SkillPoint(0x04, 14, "Metalis"),
     # Dreamtime
-    "Skill Point Friends Dont Hurt Friends":     SkillPoint(0x05, 16, "Dreamtime"),
-    "Skill Point Night Terrors":                 SkillPoint(0x05, 17, "Dreamtime"),
+    "Friends Dont Hurt Friends (SP)":     SkillPoint(0x05, 16, "Dreamtime"),
+    "Night Terrors (SP)":                 SkillPoint(0x05, 17, "Dreamtime"),
     # Outpost Omega
-    "Be An Awesome Skyboarder":                  SkillPoint(0x06, 20, "Outpost Omega"),
+    "Be An Awesome Skyboarder (SC)":      SkillPoint(0x06, 20, "Outpost Omega"),
     # Challax
-    # "Skill Point Take Them Down A Shock": SkillPoint(0x07, 24, "Challax")
+    # "Take Them Down A Shock (SP)": SkillPoint(0x07, 24, "Challax")
     # Excluded: only one opportunity to complete this in the whole game (bit 24).
-    "Skill Point High Tech Weapons Master":      SkillPoint(0x07, 25, "Challax"),
-    "Skill Point No More Varmints":              SkillPoint(0x07, 26, "Challax"),
+    "High Tech Weapons Master (SP)":      SkillPoint(0x07, 25, "Challax"),
+    "No More Varmints (SP)":              SkillPoint(0x07, 26, "Challax"),
     # Dayni Moon
-    "Skill Point Ultimate Gladiator Dayni Moon": SkillPoint(0x08, 28, "Dayni Moon"),
-    "Skill Point Wool Protest":                  SkillPoint(0x08, 29, "Dayni Moon"),
-    "Skill Point Bouncy Bouncy Bouncy":          SkillPoint(0x08, 30, "Dayni Moon"),
+    "Ultimate Gladiator Dayni Moon (SP)": SkillPoint(0x08, 28, "Dayni Moon"),
+    "Wool Protest (SP)":                  SkillPoint(0x08, 29, "Dayni Moon"),
+    "Bouncy Bouncy Bouncy (SP)":          SkillPoint(0x08, 30, "Dayni Moon"),
     # Inside Clank
-    "Skill Point Not The Shock of Me Now":       SkillPoint(0x09, 32, "Inside Clank"),
-    "Skill Point Ratchet Just Ratchet":          SkillPoint(0x09, 33, "Inside Clank"),
+    "Not The Shock of Me Now (SP)":       SkillPoint(0x09, 32, "Inside Clank"),
+    "Ratchet Just Ratchet (SP)":          SkillPoint(0x09, 33, "Inside Clank"),
     # Quodrona
-    "Skill Point Elite Annihilation":            SkillPoint(0x0A, 36, "Quodrona"),
-    "Skill Point Storm The Front":               SkillPoint(0x0A, 37, "Quodrona"),
+    "Elite Annihilation (SP)":            SkillPoint(0x0A, 36, "Quodrona"),
+    "Storm The Front (SP)":               SkillPoint(0x0A, 37, "Quodrona"),
 }
 
 CHALLENGE_SKILL_POINTS: frozenset[str] = frozenset({
-    "Skill Point Be A Cool Skyboarder",
-    "Skill Point Shutout",
-    "Skill Point Terror of the Skies",
-    "Skill Point Ultimate Gladiator",
-    "Skill Point Ultimate Gladiator Dayni Moon",
-    "Be An Awesome Skyboarder",
-    "Skill Point No More Varmints",
+    "Be A Cool Skyboarder (SP)",
+    "Shutout (SP)",
+    "Terror of the Skies (SP)",
+    "Ultimate Gladiator (SP)",
+    "Ultimate Gladiator Dayni Moon (SP)",
+    "Be An Awesome Skyboarder (SC)",
+    "No More Varmints (SP)",
 })
 
 # (planet_id, mask) → location name — mirrors BOLT_BY_PLANET_AND_DELTA

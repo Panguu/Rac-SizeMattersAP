@@ -6,7 +6,6 @@ from BaseClasses import Item, ItemClassification, Location, Tutorial
 
 from worlds.AutoWorld import WebWorld, World
 
-from .core.data.challenges import CHALLENGE_ONLY_ITEMS
 from .items import (
     ALL_ITEMS,
     ARMOUR_ITEM_TABLE,
@@ -92,29 +91,20 @@ class RACSizeMatterWorld(World):
 
     def create_items(self) -> None:
         pool: list[str] = []
-        challenges_on = bool(self.options.clank_challenges)
-
         if self.options.progressive_weapons:
             for display, steps in WEAPON_PROGRESSIVE_STEPS.items():
                 pool += [f"{display} Progressive Weapon"] * steps
         else:
             pool += list(WEAPON_ITEM_TABLE)
 
-        gadgets = [n for n in GADGET_ITEM_TABLE if challenges_on or n not in CHALLENGE_ONLY_ITEMS]
-        pool += gadgets
-
+        pool += list(GADGET_ITEM_TABLE)
         pool += list(INFOBOT_ITEM_TABLE)
 
         if self.options.progressive_armour:
-            _ARMOUR_PIECES = ("Chestplate", "Helmet", "Gloves", "Boots")
             for display, _ in ARMOUR_SETS:
-                steps = sum(
-                    1 for piece in _ARMOUR_PIECES
-                    if challenges_on or f"{display} {piece}" not in CHALLENGE_ONLY_ITEMS
-                )
-                pool += [f"{display} Progressive Pickup"] * steps
+                pool += [f"{display} Progressive Pickup"] * 4
         else:
-            pool += [n for n in ARMOUR_ITEM_TABLE if challenges_on or n not in CHALLENGE_ONLY_ITEMS]
+            pool += list(ARMOUR_ITEM_TABLE)
 
         # Fill any remaining slots (e.g. when skill_points_as_checks adds locations)
         unfilled = len(self.multiworld.get_unfilled_locations(self.player))
@@ -159,8 +149,8 @@ class RACSizeMatterWorld(World):
     def fill_slot_data(self) -> dict[str, Any]:
         return {
             "death_link": bool(self.options.death_link.value),
-            "clank_challenges": bool(self.options.clank_challenges.value),
-            "skyboard_challenges": bool(self.options.skyboard_challenges.value),
+            "clank_challenges": self.options.clank_challenges.value,
+            "vendor_mods_randomized": bool(self.options.vendor_mods_randomized.value),
             "skill_points_as_checks": self.options.skill_points_as_checks.value,
             "armour_set_checks": bool(self.options.armour_set_checks.value),
             "starting_bolts": self.options.starting_bolts.value,

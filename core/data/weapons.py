@@ -9,11 +9,10 @@ WEAPON_MOD_COUNTS: dict[str, int] = {
     "acid_bomb_glove": 2,
     "agents_of_doom":  2,
     "bee_mine_glove":  2,
-    "static_barier":   2,
+    "static_barrier":  2,
     "shock_rocket":    3,
-    "spider_mine":     2,
     "sniper_mine":     2,
-    "scorchet":        2,
+    "scorcher":        2,
     "laser_tracer":    2,
     "suck_cannon":     0,
     "mootator":        0,
@@ -158,10 +157,10 @@ WEAPON_ORDER: list[str | None] = [
     "acid_bomb_glove",  # slot  2
     "agents_of_doom",   # slot  3
     "bee_mine_glove",   # slot  4
-    "static_barier",    # slot  5
+    "static_barrier",   # slot  5
     "shock_rocket",     # slot  6
     "sniper_mine",      # slot  7
-    "scorchet",         # slot  8
+    "scorcher",         # slot  8
     "laser_tracer",     # slot  9
     "suck_cannon",      # slot 10
     "mootator",         # slot 11

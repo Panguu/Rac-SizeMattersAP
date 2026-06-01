@@ -16,6 +16,7 @@ from CommonClient import logger
 
 from ..core.challenge import ChallengePoller
 from ..core.data import PLANET_STATE_ADDRESSES, PLAYER_STATE, SKILL_POINT_ADDRESS
+from ..core.data.controller import ButtonState
 from ..core.memory import (
     ARMOUR_ADDRESSES,
     BOLTS,
@@ -23,6 +24,7 @@ from ..core.memory import (
     Int64State,
     MemoryItemState,
 )
+from ..core.skyboard import SkyboardPoller
 from ..core.state import GameState
 from ..core.vendor import VendorPoller, VendorSession
 from ..locations import ALL_LOCATIONS
@@ -52,6 +54,17 @@ class RACCommandProcessor(ClientCommandProcessor):
     def _cmd_scan(self) -> bool:
         """Force a fresh weapon array scan."""
         asyncio.create_task(self.ctx.rescan_weapons())
+        return True
+
+    def _cmd_button_debug(self) -> bool:
+        """Read and log the current controller button state."""
+        ctx = self.ctx
+        if not ctx.pine_connected:
+            logger.info("[RAC] Not connected to PPSSPP.")
+            return False
+        btn = ButtonState.read(ctx.pine)
+        logger.info(f"[RAC] Pause/Select buttons : {btn.pause_sel!r}  (raw {int(btn.pause_sel):#04x})")
+        logger.info(f"[RAC] Controller buttons   : {btn.buttons!r}  (raw {int(btn.buttons):#04x})")
         return True
 
     def _cmd_debug(self) -> bool:
@@ -125,6 +138,7 @@ class RACContext(
         self._prev_ryllus_enter: int | None = None
         self._prev_before_sprout_cutscene: int | None = None
         self._prev_sprout_cutscene: int | None = None
+        self._prev_electroshock_cutscene: int | None = None
         self._state_addr = PLAYER_STATE
 
         self._armour_pickup_state = MemoryItemState(
@@ -176,12 +190,14 @@ class RACContext(
             vendor_session=VendorSession(log=self._log, on_purchase=self._on_vendor_purchase),
         )
         self._gs.on_vendor_close = self._on_vendor_close_sync
-        self._vendor_poller = VendorPoller(self._gs, log=self._log)
+        self._vendor_poller   = VendorPoller(self._gs, log=self._log)
+        self._skyboard_poller = SkyboardPoller(log=self._log)
         self._challenge_poller = ChallengePoller(log=self._log)
 
         self._death_link_enabled = False
         self._last_death_link = 0.0
         self._debug_messages = False
+        self._challenge_defaults_written = False
 
     def _log(self, msg: str, level: str = "info") -> None:
         if not self._debug_messages:
@@ -204,6 +220,8 @@ class RACContext(
             self.slot_data = args.get("slot_data", {})
             self._death_link_enabled = bool(self.slot_data.get("death_link", False))
             self._armour_set_checks_enabled = bool(self.slot_data.get("armour_set_checks", False))
+            self._challenge_poller.set_mode(int(self.slot_data.get("clank_challenges", 1)))
+            self._gs.vendor_session.mods_randomized = bool(self.slot_data.get("vendor_mods_randomized", True))
             if self._death_link_enabled:
                 asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": ["DeathLink"]}]))
             self._pending_item_apply = True

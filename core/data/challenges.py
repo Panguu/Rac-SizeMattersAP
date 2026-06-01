@@ -1,11 +1,19 @@
-"""Clank challenge arenas — optional location checks gated by the Clank Challenges option.
+"""Clank challenge arenas — location checks gated by the Clank Challenges option.
 
-Each challenge has a dedicated memory address that goes from 0 to 1+ when completed.
-All addresses are 0x00 until confirmed.
+item_challenges (1): only the armour/gadget reward locations (CHALLENGE_PICKUPS).
+all_challenges  (2): every individual challenge completion is also a location.
 """
 from __future__ import annotations
 
+from enum import IntFlag
 from typing import NamedTuple
+
+from .addresses import (
+    DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR,
+    KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR,
+    METALIS_CLANK_CHALLENGES_COMPLETED_ADDR,
+    OUTPOST_OMEGA_SKYBOARD_CHALLENGES_COMPLETED_ADDR,
+)
 
 
 class ChallengePickup(NamedTuple):
@@ -14,48 +22,97 @@ class ChallengePickup(NamedTuple):
     planet:  str   # AP region name
 
 
+class SkyboardPickup(NamedTuple):
+    unlock_addr:    int           # write 1 here at first planet load to unlock the challenge
+    completed_addr: int           # poll this for completion bitmask; 0x00 = not yet confirmed
+    mask:           SkyboardBit # bit set in completed_addr when this race finishes
+    name:           str           # AP location name
+    planet:         str           # AP region name
+
+
+class SkyboardBit(IntFlag):
+    RACE_1 = 0x01
+    RACE_2 = 0x04
+    RACE_3 = 0x10
+    RACE_4 = 0x40
+
+
+# ── Reward locations (item_challenges + all_challenges) ───────────────────────
 CHALLENGE_PICKUPS: list[ChallengePickup] = [
-    ChallengePickup(0x00, "Kalidon Sludge Mk9 Gloves",        "Kalidon"),
-    ChallengePickup(0x00, "Metalis Sludge Mk9 Helmet",        "Metalis"),
-    ChallengePickup(0x00, "Metalis Crystallix Helmet",         "Metalis"),
-    ChallengePickup(0x00, "Metalis Crystallix Gloves",         "Metalis"),
-    ChallengePickup(0x00, "Metalis Polarizer",                 "Metalis"),
-    ChallengePickup(0x00, "Dayni Moon Mega Bomb Gloves",       "Dayni Moon"),
-    ChallengePickup(0x00, "Dayni Moon Mega Bomb Boots",        "Dayni Moon"),
-    ChallengePickup(0x00, "Outpost Omega Electroshock Boots",  "Outpost Omega"),
+    # Metalis — each address is the completion flag for the named challenge
+    ChallengePickup(0x1F4B3DE, "Metalis Polarizer (CC)",            "Metalis"),   # Buzzsaw Blitz
+    ChallengePickup(0x1F4B3E2, "Metalis Crystallix Helmet (CC)",    "Metalis"),   # Smasherbot's Revenge
+    ChallengePickup(0x1F4B3E7, "Metalis Crystallix Gloves (CC)",    "Metalis"),   # The Uber Finals
+    ChallengePickup(0x1F4B3EC, "Metalis Sludge Mk9 Helmet (CC)",    "Metalis"),   # Nigh Impossible
+    # Dayni Moon
+    ChallengePickup(0x1F4B3FF, "Dayni Moon Mega Bomb Gloves (CC)",  "Dayni Moon"),  # The Ultimate Showdown
+    ChallengePickup(0x1F4B404, "Dayni Moon Mega Bomb Boots (CC)",   "Dayni Moon"),  # Infinite Improbability
+    # Outpost Omega — detected via SkyboardPoller (Vertigo completion)
+    # ChallengePickup(0x00, "Outpost Omega Electroshock Boots (CC)", "Outpost Omega"),
 ]
 
-# address → location name; excludes 0x00 placeholders — populated as addresses are confirmed
+# Reward address map (used by item_challenges and for _append_location lookup)
 CHALLENGE_ADDRESS_MAP: dict[int, str] = {
     cp.address: cp.name
     for cp in CHALLENGE_PICKUPS
     if cp.address != 0
 }
 
-SKYBOARD_CHALLENGE_PICKUPS: list[ChallengePickup] = [
-    # Kalidon skyboard races
-    ChallengePickup(0x00, "Kalidon Learner's Permit",   "Kalidon"),
-    ChallengePickup(0x00, "Kalidon Speeding Ticket",    "Kalidon"),
-    ChallengePickup(0x00, "Kalidon Tricky Air",         "Kalidon"),
-    ChallengePickup(0x00, "Kalidon Master's Challenge", "Kalidon"),
-    # Outpost Omega skyboard races
-    ChallengePickup(0x00, "Outpost Omega Interior Decorating",   "Outpost Omega"),
-    ChallengePickup(0x00, "Outpost Omega Danger High Voltage",   "Outpost Omega"),
-    ChallengePickup(0x00, "Outpost Omega The Vortex",            "Outpost Omega"),
-    ChallengePickup(0x00, "Outpost Omega Vertigo",               "Outpost Omega"),
+# ── Individual completion locations (all_challenges only) ─────────────────────
+METALIS_CLANK_PICKUPS: list[ChallengePickup] = [
+    ChallengePickup(addr, f"Metalis {name} (CC)", "Metalis")
+    for name, addr in METALIS_CLANK_CHALLENGES_COMPLETED_ADDR.items()
 ]
 
-# Skyboard address map — populated once addresses are confirmed
-SKYBOARD_ADDRESS_MAP: dict[int, str] = {
+DAYNI_MOON_CLANK_PICKUPS: list[ChallengePickup] = [
+    ChallengePickup(addr, f"Dayni Moon {name} (CC)", "Dayni Moon")
+    for name, addr in DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR.items()
+]
+
+# All individual + reward addresses — used for initialization and all_challenges polling
+ALL_CLANK_ADDRESS_MAP: dict[int, str] = {
     cp.address: cp.name
-    for cp in SKYBOARD_CHALLENGE_PICKUPS
+    for cp in (CHALLENGE_PICKUPS + METALIS_CLANK_PICKUPS + DAYNI_MOON_CLANK_PICKUPS)
     if cp.address != 0
 }
 
-# Items only obtainable via challenges; excluded from the item pool when Clank Challenges is off
+# ── Skyboard challenge pickups ────────────────────────────────────────────────
+KALIDON_SKYBOARD_PICKUPS: list[SkyboardPickup] = [
+    SkyboardPickup(unlock_addr, completed_addr, SkyboardBit(mask), f"Kalidon {name} (SC)", "Kalidon")
+    for name, (unlock_addr, completed_addr, mask) in KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR.items()
+]
+
+# Vertigo (last race) is the condition for Outpost Omega Electroshock Boots
+_OO_SKYBOARD_NAMES: dict[str, str] = {
+    "Interior Decorating": "Outpost Omega Interior Decorating (SC)",
+    "Danger, High Voltage": "Outpost Omega Danger, High Voltage (SC)",
+    "The Vortex":           "Outpost Omega The Vortex (SC)",
+    "Vertigo":              "Outpost Omega Electroshock Boots (CC)",
+}
+
+OUTPOST_OMEGA_SKYBOARD_PICKUPS: list[SkyboardPickup] = [
+    SkyboardPickup(unlock_addr, completed_addr, SkyboardBit(mask),
+                   _OO_SKYBOARD_NAMES[name], "Outpost Omega")
+    for name, (unlock_addr, completed_addr, mask) in OUTPOST_OMEGA_SKYBOARD_CHALLENGES_COMPLETED_ADDR.items()
+]
+
+ALL_SKYBOARD_PICKUPS: list[SkyboardPickup] = KALIDON_SKYBOARD_PICKUPS + OUTPOST_OMEGA_SKYBOARD_PICKUPS
+
+# (completed_addr, mask) → location name — used by SkyboardPoller
+SKYBOARD_ADDRESS_MASK_MAP: dict[tuple[int, int], str] = {
+    (sp.completed_addr, int(sp.mask)): sp.name
+    for sp in ALL_SKYBOARD_PICKUPS
+    if sp.completed_addr != 0
+}
+
+# Unique unlock addresses — written to at first planet load
+SKYBOARD_UNLOCK_ADDRESSES: list[int] = list({
+    sp.unlock_addr for sp in ALL_SKYBOARD_PICKUPS if sp.unlock_addr != 0
+})
+
+# ── Challenge-only AP items ───────────────────────────────────────────────────
 CHALLENGE_ONLY_ITEMS: frozenset[str] = frozenset({
     "Polarizer",
-    "Sludge Mk9 Gloves",
     "Sludge Mk9 Helmet",
     "Crystallix Helmet",
     "Crystallix Gloves",

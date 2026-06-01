@@ -10,6 +10,7 @@ from ..core.data import (
     BOLT_PICKUP_MASK,
     CURRENT_PLANET_ADDRESS,
     CUTSCENE_BEFORE_SPROUT_O_MATIC,
+    ELECTROSHOCK_GLOVES_CUTSCENE,
     ENTER_CUTSCENES,
     INFOBOT_UNLOCK_VALUE,
     LOCATION_SKILL_POINTS,
@@ -101,6 +102,8 @@ class PineMixin:
             self._log(f"[RAC] Initial state read failed: {exc}", "warning")
 
     def _read_initial_state_sync(self) -> None:
+        self._challenge_defaults_written = False
+        self._challenge_poller.initialize()
         self._prev_skill_points = self.pine.read_int64(SKILL_POINT_ADDRESS)
         self._prev_bolt_pickup = self.pine.read_int64(BOLTS.pickup) & BOLT_PICKUP_MASK
         self._prev_planet = self.pine.read_int8(CURRENT_PLANET_ADDRESS)
@@ -113,6 +116,8 @@ class PineMixin:
             self._prev_ryllus_enter = self.pine.read_int32(ENTER_CUTSCENES["ryllus"])
             self._prev_before_sprout_cutscene = self.pine.read_int32(CUTSCENE_BEFORE_SPROUT_O_MATIC)
             self._prev_sprout_cutscene = self.pine.read_int32(SPROUT_O_MATIC_CUTSCENE)
+        if self._prev_planet == Planets.METALIS.planet_id:
+            self._prev_electroshock_cutscene = self.pine.read_int32(ELECTROSHOCK_GLOVES_CUTSCENE)
         self._gs.current_planet = self._prev_planet
         self._gs.state_addr = self._state_addr
         self._gs.is_dead = _dead(self._prev_player_state)
@@ -121,6 +126,7 @@ class PineMixin:
         self._gs.is_in_menu = False
         self._gs.tracked_vendor = self._prev_planet if self._on_known_planet else None
         arm_cutscenes(self.pine, self._prev_planet, "armed")
+        self._skyboard_poller.initialize(self.pine)
         self._apply_player_inventory_sync()
         self._apply_world_states_sync()
 
@@ -174,6 +180,11 @@ class PineMixin:
             arm_cutscenes(self.pine, planet, "armed")
             self._prev_bolt_pickup = self.pine.read_int64(BOLTS.pickup) & BOLT_PICKUP_MASK
             logger.info(f"[RAC] Planet loaded: {self.current_planet}")
+            if not self._challenge_defaults_written:
+                self._challenge_poller.write_defaults(self.pine)
+                self._skyboard_poller.write_defaults(self.pine)
+                self._challenge_defaults_written = True
+                logger.info("[RAC] Challenge and skyboard addresses initialised.")
             if self._on_known_planet:
                 load_weapons_for_planet(planet)
                 self._gs.weapons_ready = True
@@ -229,6 +240,7 @@ class PineMixin:
 
         self._vendor_poller.tick(self.pine)
         self._challenge_poller.tick(self.pine, new_checks, self._append_location)
+        self._skyboard_poller.tick(self.pine, new_checks, self._append_location)
 
         for loc_name in self._pending_vendor_checks:
             self._append_location(new_checks, loc_name, "Vendor purchase")
@@ -242,13 +254,18 @@ class PineMixin:
 
     def _append_location(self, checks: list[int], name: str, kind: str) -> None:
         loc_id = self._location_name_to_id.get(name)
-        if loc_id is None or loc_id in self._locally_checked_locations or loc_id in self.checked_locations:
+        if loc_id is None:
+            logger.warning(f"[RAC] {kind}: unknown location {name!r} — not in location table")
+            return
+        if loc_id in self._locally_checked_locations or loc_id in self.checked_locations:
             return
         server_locations = getattr(self, "server_locations", None)
         if server_locations and loc_id not in server_locations:
+            logger.warning(f"[RAC] {kind}: {name!r} (id={loc_id}) not in server locations"
+                           " — was game generated with the current options?")
             return
         checks.append(loc_id)
-        self._log(f"[RAC] {kind} checked: {name}")
+        logger.info(f"[RAC] {kind} checked: {name}")
 
     async def _check_locations(self, locations: list[int]) -> None:
         unique_locations = set(locations) - self._locally_checked_locations

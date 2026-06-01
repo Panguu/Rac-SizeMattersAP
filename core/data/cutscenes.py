@@ -35,8 +35,11 @@ ENTER_CUTSCENES: dict[str, int] = {
 CUTSCENE_BEFORE_SPROUT_O_MATIC: int = 0x5A7904
 SPROUT_O_MATIC_CUTSCENE:        int = 0x5A6EA8
 
+ELECTROSHOCK_GLOVES_CUTSCENE: int = 0x1CE9C0
+
 CUTSCENES: list[Cutscene] = [
-    Cutscene("End Boss", planet_id=0x0A, address=0x3D7FC8, kind="goal"),
+    Cutscene("End Boss",             planet_id=0x0A, address=0x3D7FC8,  kind="goal"),
+    Cutscene("Electroshock Gloves",  planet_id=0x04, address=0x1CE9C0,  kind="pickup"),
 ]
 
 # pokitaru

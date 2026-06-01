@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 from .core.data.armour_pickups import ARMOUR_PICKUPS
-from .core.data.challenges import CHALLENGE_PICKUPS
+from .core.data.challenges import CHALLENGE_PICKUPS, DAYNI_MOON_CLANK_PICKUPS, METALIS_CLANK_PICKUPS
 from .core.data.skill_points import SKILL_POINTS
 from .core.data.titanium_bolts import TITANIUM_BOLTS
 
@@ -95,12 +95,23 @@ ARMOUR_SET_CHECK_LOCATIONS: dict[str, RACLocationData] = {
 }
 
 GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
-    "Ryllus Sprout-O-Matic": RACLocationData(BASE_ID + 1401, "Ryllus"),
+    "Ryllus Sprout-O-Matic":            RACLocationData(BASE_ID + 1401, "Ryllus"),
+    "Kalidon Learner's Permit (SC)":    RACLocationData(BASE_ID + 1402, "Kalidon"),
+    "Kalidon Speeding Ticket (SC)":     RACLocationData(BASE_ID + 1403, "Kalidon"),
+    "Kalidon Tricky Air (SC)":          RACLocationData(BASE_ID + 1404, "Kalidon"),
+    "Kalidon Master's Challenge (SC)":  RACLocationData(BASE_ID + 1405, "Kalidon"),
+    "Metalis Electroshock Gloves":      RACLocationData(BASE_ID + 1406, "Metalis"),
 }
 
 CHALLENGE_LOCATIONS: dict[str, RACLocationData] = {
     cp.name: RACLocationData(BASE_ID + 1600 + idx, cp.planet)
     for idx, cp in enumerate(CHALLENGE_PICKUPS, start=1)
+}
+
+_ALL_CLANK_PICKUPS = METALIS_CLANK_PICKUPS + DAYNI_MOON_CLANK_PICKUPS
+ALL_CLANK_LOCATIONS: dict[str, RACLocationData] = {
+    cp.name: RACLocationData(BASE_ID + 1700 + idx, cp.planet)
+    for idx, cp in enumerate(_ALL_CLANK_PICKUPS, start=1)
 }
 
 ALL_LOCATIONS: dict[str, RACLocationData] = {
@@ -114,6 +125,7 @@ ALL_LOCATIONS: dict[str, RACLocationData] = {
     **WEAPON_MOD_VENDOR_LOCATIONS,
     **ARMOUR_SET_CHECK_LOCATIONS,
     **CHALLENGE_LOCATIONS,
+    **ALL_CLANK_LOCATIONS,
 }
 
 LOCATION_ID_TO_NAME: dict[int, str] = {data.code: name for name, data in ALL_LOCATIONS.items()}

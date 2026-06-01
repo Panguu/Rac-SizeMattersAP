@@ -6,6 +6,7 @@ from BaseClasses import Region
 
 from .core.data.skill_points import CHALLENGE_SKILL_POINTS
 from .locations import (
+    ALL_CLANK_LOCATIONS,
     ARMOUR_PICKUP_LOCATIONS,
     ARMOUR_SET_CHECK_LOCATIONS,
     BOSS_LOCATIONS,
@@ -54,10 +55,12 @@ def create_regions(world: RACSizeMatterWorld) -> None:
         GADGET_PICKUP_LOCATIONS,
         WEAPON_VENDOR_LOCATIONS,
         GADGET_VENDOR_LOCATIONS,
-        WEAPON_MOD_VENDOR_LOCATIONS,
     ]
-    if world.options.clank_challenges:
-        location_tables.append(CHALLENGE_LOCATIONS)
+    if world.options.vendor_mods_randomized:
+        location_tables.append(WEAPON_MOD_VENDOR_LOCATIONS)
+    location_tables.append(CHALLENGE_LOCATIONS)
+    if world.options.clank_challenges.value >= 2:
+        location_tables.append(ALL_CLANK_LOCATIONS)
     sp_opt = world.options.skill_points_as_checks.value
     if sp_opt == 1:
         location_tables.append({
@@ -80,11 +83,7 @@ def create_regions(world: RACSizeMatterWorld) -> None:
     victory_loc.place_locked_item(world.create_event("Victory"))
     quodrona.locations.append(victory_loc)
 
-    menu_region.connect(planet_regions["Pokitaru"], "To Pokitaru")
-    for i in range(len(PLANET_NAMES) - 1):
-        planet_regions[PLANET_NAMES[i]].connect(
-            planet_regions[PLANET_NAMES[i + 1]],
-            f"To {PLANET_NAMES[i + 1]}",
-        )
+    for planet in PLANET_NAMES:
+        menu_region.connect(planet_regions[planet], f"To {planet}")
 
     multiworld.regions += [menu_region, *planet_regions.values()]

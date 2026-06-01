@@ -3,6 +3,7 @@ from typing import NamedTuple
 from BaseClasses import ItemClassification
 
 from .core.data import WEAPON_MOD_COUNTS
+from .core.data.infobots import INFOBOT_ITEM_TO_PLANET
 
 BASE_ID = 77_700_000
 
@@ -18,10 +19,10 @@ WEAPON_DISPLAY_TO_INTERNAL: dict[str, str] = {
     "Acid Bomb Glove": "acid_bomb_glove",
     "Agents of Doom":  "agents_of_doom",
     "Bee Mine Glove":  "bee_mine_glove",
-    "Static Barrier":  "static_barier",
+    "Static Barrier":  "static_barrier",
     "Shock Rocket":    "shock_rocket",
     "Sniper Mine":     "sniper_mine",
-    "Scorcher":        "scorchet",
+    "Scorcher":        "scorcher",
     "Laser Tracer":    "laser_tracer",
     "Suck Cannon":     "suck_cannon",
     "Mootator":        "mootator",
@@ -138,8 +139,6 @@ ARMOUR_PROGRESSIVE_ITEM_TABLE: dict[str, RACItemData] = {
 FILLER_ITEM_TABLE: dict[str, RACItemData] = {
     "Bolts": RACItemData(BASE_ID + 400, ItemClassification.filler),
 }
-
-from .core.data.infobots import INFOBOT_ITEM_TO_PLANET
 
 INFOBOT_ITEM_TABLE: dict[str, RACItemData] = {
     name: RACItemData(BASE_ID + 500 + idx, ItemClassification.progression)

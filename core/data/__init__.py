@@ -10,15 +10,16 @@ __all__ = [
     "TitaniumBoltAddresses",
     # raw addresses
     "ARMOUR_BASE", "TITANIUM_BOLT_BASE", "CHEATS",
-    "CURRENT_PLANET_ADDRESS", "PLAYER_BOLT_COUNT", "PLANET_LOAD_ADDRESS",
+    "BOLT_PICKUP_MASK", "CURRENT_PLANET_ADDRESS", "PLAYER_BOLT_COUNT", "PLANET_LOAD_ADDRESS",
     "PLAYER_ADDRS", "PLAYER_STATE", "PLAYER_HEALTH",
-    "MENU_ADDR_BY_PLANET_ID", "PRELOAD_MENU_ADDR_BY_PLANET_ID",
+    "MENU_ADDR_BY_PLANET_ID", "PRELOAD_MENU_ADDR_BY_PLANET_ID", "WEAPON_ARRAY_BASE_BY_PLANET",
     "DisplayedTextBox", "TextBoxDisplayAddrs",
     # planets
     "Planet", "Planets", "BY_ID",
     # cutscenes
     "Cutscene", "arm_cutscenes",
-    "ENTER_CUTSCENES", "CUTSCENE_BEFORE_SPROUT_O_MATIC", "SPROUT_O_MATIC_CUTSCENE", "CUTSCENES",
+    "ENTER_CUTSCENES", "CUTSCENE_BEFORE_SPROUT_O_MATIC", "SPROUT_O_MATIC_CUTSCENE",
+    "ELECTROSHOCK_GLOVES_CUTSCENE", "CUTSCENES",
     # skill points
     "SkillPoint", "SKILL_POINT_ADDRESS", "SKILL_POINTS", "LOCATION_SKILL_POINTS", "SKILL_POINT_BY_PLANET_AND_MASK",
     "CHALLENGE_SKILL_POINTS",
@@ -28,6 +29,7 @@ __all__ = [
     "ArmourPickup", "ARMOUR_PICKUPS", "ARMOUR_FLAG_TO_LOCATION",
     # challenges
     "ChallengePickup", "CHALLENGE_PICKUPS", "CHALLENGE_ADDRESS_MAP", "CHALLENGE_ONLY_ITEMS",
+    "METALIS_CLANK_PICKUPS", "DAYNI_MOON_CLANK_PICKUPS", "ALL_CLANK_ADDRESS_MAP",
     # armour set checks
     "ArmourSets", "ArmourSetCheck", "ARMOUR_SET_CHECKS",
     # player states
@@ -40,6 +42,7 @@ __all__ = [
 # ── Raw addresses ──────────────────────────────────────────────────────────────
 from .addresses import (
     ARMOUR_BASE,
+    BOLT_PICKUP_MASK,
     CHEATS,
     CURRENT_PLANET_ADDRESS,
     MENU_ADDR_BY_PLANET_ID,
@@ -50,6 +53,7 @@ from .addresses import (
     PLAYER_STATE,
     PRELOAD_MENU_ADDR_BY_PLANET_ID,
     TITANIUM_BOLT_BASE,
+    WEAPON_ARRAY_BASE_BY_PLANET,
     DisplayedTextBox,
     TextBoxDisplayAddrs,
 )
@@ -62,12 +66,21 @@ from .armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPicku
 from .armour_set_checks import ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
 
 # ── Challenges ────────────────────────────────────────────────────────────────
-from .challenges import CHALLENGE_ADDRESS_MAP, CHALLENGE_ONLY_ITEMS, CHALLENGE_PICKUPS, ChallengePickup
+from .challenges import (
+    ALL_CLANK_ADDRESS_MAP,
+    CHALLENGE_ADDRESS_MAP,
+    CHALLENGE_ONLY_ITEMS,
+    CHALLENGE_PICKUPS,
+    DAYNI_MOON_CLANK_PICKUPS,
+    METALIS_CLANK_PICKUPS,
+    ChallengePickup,
+)
 
 # ── Cutscenes ─────────────────────────────────────────────────────────────────
 from .cutscenes import (
     CUTSCENE_BEFORE_SPROUT_O_MATIC,
     CUTSCENES,
+    ELECTROSHOCK_GLOVES_CUTSCENE,
     ENTER_CUTSCENES,
     SPROUT_O_MATIC_CUTSCENE,
     Cutscene,

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import IntEnum
 
 from CommonClient import logger
 
 from ..pypine.pypine.pine import Pine
-from .data import BY_ID, WEAPON_MOD_COUNTS, TextBoxDisplayAddrs
+from .data import WEAPON_MOD_COUNTS, TextBoxDisplayAddrs
 from .memory import GADGETS, WEAPONS, MemoryItemState, restore_tracked_weapon_state, zero_weapon
+from .menu_state import MenuState, MenuStateValue
 
 _TEXTBOX_BY_PLANET: dict[int, object] = {tb.planet_id: tb for tb in TextBoxDisplayAddrs}
 
@@ -16,11 +16,6 @@ _MOD_SLOT_ATTRS = ("mod_slot_one", "mod_slot_two", "mod_slot_three")
 _SLOT_NAMES = {1: "one", 2: "two", 3: "three"}
 
 from .state import GameState
-
-
-class VendorMenuState(IntEnum):
-    GadgetTron = 0x09
-    ModVendor  = 0x0E
 
 
 def _build_vendor_weapon_addresses() -> dict[str, int]:
@@ -46,11 +41,12 @@ class VendorSession:
     "gadget", or "mod".  This lets the client queue the AP location check
     straight away rather than waiting for the session to close.
     """
-    purchased_weapons: list[str]                              = field(default_factory=list)
-    purchased_gadgets: list[str]                              = field(default_factory=list)
-    purchased_mods:    list[tuple[str, str]]                  = field(default_factory=list)
-    log:               Callable[[str], None]                  = field(default=logger.info, repr=False, compare=False)
-    on_purchase:       Callable[[str, str, str | None], None] | None = field(default=None, repr=False, compare=False)
+    purchased_weapons:  list[str]                              = field(default_factory=list)
+    purchased_gadgets:  list[str]                              = field(default_factory=list)
+    purchased_mods:     list[tuple[str, str]]                  = field(default_factory=list)
+    mods_randomized:    bool                                   = field(default=True)
+    log:                Callable[[str], None]                  = field(default=logger.info, repr=False, compare=False)
+    on_purchase:        Callable[[str, str, str | None], None] | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         self.weapon_state = MemoryItemState({}, name="VendorWeaponState", debug_log=self.log)
@@ -110,14 +106,13 @@ class VendorSession:
             if self.weapon_state.get(name) == 0 and ipc.read_int8(w.unlocked):
                 self._add_weapon(name, gs)
                 self.weapon_state.add(name, 1)
-            # Check mods unconditionally — they live in a separate vendor (ModVendor)
-            # and can never be purchased in the same session as the weapon itself.
-            for i in range(1, WEAPON_MOD_COUNTS.get(name, 0) + 1):
-                attr = _MOD_SLOT_ATTRS[i - 1]
-                if self.weapon_state.get(f"{name}_mod_{i}") == 0 and ipc.read_int8(getattr(w, attr)):
-                    slot = _SLOT_NAMES[i]
-                    self._add_mod(name, slot, gs)
-                    self.weapon_state.add(f"{name}_mod_{i}", 1)
+            if self.mods_randomized:
+                for i in range(1, WEAPON_MOD_COUNTS.get(name, 0) + 1):
+                    attr = _MOD_SLOT_ATTRS[i - 1]
+                    if self.weapon_state.get(f"{name}_mod_{i}") == 0 and ipc.read_int8(getattr(w, attr)):
+                        slot = _SLOT_NAMES[i]
+                        self._add_mod(name, slot, gs)
+                        self.weapon_state.add(f"{name}_mod_{i}", 1)
         for name, g in GADGETS.items():
             if self.gadget_state.get(name) == 0 and ipc.read_int8(g.unlocked):
                 self._add_gadget(name, gs)
@@ -132,11 +127,12 @@ class VendorSession:
                     zero_weapon(ipc, w)
                 else:
                     ipc.write_int8(w.unlocked, 1)
-            for i in range(1, WEAPON_MOD_COUNTS.get(name, 0) + 1):
-                attr = _MOD_SLOT_ATTRS[i - 1]
-                exp_mod = self.weapon_state.get(f"{name}_mod_{i}")
-                if ipc.read_int8(getattr(w, attr)) != exp_mod:
-                    ipc.write_int8(getattr(w, attr), exp_mod)
+            if self.mods_randomized:
+                for i in range(1, WEAPON_MOD_COUNTS.get(name, 0) + 1):
+                    attr = _MOD_SLOT_ATTRS[i - 1]
+                    exp_mod = self.weapon_state.get(f"{name}_mod_{i}")
+                    if ipc.read_int8(getattr(w, attr)) != exp_mod:
+                        ipc.write_int8(getattr(w, attr), exp_mod)
         for name, g in GADGETS.items():
             exp = self.gadget_state.get(name)
             if ipc.read_int8(g.unlocked) != exp:
@@ -181,9 +177,7 @@ class VendorPoller:
 
     def tick(self, ipc: Pine) -> None:
         gs           = self._gs
-        planet_obj   = BY_ID.get(gs.current_planet)
-        menu_addr    = planet_obj.menu_addr if planet_obj else None
-        menu_state   = ipc.read_int8(menu_addr) if menu_addr else 0
+        ms           = MenuState.read(ipc, gs.current_planet)
         textbox      = _TEXTBOX_BY_PLANET.get(gs.current_planet)
         if textbox:
             raw      = ipc.read_int16(textbox.message_str_pointer)
@@ -191,11 +185,11 @@ class VendorPoller:
             is_preloaded = msg_val == textbox.vendor_value and bool(ipc.read_int8(textbox.is_visible))
         else:
             is_preloaded = False
-        is_in_menu    = menu_state in (VendorMenuState.GadgetTron, VendorMenuState.ModVendor)
+        is_in_menu    = ms.is_vendor
         was_preloaded = gs.is_preloaded
         was_in_menu   = gs.is_in_menu
 
-        # Stage 1: preload rising edge
+        # Stage 1: preload rising edge — player entered vendor proximity
         if is_preloaded and not was_preloaded and not is_in_menu and not gs.is_dead and not gs.is_picking_up:
             if not WEAPONS or not gs.weapons_ready:
                 logger.warning("Vendor preload: weapon addresses not ready yet — waiting for planet load.")
@@ -215,15 +209,14 @@ class VendorPoller:
 
         # Stage 2: menu opened
         if is_in_menu and not was_in_menu and not gs.is_dead and not gs.is_picking_up:
-            self._log(f"Vendor menu opened (menu={menu_state:#04x}).")
+            self._log(f"Vendor menu opened ({ms!r}).")
             if not WEAPONS or not gs.weapons_ready:
                 logger.warning("Vendor menu: weapon addresses not ready yet.")
                 return
             gs.vendor_session.apply(ipc)
-            if menu_addr:
-                ipc.write_int8(menu_addr, 0x01)
-                ipc.write_int8(menu_addr, menu_state)
-                self._log("Vendor menu refreshed.")
+            ms.write(ipc, MenuStateValue.CLOSED)
+            ms.write(ipc, MenuStateValue(ms.raw))
+            self._log("Vendor menu refreshed.")
 
         # Stage 2: ongoing purchase detection — fires on_purchase immediately per item
         if is_in_menu and not gs.is_dead:

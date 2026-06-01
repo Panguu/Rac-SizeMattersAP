@@ -107,122 +107,146 @@ def set_rules(world: RACSizeMatterWorld) -> None:
         return lambda state: state.has(f"{planet} Infobot", player)
 
     # ── Entrance rules ────────────────────────────────────────────────────────
-    # Pokitaru and Ryllus are free (starting planets).
-    # Metalis and Dreamtime are auto-unlocked by the game (no infobot item).
-    # Inside Clank is accessible once Kalidon is accessible (Shrink Ray obtained naturally).
+    # All planets connect directly from Menu (the in-game planet select screen).
+    # Pokitaru, Ryllus, Metalis, and Outpost Omega are auto-unlocked from the start.
+    # Inside Clank and Challax require Shrink Ray (obtained on Kalidon).
+    # Dreamtime is auto-unlocked; no extra item requirement.
 
     multiworld.get_entrance("To Ryllus",        player).access_rule = lambda _: True
-    multiworld.get_entrance("To Kalidon",       player).access_rule = _infobot("Kalidon")
+    multiworld.get_entrance("To Kalidon",       player).access_rule = \
+        lambda state: (_has_projectile_weapon(state, player)
+                       and state.has("Hypershot", player)
+                       and state.has("Sprout-O-Matic", player))
     multiworld.get_entrance("To Metalis",       player).access_rule = lambda _: True
-    multiworld.get_entrance("To Dreamtime",     player).access_rule = lambda _: True
-    multiworld.get_entrance("To Outpost Omega", player).access_rule = _infobot("Outpost Omega")
-    multiworld.get_entrance("To Challax",       player).access_rule = _infobot("Challax")
+    multiworld.get_entrance("To Dreamtime",     player).access_rule = \
+        lambda state: (state.has("Shrink Ray", player)
+                       and state.has("Hypershot", player)
+                       and state.has("Sprout-O-Matic", player))
+    multiworld.get_entrance("To Outpost Omega", player).access_rule = lambda _: True
+    multiworld.get_entrance("To Challax",       player).access_rule = \
+        lambda state: (state.has("Shrink Ray", player)
+                       and state.has("Polarizer", player))
     multiworld.get_entrance("To Dayni Moon",    player).access_rule = _infobot("Dayni Moon")
     multiworld.get_entrance("To Inside Clank",  player).access_rule = \
-        lambda state: state.has("Kalidon Infobot", player)
+        lambda state: (state.has("Dayni Moon Infobot", player)
+                       and state.has("Sprout-O-Matic", player)
+                       and state.has("Shrink Ray", player)
+                       and _has_projectile_weapon(state, player))
     multiworld.get_entrance("To Quodrona",      player).access_rule = \
-        lambda state: (state.has("Quodrona Infobot", player)
-                       and state.has("Kalidon Infobot", player)
-                       and state.has("Hypershot", player))
+        lambda state: (state.has("Shrink Ray", player)
+                       and state.has("Hypershot", player)
+                       and state.has("Polarizer", player))
 
     # ── Pokitaru ──────────────────────────────────────────────────────────────
     # All checks are freely accessible.
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point Train Faster", player).access_rule = \
+        multiworld.get_location("Train Faster (SP)", player).access_rule = \
             lambda state: _has_projectile_weapon(state, player)
-        multiworld.get_location("Skill Point Dont Rock The Boat", player).access_rule = \
+        multiworld.get_location("Dont Rock The Boat (SP)", player).access_rule = \
             lambda _: True
-        multiworld.get_location("Skill Point Do Cows Get Crabby", player).access_rule = \
+        multiworld.get_location("Do Cows Get Crabby (SP)", player).access_rule = \
             lambda state: _has_projectile_weapon(state, player) and _has_weapon(state, player, "Mootator")
 
     # ── Ryllus ────────────────────────────────────────────────────────────────
     _ryllus_full = lambda state: (state.has("Hypershot", player)
                                   and state.has("Sprout-O-Matic", player))
 
-    multiworld.get_location("Ryllus Titanium Bolt After the Wall", player).access_rule = _ryllus_full
+    multiworld.get_location("Ryllus After the Wall (TB)", player).access_rule = _ryllus_full
     multiworld.get_location("Ryllus Sludge Mk9 Boots",            player).access_rule = \
         lambda state: state.has("Sprout-O-Matic", player)
     multiworld.get_location("Ryllus Wildfire Helmet",              player).access_rule = _ryllus_full
 
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point Bury The Pygmies", player).access_rule = _ryllus_full
-        multiworld.get_location("Skill Point Ship It",          player).access_rule = _ryllus_full
-        multiworld.get_location("Skill Point Lights Camera Action", player).access_rule = \
+        multiworld.get_location("Bury The Pygmies (SP)", player).access_rule = _ryllus_full
+        multiworld.get_location("Ship It (SP)",          player).access_rule = _ryllus_full
+        multiworld.get_location("Lights Camera Action (SP)", player).access_rule = \
             lambda _: True
 
     # ── Kalidon ───────────────────────────────────────────────────────────────
-    # Base requirement to be on Kalidon: Kalidon Infobot (entrance rule above).
-    _kalidon_shrink = lambda state: state.has("Kalidon Infobot", player)
-    _kalidon_hard   = lambda state: (state.has("Kalidon Infobot", player)
+    # Planet entrance requires projectile + Hypershot + Sprout-O-Matic.
+    # Some locations additionally require the Shrink Ray item.
+    _kalidon_shrink = lambda state: state.has("Shrink Ray", player)
+    _kalidon_hard   = lambda state: (state.has("Shrink Ray", player)
                                      and state.has("Hypershot", player))
 
-    multiworld.get_location("Kalidon Titanium Bolt Behind The Ship",            player).access_rule = \
+    multiworld.get_location("Kalidon Behind The Ship (TB)",            player).access_rule = \
         lambda state: state.has("Hypershot", player)
-    multiworld.get_location("Kalidon Titanium Bolt Side of Mechanoid Factory",  player).access_rule = \
+    multiworld.get_location("Kalidon Side of Mechanoid Factory (TB)",  player).access_rule = \
         _kalidon_shrink
-    multiworld.get_location("Kalidon Titanium Bolt Grav-Ramps",                 player).access_rule = \
+    multiworld.get_location("Kalidon Grav-Ramps (TB)",                 player).access_rule = \
         _kalidon_hard
     # All Kalidon armour requires Shrink Ray + Hypershot
     for _loc in (
-        "Kalidon Sludge Mk9 Gloves",
         "Kalidon Sludge Mk9 Chestplate",
         "Kalidon Wildfire Boots",
     ):
         multiworld.get_location(_loc, player).access_rule = _kalidon_hard
 
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point Explosive Ordnance Disposal",  player).access_rule = \
+        multiworld.get_location("Explosive Ordnance Disposal (SP)",  player).access_rule = \
             _kalidon_hard
-        multiworld.get_location("Skill Point Super Lombax",                 player).access_rule = \
-            lambda state: (state.has("Kalidon Infobot", player)
+        multiworld.get_location("Super Lombax (SP)",                 player).access_rule = \
+            lambda state: (state.has("Shrink Ray", player)
                            and state.has("Hypershot", player)
                            and state.has("Static Barrier", player))
     if world.options.skill_points_as_checks.value >= 2:
-        multiworld.get_location("Skill Point Be A Cool Skyboarder",         player).access_rule = \
+        multiworld.get_location("Be A Cool Skyboarder (SP)",         player).access_rule = \
             _kalidon_shrink
 
     # ── Metalis ───────────────────────────────────────────────────────────────
     # Auto-unlocked, all checks freely accessible once on the planet.
-    multiworld.get_location("Metalis Titanium Bolt Behind the Polarized Door", player).access_rule = \
+    multiworld.get_location("Metalis Behind the Polarized Door (TB)", player).access_rule = \
         lambda state: state.has("Polarizer", player) and state.has("Hypershot", player)
 
     # ── Dreamtime ─────────────────────────────────────────────────────────────
-    # Auto-unlocked via Outpost Omega.  All checks require Hypershot + Sprout-O-Matic.
-    _dreamtime = lambda state: (state.has("Hypershot", player)
+    # Requires Shrink Ray + Hypershot + Sprout-O-Matic (entrance rule above).
+    _dreamtime = lambda state: (state.has("Shrink Ray", player)
+                                and state.has("Hypershot", player)
                                 and state.has("Sprout-O-Matic", player))
 
     for _loc in (
-        "Dreamtime Titanium Bolt Jump Across three moving parasols",
-        "Dreamtime Titanium Bolt To the left of Ratchets Garage",
+        "Dreamtime Jump Across three moving parasols (TB)",
+        "Dreamtime To the left of Ratchets Garage (TB)",
         "Dreamtime Crystallix Chestplate",
     ):
         multiworld.get_location(_loc, player).access_rule = _dreamtime
 
     multiworld.get_location(
-        "Dreamtime Titanium Bolt Apparition of the Scuttle Crab", player
+        "Dreamtime Apparition of the Scuttle Crab (TB)", player
     ).access_rule = lambda state: (_dreamtime(state) and _has_projectile_weapon(state, player))
 
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point Friends Dont Hurt Friends", player).access_rule = _dreamtime
-        multiworld.get_location("Skill Point Night Terrors",             player).access_rule = _dreamtime
+        multiworld.get_location("Friends Dont Hurt Friends (SP)", player).access_rule = _dreamtime
+        multiworld.get_location("Night Terrors (SP)",             player).access_rule = _dreamtime
 
     # ── Outpost Omega ─────────────────────────────────────────────────────────
-    # All checks just require the Outpost Omega Infobot (entrance rule).
+    # Accessible from the menu but requires Shrink Ray to progress.
+    _outpost_omega = lambda state: state.has("Shrink Ray", player)
+
+    for _loc in (
+        "Outpost Omega Near the Entrance to DreamTime (TB)",
+        "Outpost Omega Crystallix Boots",
+        "Purchase Bee Mine Glove",
+    ):
+        multiworld.get_location(_loc, player).access_rule = _outpost_omega
+
+    multiworld.get_location("Outpost Omega Electroshock Boots (CC)", player).access_rule = _outpost_omega
+
     if world.options.skill_points_as_checks.value >= 2:
-        multiworld.get_location("Be An Awesome Skyboarder", player).access_rule = lambda _: True
+        multiworld.get_location("Be An Awesome Skyboarder (SC)", player).access_rule = _outpost_omega
 
     # ── Challax ───────────────────────────────────────────────────────────────
-    # Entrance requires Challax Infobot (rule above).
-    # Most checks additionally require Shrink Ray + Polarizer.
-    _challax_base  = lambda state: (state.has("Kalidon Infobot", player)
-                                    and state.has("Polarizer", player))
-    _challax_sprout = lambda state: (state.has("Kalidon Infobot", player)
+    # Entrance requires Shrink Ray + Polarizer (rule above).
+    # Some checks additionally require Sprout-O-Matic.
+    _challax_base   = lambda state: (state.has("Shrink Ray", player)
+                                     and state.has("Polarizer", player))
+    _challax_sprout = lambda state: (state.has("Shrink Ray", player)
                                      and state.has("Polarizer", player)
                                      and state.has("Sprout-O-Matic", player))
 
     # Titanium Bolt Beside The Ultra Mech Pad: just the planet entrance (no extra rule)
-    multiworld.get_location("Challax Titanium Bolt Hidden Room",    player).access_rule = _challax_base
-    multiworld.get_location("Challax Titanium Bolt Mimic Plant Lob", player).access_rule = _challax_sprout
+    multiworld.get_location("Challax Hidden Room (TB)",    player).access_rule = _challax_base
+    multiworld.get_location("Challax Mimic Plant Lob (TB)", player).access_rule = _challax_sprout
 
     for _loc in (
         "Challax Electroshock Chestplate",
@@ -231,24 +255,24 @@ def set_rules(world: RACSizeMatterWorld) -> None:
         multiworld.get_location(_loc, player).access_rule = _challax_base
 
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point High Tech Weapons Master", player).access_rule = _challax_base
+        multiworld.get_location("High Tech Weapons Master (SP)", player).access_rule = _challax_base
         # Skill Point Take Them Down A Shock is EXCLUDED — there is only one
         # opportunity to complete it in the entire game, making it unreliable
         # for randomisation.  The address (bit 24) is preserved in the data.
     if world.options.skill_points_as_checks.value >= 2:
-        multiworld.get_location("Skill Point No More Varmints",         player).access_rule = _challax_base
+        multiworld.get_location("No More Varmints (SP)",         player).access_rule = _challax_base
 
     # ── Dayni Moon ────────────────────────────────────────────────────────────
     # Entrance requires Dayni Moon Infobot (rule above).
     _dayni_base = lambda state: (state.has("Sprout-O-Matic", player)
                                   and _has_projectile_weapon(state, player))
 
-    multiworld.get_location("Dayni Moon Titanium Bolt Planting at the Barnyard", player).access_rule = \
+    multiworld.get_location("Dayni Moon Planting at the Barnyard (TB)", player).access_rule = \
         lambda state: state.has("Sprout-O-Matic", player)
-    multiworld.get_location("Dayni Moon Titanium Bolt Bounce on the Blue mimic", player).access_rule = \
-        _dayni_base
+    multiworld.get_location("Dayni Moon Bounce on the Blue mimic (TB)", player).access_rule = \
+        lambda state: (_dayni_base(state) and state.has("Shrink Ray", player))
 
-    for _loc in ("Dayni Moon Mega Bomb Boots", "Dayni Moon Mega Bomb Gloves"):
+    for _loc in ("Dayni Moon Mega Bomb Boots (CC)", "Dayni Moon Mega Bomb Gloves (CC)"):
         multiworld.get_location(_loc, player).access_rule = _dayni_base
 
     # Mega Bomb Helmet is acquired together with the Dayni Moon Infobot.
@@ -256,73 +280,75 @@ def set_rules(world: RACSizeMatterWorld) -> None:
         _infobot("Dayni Moon")
 
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point Wool Protest",              player).access_rule = _dayni_base
-        multiworld.get_location("Skill Point Bouncy Bouncy Bouncy",      player).access_rule = \
+        multiworld.get_location("Wool Protest (SP)",              player).access_rule = _dayni_base
+        multiworld.get_location("Bouncy Bouncy Bouncy (SP)",      player).access_rule = \
             lambda state: state.has("Sprout-O-Matic", player)
     if world.options.skill_points_as_checks.value >= 2:
-        multiworld.get_location("Skill Point Ultimate Gladiator Dayni Moon", player).access_rule = \
+        multiworld.get_location("Ultimate Gladiator Dayni Moon (SP)", player).access_rule = \
             _infobot("Dayni Moon")
 
     # ── Inside Clank ──────────────────────────────────────────────────────────
-    # Inside Clank entrance requires Kalidon Infobot (Shrink Ray obtained naturally).
-    # Full access also needs Polarizer.
-    _inside_clank_full = lambda state: (state.has("Kalidon Infobot", player)
+    # Entrance requires Shrink Ray (rule above).
+    # Some locations additionally require Polarizer.
+    _inside_clank_full = lambda state: (state.has("Shrink Ray", player)
                                         and state.has("Polarizer", player))
 
-    multiworld.get_location("Inside Clank Mega Bomb Chestplate", player).access_rule = _inside_clank_full
+    # multiworld.get_location("Inside Clank Mega Bomb Chestplate", player).access_rule = (
+    #     _inside_clank_full  # cutscene address not yet found
+    # )
 
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point Not The Shock of Me Now", player).access_rule = \
+        multiworld.get_location("Not The Shock of Me Now (SP)", player).access_rule = \
             _inside_clank_full
-        multiworld.get_location("Skill Point Ratchet Just Ratchet",    player).access_rule = \
+        multiworld.get_location("Ratchet Just Ratchet (SP)",    player).access_rule = \
             _inside_clank_full
 
     # ── Quodrona ──────────────────────────────────────────────────────────────
-    # Entrance requires Quodrona Infobot + Shrink Ray + Hypershot (rule above).
+    # Entrance requires Shrink Ray + Hypershot + Polarizer (rule above).
     # Skill points additionally need RYNO.
-    _quodrona_sp = lambda state: (state.has("Quodrona Infobot", player)
-                                   and state.has("Kalidon Infobot", player)
+    _quodrona_sp = lambda state: (state.has("Shrink Ray", player)
                                    and state.has("Hypershot", player)
+                                   and state.has("Polarizer", player)
                                    and _has_weapon(state, player, "RYNO"))
 
     if world.options.skill_points_as_checks:
-        multiworld.get_location("Skill Point Elite Annihilation", player).access_rule = _quodrona_sp
-        multiworld.get_location("Skill Point Storm The Front",    player).access_rule = _quodrona_sp
+        multiworld.get_location("Elite Annihilation (SP)", player).access_rule = _quodrona_sp
+        multiworld.get_location("Storm The Front (SP)",    player).access_rule = _quodrona_sp
 
     # ── Vendor access rules ───────────────────────────────────────────────────
-    # Planet-level vendor access.  Challax vendor also needs Polarizer + Shrink Ray.
+    # Planet-level vendor access mirrors the planet entrance rules.
     _planet_rule: dict[str, object] = {
         "Pokitaru":      lambda _: True,
-        "Ryllus":        lambda _: True,
-        "Kalidon":       _infobot("Kalidon"),
-        "Metalis":       lambda _: True,
+        "Ryllus":        lambda state: _has_projectile_weapon(state, player),
+        "Kalidon":       lambda state: (_has_projectile_weapon(state, player)
+                                        and state.has("Hypershot", player)
+                                        and state.has("Sprout-O-Matic", player)),
+        "Metalis":       lambda state: state.has("Shrink Ray", player),
         "Dreamtime":     _dreamtime,
-        "Outpost Omega": _infobot("Outpost Omega"),
-        # Challax and Dayni Moon vendor rules must include the infobot so that
-        # mod-vendor locations on those planets require unlocking the planet first.
-        "Challax":       lambda state: (state.has("Challax Infobot", player)
-                                        and state.has("Kalidon Infobot", player)
+        "Outpost Omega": lambda state: state.has("Shrink Ray", player),
+        "Challax":       lambda state: (state.has("Shrink Ray", player)
                                         and state.has("Polarizer", player)),
         "Dayni Moon":    lambda state: (state.has("Dayni Moon Infobot", player)
                                         and state.has("Sprout-O-Matic", player)
                                         and _has_projectile_weapon(state, player)),
         "Inside Clank":  _inside_clank_full,
-        "Quodrona":      lambda state: (state.has("Quodrona Infobot", player)
-                                        and state.has("Kalidon Infobot", player)
-                                        and state.has("Hypershot", player)),
+        "Quodrona":      lambda state: (state.has("Shrink Ray", player)
+                                        and state.has("Hypershot", player)
+                                        and state.has("Polarizer", player)),
     }
     for name, planet in {**VENDOR_WEAPON_PLANET, **VENDOR_GADGET_PLANET}.items():
         multiworld.get_location(f"Purchase {name}", player).access_rule = _planet_rule[planet]
 
-    for (weapon, mod), planet in VENDOR_WEAPON_MOD_PLANET.items():
-        if mod is None:
-            continue  # inaccessible slot sentinel — no AP location
-        _weapon_planet  = VENDOR_WEAPON_PLANET.get(weapon)
-        _mod_rule       = _planet_rule[planet]
-        _weapon_rule    = _planet_rule[_weapon_planet] if _weapon_planet else lambda _: True
-        multiworld.get_location(f"Purchase {weapon} {mod}", player).access_rule = (
-            lambda state, pr=_mod_rule, wr=_weapon_rule: pr(state) and wr(state)
-        )
+    if world.options.vendor_mods_randomized:
+        for (weapon, mod), planet in VENDOR_WEAPON_MOD_PLANET.items():
+            if mod is None:
+                continue  # inaccessible slot sentinel — no AP location
+            _weapon_planet  = VENDOR_WEAPON_PLANET.get(weapon)
+            _mod_rule       = _planet_rule[planet]
+            _weapon_rule    = _planet_rule[_weapon_planet] if _weapon_planet else lambda _: True
+            multiworld.get_location(f"Purchase {weapon} {mod}", player).access_rule = (
+                lambda state, pr=_mod_rule, wr=_weapon_rule: pr(state) and wr(state)
+            )
 
     # ── Armour-set checks ─────────────────────────────────────────────────────
     if world.options.armour_set_checks:

@@ -8,6 +8,8 @@ CURRENT_PLANET_ADDRESS = 0x21F4C76C
 PLAYER_BOLT_COUNT      = 0x21F4C768
 BOLT_PICKUP_MASK       = 0x000000FFFFFFFFFF
 PLANET_LOAD_ADDRESS    = 0x21F4C770
+CONTROLLER_PAUSE_SELECT_ADDRESS = 0x20F7F414
+CONTROLLER_BUTTONS_ADDRESS = 0x20F7F415
 CHALLENGE_MODE_ADDRESS = 0x21F4C778 # 1 - 255 when challange mode is active, 0 otherwise
 PLANET_UNLOCK_ADDRESSES: dict[str, int] = { # each value must be 3 in order to unlock next planet
     "POKITARU": 0x21F4C661,
@@ -105,7 +107,7 @@ TextBoxDisplayAddrs: list[DisplayedTextBox] = [
     DisplayedTextBox(planet_id=0x17, message_str_pointer=0xF4FE10, is_visible=0xF4FE08, vendor_value=0x3f37, countdown_timer=0xF4FDE8), # outpost omega 2 unknown vendor  # noqa: E501
 ]
 
-DAYNI_MOON_CLANK_CHALLANGES_COMPLETED_ADDR: dict[str, int] = {
+DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
     "Two's A Crowd": 0x1F4B400,
     "Reverse Into Victory": 0x1F4B401,
     "Emergency Bridge": 0x1F4B402,
@@ -139,16 +141,20 @@ METALIS_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
     "The Uber Finals": 0x1F4B3E7,
 }
 
-KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
-    "Learner's Permit": 0x1F4B407,
-    "Speeding Ticket": 0x1F4B408,
-    "Tricky Air": 0x1F4B409,
-    "Master's Challenge": 0x1F4B40A,
+# Single address per planet, cumulative bitmask per race.
+# Cumulative values: race 1=0x01, race 2=0x05, race 3=0x15, race 4=0x55.
+# Each entry is (address, detection_mask) — the NEW bit set when that race completes.
+KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, tuple[int, int, int]] = {
+    "Learner's Permit":   (0x1F4B407, 0x1F4B408, 0x01),
+    "Speeding Ticket":    (0x1F4B407, 0x1F4B408, 0x04),
+    "Tricky Air":         (0x1F4B407, 0x1F4B408, 0x10),
+    "Master's Challenge": (0x1F4B407, 0x1F4B408, 0x40),
 }
 
-OUTPOST_OMEGA_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
-    "Interior Decorating": 0x1F4B40B,
-    "Danger, High Voltage": 0x1F4B40C,
-    "The Vortex": 0x1F4B40D,
-    "Vertigo": 0x1F4B40E,
+
+OUTPOST_OMEGA_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, tuple[int, int, int]] = {
+    "Interior Decorating": (0x1F4B409, 0x1F4B40A, 0x01),  # address unknown
+    "Danger, High Voltage": (0x1F4B409, 0x1F4B40A, 0x04),  # address unknown
+    "The Vortex":           (0x1F4B409, 0x1F4B40A, 0x10),  # address unknown
+    "Vertigo":              (0x1F4B409, 0x1F4B40A, 0x40),  # address unknown
 }

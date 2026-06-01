@@ -13,48 +13,59 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Titanium Bolt Above Zipline",
-            "item_count": 1
+            "name": "Pokitaru Above Zipline (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Pokitaru Titanium Bolt Behind Hut",
-            "item_count": 1
+            "name": "Pokitaru Behind Hut (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Pokitaru Wildfire Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Pokitaru Wildfire Gloves",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Lacerator",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Acid Bomb Glove",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Hypershot",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Train Faster",
-            "item_count": 1
+            "name": "Train Faster (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Dont Rock The Boat",
-            "item_count": 1
+            "name": "Dont Rock The Boat (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Do Cows Get Crabby",
-            "item_count": 1
+            "name": "Do Cows Get Crabby (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -69,40 +80,49 @@
         ],
         "sections": [
           {
-            "name": "Ryllus Titanium Bolt Down The Cliff",
-            "item_count": 1
+            "name": "Ryllus Down The Cliff (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Ryllus Titanium Bolt After the Wall",
-            "item_count": 1
+            "name": "Ryllus After the Wall (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Ryllus Sludge Mk9 Boots",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Ryllus Wildfire Helmet",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Ryllus Sprout-O-Matic",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Agents of Doom",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Bury The Pygmies",
-            "item_count": 1
+            "name": "Bury The Pygmies (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Lights Camera Action",
-            "item_count": 1
+            "name": "Lights Camera Action (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ship It",
-            "item_count": 1
+            "name": "Ship It (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -117,52 +137,79 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Titanium Bolt Behind The Ship",
-            "item_count": 1
+            "name": "Kalidon Behind The Ship (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Kalidon Titanium Bolt Side of Mechanoid Factory",
-            "item_count": 1
+            "name": "Kalidon Side of Mechanoid Factory (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Kalidon Titanium Bolt Grav-Ramps",
-            "item_count": 1
-          },
-          {
-            "name": "Kalidon Sludge Mk9 Gloves",
-            "item_count": 1
+            "name": "Kalidon Grav-Ramps (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Kalidon Sludge Mk9 Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Kalidon Wildfire Boots",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Scorcher",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Lacerator Lock On Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun Split Barrel Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Explosive Ordnance Disposal",
-            "item_count": 1
+            "name": "Explosive Ordnance Disposal (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Super Lombax",
-            "item_count": 1
+            "name": "Super Lombax (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Be A Cool Skyboarder",
-            "item_count": 1
+            "name": "Be A Cool Skyboarder (SP)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Kalidon Learner's Permit (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Kalidon Speeding Ticket (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Kalidon Tricky Air (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Kalidon Master's Challenge (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
           }
         ]
       },
@@ -177,36 +224,49 @@
         ],
         "sections": [
           {
-            "name": "Metalis Titanium Bolt Behind the Polarized Door",
-            "item_count": 1
+            "name": "Metalis Behind the Polarized Door (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Metalis Sludge Mk9 Helmet",
-            "item_count": 1
+            "name": "Metalis Sludge Mk9 Helmet (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Crystallix Helmet",
-            "item_count": 1
+            "name": "Metalis Crystallix Helmet (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Crystallix Gloves",
-            "item_count": 1
+            "name": "Metalis Crystallix Gloves (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
+          },
+          {
+            "name": "Metalis Polarizer (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           },
           {
             "name": "Metalis Electroshock Gloves",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Shutout",
-            "item_count": 1
+            "name": "Shutout (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Terror of the Skies",
-            "item_count": 1
+            "name": "Terror of the Skies (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ultimate Gladiator",
-            "item_count": 1
+            "name": "Ultimate Gladiator (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -221,32 +281,39 @@
         ],
         "sections": [
           {
-            "name": "Dreamtime Titanium Bolt Jump Across three moving parasols",
-            "item_count": 1
+            "name": "Dreamtime Jump Across three moving parasols (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Titanium Bolt To the left of Ratchets Garage",
-            "item_count": 1
+            "name": "Dreamtime To the left of Ratchets Garage (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Titanium Bolt Apparition of the Scuttle Crab",
-            "item_count": 1
+            "name": "Dreamtime Apparition of the Scuttle Crab (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Dreamtime Crystallix Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Suck Cannon",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Friends Dont Hurt Friends",
-            "item_count": 1
+            "name": "Friends Dont Hurt Friends (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Night Terrors",
-            "item_count": 1
+            "name": "Night Terrors (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -261,24 +328,29 @@
         ],
         "sections": [
           {
-            "name": "Outpost Omega Titanium Bolt Near the Entrance to DreamTime",
-            "item_count": 1
+            "name": "Outpost Omega Near the Entrance to DreamTime (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Outpost Omega Electroshock Boots",
-            "item_count": 1
+            "name": "Outpost Omega Electroshock Boots (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           },
           {
             "name": "Outpost Omega Crystallix Boots",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Bee Mine Glove",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Be An Awesome Skyboarder",
-            "item_count": 1
+            "name": "Be An Awesome Skyboarder (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
           }
         ]
       },
@@ -293,64 +365,79 @@
         ],
         "sections": [
           {
-            "name": "Challax Titanium Bolt Beside The Ultra Mech Pad",
-            "item_count": 1
+            "name": "Challax Beside The Ultra Mech Pad (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Challax Titanium Bolt Hidden Room",
-            "item_count": 1
+            "name": "Challax Hidden Room (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Challax Titanium Bolt Mimic Plant Lob",
-            "item_count": 1
+            "name": "Challax Mimic Plant Lob (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Challax Electroshock Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Challax Electroshock Helmet",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Sniper Mine",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Lacerator Double Barrel Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Acid Bomb Glove Acid Burn Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Acid Bomb Glove Epoxy Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun Lock On Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun Charge Up Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Bee Mine Glove Worker Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Skill Point Take Them Down A Shock",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point High Tech Weapons Master",
-            "item_count": 1
+            "name": "High Tech Weapons Master (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point No More Varmints",
-            "item_count": 1
+            "name": "No More Varmints (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -365,44 +452,54 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Titanium Bolt Planting at the Barnyard",
-            "item_count": 1
+            "name": "Dayni Moon Planting at the Barnyard (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dayni Moon Titanium Bolt Bounce on the Blue mimic",
-            "item_count": 1
+            "name": "Dayni Moon Bounce on the Blue mimic (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dayni Moon Mega Bomb Boots",
-            "item_count": 1
+            "name": "Dayni Moon Mega Bomb Boots (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Dayni Moon Mega Bomb Gloves",
-            "item_count": 1
+            "name": "Dayni Moon Mega Bomb Gloves (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           },
           {
             "name": "Dayni Moon Mega Bomb Helmet",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Mootator",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Shock Rocket",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ultimate Gladiator Dayni Moon",
-            "item_count": 1
+            "name": "Ultimate Gladiator Dayni Moon (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Wool Protest",
-            "item_count": 1
+            "name": "Wool Protest (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Bouncy Bouncy Bouncy",
-            "item_count": 1
+            "name": "Bouncy Bouncy Bouncy (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -417,28 +514,34 @@
         ],
         "sections": [
           {
-            "name": "Inside Clank Titanium Bolt Walk behind the ladder",
-            "item_count": 1
+            "name": "Inside Clank Walk behind the ladder (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Inside Clank Titanium Bolt Wall jumping Technomite",
-            "item_count": 1
+            "name": "Inside Clank Wall jumping Technomite (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Inside Clank Mega Bomb Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Static Barrier",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Not The Shock of Me Now",
-            "item_count": 1
+            "name": "Not The Shock of Me Now (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ratchet Just Ratchet",
-            "item_count": 1
+            "name": "Ratchet Just Ratchet (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -453,44 +556,54 @@
         ],
         "sections": [
           {
-            "name": "Quodrona Titanium Bolt Ratchet Clones and Dummies",
-            "item_count": 1
+            "name": "Quodrona Ratchet Clones and Dummies (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Defeat Otto Destruct",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Laser Tracer",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Agents of Doom Launcher Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Scorcher Spitfire Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Sniper Mine Split Beam Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Shock Rocket Lock On Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Shock Rocket After Shock Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Elite Annihilation",
-            "item_count": 1
+            "name": "Elite Annihilation (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Storm The Front",
-            "item_count": 1
+            "name": "Storm The Front (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -511,12 +624,13 @@
         "sections": [
           {
             "name": "Pokitaru Wildfire Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
       {
-        "name": "Pokitaru Titanium Bolt Above Zipline",
+        "name": "Pokitaru Above Zipline (TB)",
         "map_locations": [
           {
             "map": "Pokitaru",
@@ -526,8 +640,9 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Titanium Bolt Above Zipline",
-            "item_count": 1
+            "name": "Pokitaru Above Zipline (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
@@ -543,12 +658,13 @@
         "sections": [
           {
             "name": "Pokitaru Wildfire Gloves",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
       {
-        "name": "Pokitaru Titanium Bolt Behind Hut",
+        "name": "Pokitaru Behind Hut (TB)",
         "map_locations": [
           {
             "map": "Pokitaru",
@@ -558,8 +674,9 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Titanium Bolt Behind Hut",
-            "item_count": 1
+            "name": "Pokitaru Behind Hut (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
@@ -575,31 +692,38 @@
         "sections": [
           {
             "name": "Purchase Lacerator",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Acid Bomb Glove",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Hypershot",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Train Faster",
-            "item_count": 1
+            "name": "Train Faster (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Dont Rock The Boat",
-            "item_count": 1
+            "name": "Dont Rock The Boat (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Do Cows Get Crabby",
-            "item_count": 1
+            "name": "Do Cows Get Crabby (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -609,7 +733,7 @@
     "name": "2",
     "children": [
       {
-        "name": "Ryllus Titanium Bolt Down The Cliff",
+        "name": "Ryllus Down The Cliff (TB)",
         "map_locations": [
           {
             "map": "Ryllus",
@@ -619,8 +743,9 @@
         ],
         "sections": [
           {
-            "name": "Ryllus Titanium Bolt Down The Cliff",
-            "item_count": 1
+            "name": "Ryllus Down The Cliff (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
@@ -636,7 +761,8 @@
         "sections": [
           {
             "name": "Ryllus Sprout-O-Matic",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -651,12 +777,14 @@
         ],
         "sections": [
           {
-            "name": "Ryllus Titanium Bolt After the Wall",
-            "item_count": 1
+            "name": "Ryllus After the Wall (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Ryllus Wildfire Helmet",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -672,7 +800,8 @@
         "sections": [
           {
             "name": "Ryllus Sludge Mk9 Boots",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -688,19 +817,23 @@
         "sections": [
           {
             "name": "Purchase Agents of Doom",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Bury The Pygmies",
-            "item_count": 1
+            "name": "Bury The Pygmies (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Lights Camera Action",
-            "item_count": 1
+            "name": "Lights Camera Action (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ship It",
-            "item_count": 1
+            "name": "Ship It (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -710,7 +843,7 @@
     "name": "3",
     "children": [
       {
-        "name": "Kalidon Titanium Bolt Behind The Ship",
+        "name": "Kalidon Behind The Ship (TB)",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -720,13 +853,14 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Titanium Bolt Behind The Ship",
-            "item_count": 1
+            "name": "Kalidon Behind The Ship (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Kalidon Titanium Bolt Side of Mechanoid Factory",
+        "name": "Kalidon Side of Mechanoid Factory (TB)",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -736,13 +870,14 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Titanium Bolt Side of Mechanoid Factory",
-            "item_count": 1
+            "name": "Kalidon Side of Mechanoid Factory (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Kalidon Titanium Bolt Grav-Ramps",
+        "name": "Kalidon Grav-Ramps (TB)",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -752,8 +887,41 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Titanium Bolt Grav-Ramps",
-            "item_count": 1
+            "name": "Kalidon Grav-Ramps (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
+          }
+        ]
+      },
+      {
+        "name": "Kalidon Skyboard Challenges",
+        "map_locations": [
+          {
+            "map": "Kalidon",
+            "x": 328,
+            "y": 361
+          }
+        ],
+        "sections": [
+          {
+            "name": "Kalidon Learner's Permit (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Kalidon Speeding Ticket (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Kalidon Tricky Air (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Kalidon Master's Challenge (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
           }
         ]
       },
@@ -768,40 +936,44 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Sludge Mk9 Gloves",
-            "item_count": 1
-          },
-          {
             "name": "Kalidon Sludge Mk9 Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Kalidon Wildfire Boots",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Scorcher",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Lacerator Lock On Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun Split Barrel Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Explosive Ordnance Disposal",
-            "item_count": 1
+            "name": "Explosive Ordnance Disposal (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Super Lombax",
-            "item_count": 1
+            "name": "Super Lombax (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Be A Cool Skyboarder",
-            "item_count": 1
+            "name": "Be A Cool Skyboarder (SP)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
           }
         ]
       }
@@ -811,7 +983,7 @@
     "name": "4",
     "children": [
       {
-        "name": "Metalis Titanium Bolt Behind the Polarized Door",
+        "name": "Metalis Behind the Polarized Door (TB)",
         "map_locations": [
           {
             "map": "Metalis",
@@ -821,8 +993,41 @@
         ],
         "sections": [
           {
-            "name": "Metalis Titanium Bolt Behind the Polarized Door",
-            "item_count": 1
+            "name": "Metalis Behind the Polarized Door (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
+          }
+        ]
+      },
+      {
+        "name": "Metalis Clank Challenges",
+        "map_locations": [
+          {
+            "map": "Metalis",
+            "x": 80,
+            "y": 293
+          }
+        ],
+        "sections": [
+          {
+            "name": "Metalis Sludge Mk9 Helmet (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
+          },
+          {
+            "name": "Metalis Crystallix Helmet (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
+          },
+          {
+            "name": "Metalis Crystallix Gloves (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
+          },
+          {
+            "name": "Metalis Polarizer (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           }
         ]
       },
@@ -837,32 +1042,24 @@
         ],
         "sections": [
           {
-            "name": "Metalis Sludge Mk9 Helmet",
-            "item_count": 1
-          },
-          {
-            "name": "Metalis Crystallix Helmet",
-            "item_count": 1
-          },
-          {
-            "name": "Metalis Crystallix Gloves",
-            "item_count": 1
-          },
-          {
             "name": "Metalis Electroshock Gloves",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Shutout",
-            "item_count": 1
+            "name": "Shutout (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Terror of the Skies",
-            "item_count": 1
+            "name": "Terror of the Skies (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ultimate Gladiator",
-            "item_count": 1
+            "name": "Ultimate Gladiator (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -882,32 +1079,39 @@
         ],
         "sections": [
           {
-            "name": "Dreamtime Titanium Bolt Jump Across three moving parasols",
-            "item_count": 1
+            "name": "Dreamtime Jump Across three moving parasols (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Titanium Bolt To the left of Ratchets Garage",
-            "item_count": 1
+            "name": "Dreamtime To the left of Ratchets Garage (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Titanium Bolt Apparition of the Scuttle Crab",
-            "item_count": 1
+            "name": "Dreamtime Apparition of the Scuttle Crab (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
             "name": "Dreamtime Crystallix Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Suck Cannon",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Friends Dont Hurt Friends",
-            "item_count": 1
+            "name": "Friends Dont Hurt Friends (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Night Terrors",
-            "item_count": 1
+            "name": "Night Terrors (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -927,24 +1131,29 @@
         ],
         "sections": [
           {
-            "name": "Outpost Omega Titanium Bolt Near the Entrance to DreamTime",
-            "item_count": 1
+            "name": "Outpost Omega Near the Entrance to DreamTime (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Outpost Omega Electroshock Boots",
-            "item_count": 1
+            "name": "Outpost Omega Electroshock Boots (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           },
           {
             "name": "Outpost Omega Crystallix Boots",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Bee Mine Glove",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Be An Awesome Skyboarder",
-            "item_count": 1
+            "name": "Be An Awesome Skyboarder (SC)",
+            "item_count": 1,
+            "icon": "icons/Skyboard_Challanges.png"
           }
         ]
       }
@@ -954,7 +1163,7 @@
     "name": "7",
     "children": [
       {
-        "name": "Challax Titanium Bolt Beside The Ultra Mech Pad",
+        "name": "Challax Beside The Ultra Mech Pad (TB)",
         "map_locations": [
           {
             "map": "Challax",
@@ -964,13 +1173,14 @@
         ],
         "sections": [
           {
-            "name": "Challax Titanium Bolt Beside The Ultra Mech Pad",
-            "item_count": 1
+            "name": "Challax Beside The Ultra Mech Pad (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Challax Titanium Bolt Hidden Room",
+        "name": "Challax Hidden Room (TB)",
         "map_locations": [
           {
             "map": "Challax",
@@ -980,13 +1190,14 @@
         ],
         "sections": [
           {
-            "name": "Challax Titanium Bolt Hidden Room",
-            "item_count": 1
+            "name": "Challax Hidden Room (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Challax Titanium Bolt Mimic Plant Lob",
+        "name": "Challax Mimic Plant Lob (TB)",
         "map_locations": [
           {
             "map": "Challax",
@@ -996,8 +1207,9 @@
         ],
         "sections": [
           {
-            "name": "Challax Titanium Bolt Mimic Plant Lob",
-            "item_count": 1
+            "name": "Challax Mimic Plant Lob (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
@@ -1013,51 +1225,63 @@
         "sections": [
           {
             "name": "Challax Electroshock Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Challax Electroshock Helmet",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Sniper Mine",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Lacerator Double Barrel Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Acid Bomb Glove Acid Burn Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Acid Bomb Glove Epoxy Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun Lock On Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Concussion Gun Charge Up Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Bee Mine Glove Worker Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Skill Point Take Them Down A Shock",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point High Tech Weapons Master",
-            "item_count": 1
+            "name": "High Tech Weapons Master (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point No More Varmints",
-            "item_count": 1
+            "name": "No More Varmints (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1067,7 +1291,7 @@
     "name": "8",
     "children": [
       {
-        "name": "Dayni Moon Titanium Bolt Bounce on the Blue mimic",
+        "name": "Dayni Moon Bounce on the Blue mimic (TB)",
         "map_locations": [
           {
             "map": "Dayni Moon",
@@ -1077,13 +1301,14 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Titanium Bolt Bounce on the Blue mimic",
-            "item_count": 1
+            "name": "Dayni Moon Bounce on the Blue mimic (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Dayni Moon Titanium Bolt Planting at the Barnyard",
+        "name": "Dayni Moon Planting at the Barnyard (TB)",
         "map_locations": [
           {
             "map": "Dayni Moon",
@@ -1093,8 +1318,31 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Titanium Bolt Planting at the Barnyard",
-            "item_count": 1
+            "name": "Dayni Moon Planting at the Barnyard (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
+          }
+        ]
+      },
+      {
+        "name": "Dayni Moon Clank Challenges",
+        "map_locations": [
+          {
+            "map": "Dayni Moon",
+            "x": 378,
+            "y": 299
+          }
+        ],
+        "sections": [
+          {
+            "name": "Dayni Moon Mega Bomb Gloves (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
+          },
+          {
+            "name": "Dayni Moon Mega Bomb Boots (CC)",
+            "item_count": 1,
+            "icon": "icons/Clank_Challanges.png"
           }
         ]
       },
@@ -1109,36 +1357,34 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Mega Bomb Boots",
-            "item_count": 1
-          },
-          {
-            "name": "Dayni Moon Mega Bomb Gloves",
-            "item_count": 1
-          },
-          {
             "name": "Dayni Moon Mega Bomb Helmet",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Mootator",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Shock Rocket",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ultimate Gladiator Dayni Moon",
-            "item_count": 1
+            "name": "Ultimate Gladiator Dayni Moon (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Wool Protest",
-            "item_count": 1
+            "name": "Wool Protest (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Bouncy Bouncy Bouncy",
-            "item_count": 1
+            "name": "Bouncy Bouncy Bouncy (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1148,7 +1394,7 @@
     "name": "9",
     "children": [
       {
-        "name": "Inside Clank Titanium Bolt Wall jumping Technomite",
+        "name": "Inside Clank Wall jumping Technomite (TB)",
         "map_locations": [
           {
             "map": "Inside Clank",
@@ -1158,13 +1404,14 @@
         ],
         "sections": [
           {
-            "name": "Inside Clank Titanium Bolt Wall jumping Technomite",
-            "item_count": 1
+            "name": "Inside Clank Wall jumping Technomite (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Inside Clank Titanium Bolt Walk behind the ladder",
+        "name": "Inside Clank Walk behind the ladder (TB)",
         "map_locations": [
           {
             "map": "Inside Clank",
@@ -1174,8 +1421,9 @@
         ],
         "sections": [
           {
-            "name": "Inside Clank Titanium Bolt Walk behind the ladder",
-            "item_count": 1
+            "name": "Inside Clank Walk behind the ladder (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
@@ -1191,19 +1439,23 @@
         "sections": [
           {
             "name": "Inside Clank Mega Bomb Chestplate",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Static Barrier",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Not The Shock of Me Now",
-            "item_count": 1
+            "name": "Not The Shock of Me Now (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Ratchet Just Ratchet",
-            "item_count": 1
+            "name": "Ratchet Just Ratchet (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1213,7 +1465,7 @@
     "name": "10",
     "children": [
       {
-        "name": "Quodrona Titanium Bolt Ratchet Clones and Dummies",
+        "name": "Quodrona Ratchet Clones and Dummies (TB)",
         "map_locations": [
           {
             "map": "Quodrona",
@@ -1223,8 +1475,9 @@
         ],
         "sections": [
           {
-            "name": "Quodrona Titanium Bolt Ratchet Clones and Dummies",
-            "item_count": 1
+            "name": "Quodrona Ratchet Clones and Dummies (TB)",
+            "item_count": 1,
+            "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
@@ -1240,39 +1493,48 @@
         "sections": [
           {
             "name": "Defeat Otto Destruct",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Laser Tracer",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Agents of Doom Launcher Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Scorcher Spitfire Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Sniper Mine Split Beam Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Shock Rocket Lock On Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Purchase Shock Rocket After Shock Mod",
-            "item_count": 1
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Elite Annihilation",
-            "item_count": 1
+            "name": "Elite Annihilation (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Storm The Front",
-            "item_count": 1
+            "name": "Storm The Front (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
