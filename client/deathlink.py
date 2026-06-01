@@ -5,28 +5,62 @@ import random
 import time
 from typing import Any
 
-from CommonClient import logger
-
 from ..core.data import BY_ID as PLANETS_BY_ID
-from ..core.data import PLAYER_ADDRS, PLAYER_HEALTH, PLAYER_STATE
+from ..core.data import PLAYER_ADDRS, PLAYER_HEALTH, PLAYER_STATE, PlayerState
 
-_DEATH_CAUSES: dict[int, str] = {
-    0x29: "got eaten by a fish",
-    0x2A: "was faded out of existance",
-    0x2B: "got electrocuted",
-    0x2C: "fell out of the world",
-    0x2D: "met an untimely end",
-    0x2E: "tried to swim in lava",
-    0x2F: "died under mysterious circumstances",
+_DEATH_CAUSES: dict[PlayerState, list[str]] = {
+    PlayerState.FishDeath: [
+        "got eaten by a fish",
+        "tried to swim with the fishes",
+        "became an aquatic creature's lunch",
+        "found out fish bite back",
+    ],
+    PlayerState.FadeDeath: [
+        "was faded out of existence",
+        "ceased to exist, briefly",
+        "got erased from reality",
+        "found the off switch for themselves",
+    ],
+    PlayerState.Electrocution: [
+        "got electrocuted",
+        "touched the wrong wire",
+        "became a lightning rod",
+        "found out electricity is not their friend",
+    ],
+    PlayerState.VoidDeath: [
+        "fell out of the world",
+        "discovered the world has edges",
+        "took a step too far",
+        "found a shortcut to the void",
+    ],
+    PlayerState.UnknownDeath: [
+        "met an untimely end",
+        "had a very bad day",
+        "encountered something unfortunate",
+        "lost a fight with the universe",
+    ],
+    PlayerState.SwimDeath: [
+        "tried to swim in lava",
+        "thought lava was just spicy water",
+        "went for a relaxing lava bath",
+        "underestimated the temperature of magma",
+    ],
+    PlayerState.MysteriousDeath: [
+        "died under mysterious circumstances",
+        "departed this world inexplicably",
+        "achieved death through unknown means",
+        "was claimed by forces beyond comprehension",
+    ],
 }
 
 
 def _dead(player_state: int) -> bool:
-    return 0x29 <= player_state <= 0x2F
+    return PlayerState.is_dead(player_state)
 
 
 def _death_cause(player_state: int) -> str:
-    return _DEATH_CAUSES.get(player_state, "died")
+    causes = _DEATH_CAUSES.get(player_state)
+    return random.choice(causes) if causes else "died"
 
 
 class DeathLinkMixin:
@@ -69,7 +103,7 @@ class DeathLinkMixin:
         self._last_death_link = max(timestamp, time.time())
         cause = data.get("cause")
         if cause:
-            logger.info(f"[RAC] DeathLink received: {cause}")
+            self._log(f"[RAC] DeathLink received: {cause}")
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
             await loop.run_in_executor(None, self._kill_player_sync)

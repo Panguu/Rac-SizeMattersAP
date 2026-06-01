@@ -19,8 +19,6 @@ def zero_weapon(ipc: Pine, w: WeaponAddresses) -> None:
     ipc.write_int8(w.mod_slot_one, 0)
     ipc.write_int8(w.mod_slot_two, 0)
     ipc.write_int8(w.mod_slot_three, 0)
-    ipc.write_int32(w.level, 0)
-    ipc.write_int32(w.experience, 0)
 
 
 def apply_tracked_armour(gs: GameState) -> None:
@@ -34,9 +32,9 @@ def apply_slots_from_armour(gs: GameState) -> None:
         val = gs.tracked_armour.get(set_name, 0)
         if not val:
             continue
-        for piece_idx, piece in enumerate(_ARMOUR_PIECES):
+        slot_value = set_idx + 1
+        for piece in _ARMOUR_PIECES:
             if piece in ArmourPiece(val):
-                slot_value = set_idx * 4 + piece_idx + 1
                 for slot in _PIECE_TO_SLOTS[piece]:
                     slot_vals[slot] = slot_value
     for slot, v in slot_vals.items():

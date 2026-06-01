@@ -69,6 +69,7 @@ class GameState:
     is_picking_up:          bool                   = False
     is_preloaded:           bool                   = False
     is_in_menu:             bool                   = False
+    weapons_ready:          bool                   = False
     goal_reached:           bool                   = False
     on_reward:              Callable[[], None] | None = field(default=None)
     on_vendor_close:        Callable[[], None] | None = field(default=None)

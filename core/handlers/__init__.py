@@ -9,6 +9,7 @@ from ..data import (
     CURRENT_PLANET_ADDRESS,
     CUTSCENES,
     SKILL_POINT_ADDRESS,
+    PlayerState,
 )
 from ..memory import BOLTS
 from ..state import GameState, PollAddress
@@ -18,7 +19,7 @@ from .death import _on_death, _on_respawn
 from .locks import _enforce_locks
 from .pickup import _build_scanners, _on_pickup_end, _on_pickup_start
 
-_dead = lambda v: 0x29 <= v <= 0x2F
+_dead = PlayerState.is_dead
 
 
 def build_pollers(gs: GameState) -> list:
@@ -49,19 +50,19 @@ def build_pollers(gs: GameState) -> list:
         PollAddress(
             lambda: gs.state_addr,
             partial(_on_respawn, gs),
-            trigger=lambda o, n: _dead(o) and n == 0x00,
+            trigger=lambda o, n: _dead(o) and n == PlayerState.Alive,
             read_fn=_state_read,
         ),
         PollAddress(
             lambda: gs.state_addr,
             partial(_on_pickup_start, gs, _scanners),
-            trigger=lambda o, n: o != 0x43 and n == 0x43,
+            trigger=lambda o, n: o != PlayerState.Pickup and n == PlayerState.Pickup,
             read_fn=_state_read,
         ),
         PollAddress(
             lambda: gs.state_addr,
             partial(_on_pickup_end, gs, _scanners),
-            trigger=lambda o, n: o == 0x43 and n == 0x00,
+            trigger=lambda o, n: o == PlayerState.Pickup and n == PlayerState.Alive,
             read_fn=_state_read,
         ),
         VendorPoller(gs),

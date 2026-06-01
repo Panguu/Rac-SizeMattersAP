@@ -4,10 +4,12 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Region
 
+from .core.data.skill_points import CHALLENGE_SKILL_POINTS
 from .locations import (
     ARMOUR_PICKUP_LOCATIONS,
     ARMOUR_SET_CHECK_LOCATIONS,
     BOSS_LOCATIONS,
+    CHALLENGE_LOCATIONS,
     GADGET_PICKUP_LOCATIONS,
     GADGET_VENDOR_LOCATIONS,
     SKILL_POINT_LOCATIONS,
@@ -45,8 +47,6 @@ def create_regions(world: RACSizeMatterWorld) -> None:
         for name in PLANET_NAMES
     }
 
-    # ── Place locations ───────────────────────────────────────────────────────
-
     location_tables = [
         TITANIUM_BOLT_LOCATIONS,
         ARMOUR_PICKUP_LOCATIONS,
@@ -56,7 +56,15 @@ def create_regions(world: RACSizeMatterWorld) -> None:
         GADGET_VENDOR_LOCATIONS,
         WEAPON_MOD_VENDOR_LOCATIONS,
     ]
-    if world.options.skill_points_as_checks:
+    if world.options.clank_challenges:
+        location_tables.append(CHALLENGE_LOCATIONS)
+    sp_opt = world.options.skill_points_as_checks.value
+    if sp_opt == 1:
+        location_tables.append({
+            name: data for name, data in SKILL_POINT_LOCATIONS.items()
+            if name not in CHALLENGE_SKILL_POINTS
+        })
+    elif sp_opt == 2:
         location_tables.append(SKILL_POINT_LOCATIONS)
     if world.options.armour_set_checks:
         location_tables.append(ARMOUR_SET_CHECK_LOCATIONS)
@@ -67,17 +75,11 @@ def create_regions(world: RACSizeMatterWorld) -> None:
             location = RACLocation(player, loc_name, loc_data.code, region)
             region.locations.append(location)
 
-    # ── Victory event ─────────────────────────────────────────────────────────
-    # Separate from the "Defeat Otto Destruct" check location.  The client sends
-    # ClientStatus.CLIENT_GOAL when it detects the end-boss cutscene completing.
     quodrona = planet_regions["Quodrona"]
     victory_loc = RACLocation(player, "Quodrona Completed", None, quodrona)
     victory_loc.place_locked_item(world.create_event("Victory"))
     quodrona.locations.append(victory_loc)
 
-    # ── Region connections ────────────────────────────────────────────────────
-    # Pokitaru is always reachable from the menu (starting planet).
-    # Subsequent planets connect linearly; entrance rules are set in rules.py.
     menu_region.connect(planet_regions["Pokitaru"], "To Pokitaru")
     for i in range(len(PLANET_NAMES) - 1):
         planet_regions[PLANET_NAMES[i]].connect(

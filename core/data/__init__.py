@@ -21,12 +21,19 @@ __all__ = [
     "ENTER_CUTSCENES", "CUTSCENE_BEFORE_SPROUT_O_MATIC", "SPROUT_O_MATIC_CUTSCENE", "CUTSCENES",
     # skill points
     "SkillPoint", "SKILL_POINT_ADDRESS", "SKILL_POINTS", "LOCATION_SKILL_POINTS", "SKILL_POINT_BY_PLANET_AND_MASK",
+    "CHALLENGE_SKILL_POINTS",
     # titanium bolts
     "TitaniumBolt", "TITANIUM_BOLTS", "BOLT_BY_PLANET_AND_DELTA",
     # armour pickups
     "ArmourPickup", "ARMOUR_PICKUPS", "ARMOUR_FLAG_TO_LOCATION",
+    # challenges
+    "ChallengePickup", "CHALLENGE_PICKUPS", "CHALLENGE_ADDRESS_MAP", "CHALLENGE_ONLY_ITEMS",
     # armour set checks
     "ArmourSets", "ArmourSetCheck", "ARMOUR_SET_CHECKS",
+    # player states
+    "PlayerState",
+    # infobots / planet state
+    "INFOBOT_ITEM_TO_PLANET", "INFOBOT_UNLOCK_VALUE", "AUTO_UNLOCK_ADDRESSES", "PLANET_STATE_ADDRESSES",
 ]
 
 # ── Armour address resolvers ───────────────────────────────────────────────────
@@ -54,6 +61,9 @@ from .armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPicku
 # ── Armour set checks ─────────────────────────────────────────────────────────
 from .armour_set_checks import ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
 
+# ── Challenges ────────────────────────────────────────────────────────────────
+from .challenges import CHALLENGE_ADDRESS_MAP, CHALLENGE_ONLY_ITEMS, CHALLENGE_PICKUPS, ChallengePickup
+
 # ── Cutscenes ─────────────────────────────────────────────────────────────────
 from .cutscenes import (
     CUTSCENE_BEFORE_SPROUT_O_MATIC,
@@ -64,14 +74,21 @@ from .cutscenes import (
     arm_cutscenes,
 )
 
+# ── Infobots ──────────────────────────────────────────────────────────────────
+from .infobots import AUTO_UNLOCK_ADDRESSES, INFOBOT_ITEM_TO_PLANET, INFOBOT_UNLOCK_VALUE, PLANET_STATE_ADDRESSES
+
 # ── Pickup address resolvers ───────────────────────────────────────────────────
 from .pickups import TitaniumBoltAddresses
 
 # ── Planets ────────────────────────────────────────────────────────────────────
 from .planets import BY_ID, Planet, Planets
 
+# ── Player states ──────────────────────────────────────────────────────────────
+from .player_states import PlayerState
+
 # ── Skill points ──────────────────────────────────────────────────────────────
 from .skill_points import (
+    CHALLENGE_SKILL_POINTS,
     LOCATION_SKILL_POINTS,
     SKILL_POINT_ADDRESS,
     SKILL_POINT_BY_PLANET_AND_MASK,

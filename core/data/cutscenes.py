@@ -3,13 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from CommonClient import logger
-
 if TYPE_CHECKING:
     from ...pypine.pypine.pine import Pine
 
 
 def arm_cutscenes(ipc: Pine, planet_id: int, label: str) -> None:
+    from CommonClient import logger
     for c in CUTSCENES:
         if c.planet_id == planet_id:
             ipc.write_int32(c.address, c.init_val)

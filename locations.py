@@ -1,19 +1,11 @@
-"""AP location definitions for Ratchet & Clank: Size Matters.
-
-All names are sourced directly from the game data files in core/data/
-to guarantee consistency between the AP world and the client's detection logic.
-"""
 from typing import NamedTuple
 
 from .core.data.armour_pickups import ARMOUR_PICKUPS
+from .core.data.challenges import CHALLENGE_PICKUPS
 from .core.data.skill_points import SKILL_POINTS
-
-# Data sources — standalone files with no broken imports
 from .core.data.titanium_bolts import TITANIUM_BOLTS
 
 BASE_ID = 77_700_000
-
-
 
 
 class RACLocationData(NamedTuple):
@@ -21,44 +13,25 @@ class RACLocationData(NamedTuple):
     region: str
 
 
-# ── Titanium Bolt locations (1001-1020) ───────────────────────────────────────
-# Region and unique index sourced from core/data/titanium_bolts.py.
-# Client detection uses (planet_id, delta) via BOLT_BY_PLANET_AND_DELTA.
-
 TITANIUM_BOLT_LOCATIONS: dict[str, RACLocationData] = {
     name: RACLocationData(BASE_ID + 1000 + idx, bolt.region)
     for idx, (name, bolt) in enumerate(TITANIUM_BOLTS.items(), start=1)
 }
-
-# ── Armour pickup locations (1101-1120) ───────────────────────────────────────
-# Names sourced from core/data/armour_pickups.py.
-# Client detection: monitor each armour set bitmask at ARMOUR_BASE + set_offset
-# for new bits; look up (set_key, new_bit) in ARMOUR_FLAG_TO_LOCATION.
 
 ARMOUR_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
     ap.name: RACLocationData(BASE_ID + 1100 + idx, ap.planet)
     for idx, ap in enumerate(ARMOUR_PICKUPS, start=1)
 }
 
-# ── Boss location (1200) ──────────────────────────────────────────────────────
-# Checking "Defeat Otto Destruct" also triggers the victory event in the client.
 
 BOSS_LOCATIONS: dict[str, RACLocationData] = {
     "Defeat Otto Destruct": RACLocationData(BASE_ID + 1200, "Quodrona"),
 }
 
-# ── Skill point locations (1301-1325) ─────────────────────────────────────────
-# Names sourced from core/data/skill_points.py (LOCATION_SKILL_POINTS keys).
-# Client detection: read int64 at SKILL_POINT_ADDRESS, compare new_bits & ~old_bits.
-
 SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
     name: RACLocationData(BASE_ID + 1300 + idx, sp.region)
     for idx, (name, sp) in enumerate(SKILL_POINTS.items(), start=1)
 }
-
-# ── Vendor purchase locations (2001-2012 weapons, 2101 gadgets) ───────────────
-# Maps each purchasable weapon to the planet where its vendor slot first appears.
-# RYNO is not vendor-sold and is excluded. Hypershot is a gadget sold at Pokitaru.
 
 VENDOR_WEAPON_PLANET: dict[str, str] = {
     "Lacerator":       "Pokitaru",
@@ -89,11 +62,9 @@ GADGET_VENDOR_LOCATIONS: dict[str, RACLocationData] = {
     for idx, (name, planet) in enumerate(VENDOR_GADGET_PLANET.items(), start=1)
 }
 
-# ── Weapon mod vendor locations (2201+) ──────────────────────────────────────
-# Mods marked (CM) in the source data are not AP locations and are excluded.
-# Entries without a known "first available" planet are listed as TODO comments.
-
-VENDOR_WEAPON_MOD_PLANET: dict[tuple, str] = {
+# None sentinel = mod slot exists in the weapon struct but is not sold at any vendor.
+# It is counted for slot-index purposes so subsequent mods land on the correct address.
+VENDOR_WEAPON_MOD_PLANET: dict[tuple, str | None] = {
     ("Lacerator",       "Lock On Mod"):       "Kalidon",
     ("Lacerator",       "Double Barrel Mod"): "Challax",
     ("Acid Bomb Glove", "Acid Burn Mod"):     "Challax",
@@ -101,7 +72,8 @@ VENDOR_WEAPON_MOD_PLANET: dict[tuple, str] = {
     ("Concussion Gun",  "Split Barrel Mod"):  "Kalidon",
     ("Concussion Gun",  "Lock On Mod"):       "Challax",
     ("Concussion Gun",  "Charge Up Mod"):     "Challax",
-    ("Agents of Doom",  "Launcher Mod"):      "Quodrona",
+    ("Agents of Doom",  None):                None,    # mod slot 1 inaccessible at vendor
+    ("Agents of Doom",  "Launcher Mod"):      "Kalidon",
     ("Scorcher",        "Spitfire Mod"):      "Quodrona",
     ("Bee Mine Glove",  "Worker Mod"):        "Challax",
     ("Sniper Mine",     "Split Beam Mod"):    "Quodrona",
@@ -112,12 +84,8 @@ VENDOR_WEAPON_MOD_PLANET: dict[tuple, str] = {
 WEAPON_MOD_VENDOR_LOCATIONS: dict[str, RACLocationData] = {
     f"Purchase {weapon} {mod}": RACLocationData(BASE_ID + 2200 + idx, planet)
     for idx, ((weapon, mod), planet) in enumerate(VENDOR_WEAPON_MOD_PLANET.items(), start=1)
+    if mod is not None
 }
-
-# ── Armour set check locations (1501-1505) ───────────────────────────────────
-# Triggered when the player equips a complete armour set and closes the menu.
-# Region is Pokitaru — equipping can happen anywhere, so the first accessible
-# region is used; progression rules require owning all four pieces.
 
 from .core.data.armour_set_checks import ARMOUR_SET_CHECKS
 
@@ -126,14 +94,14 @@ ARMOUR_SET_CHECK_LOCATIONS: dict[str, RACLocationData] = {
     for idx, name in enumerate(ARMOUR_SET_CHECKS, start=1)
 }
 
-# ── Gadget pickup locations (1401+) ──────────────────────────────────────────
-# World-space gadget pickups detected via cutscene address transitions.
-
 GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
     "Ryllus Sprout-O-Matic": RACLocationData(BASE_ID + 1401, "Ryllus"),
 }
 
-# ── Combined lookup ───────────────────────────────────────────────────────────
+CHALLENGE_LOCATIONS: dict[str, RACLocationData] = {
+    cp.name: RACLocationData(BASE_ID + 1600 + idx, cp.planet)
+    for idx, cp in enumerate(CHALLENGE_PICKUPS, start=1)
+}
 
 ALL_LOCATIONS: dict[str, RACLocationData] = {
     **TITANIUM_BOLT_LOCATIONS,
@@ -145,6 +113,7 @@ ALL_LOCATIONS: dict[str, RACLocationData] = {
     **GADGET_VENDOR_LOCATIONS,
     **WEAPON_MOD_VENDOR_LOCATIONS,
     **ARMOUR_SET_CHECK_LOCATIONS,
+    **CHALLENGE_LOCATIONS,
 }
 
 LOCATION_ID_TO_NAME: dict[int, str] = {data.code: name for name, data in ALL_LOCATIONS.items()}

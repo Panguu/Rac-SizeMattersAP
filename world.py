@@ -6,11 +6,14 @@ from BaseClasses import Item, ItemClassification, Location, Tutorial
 
 from worlds.AutoWorld import WebWorld, World
 
+from .core.data.challenges import CHALLENGE_ONLY_ITEMS
 from .items import (
     ALL_ITEMS,
     ARMOUR_ITEM_TABLE,
     ARMOUR_PROGRESSIVE_ITEM_TABLE,
+    ARMOUR_SETS,
     GADGET_ITEM_TABLE,
+    INFOBOT_ITEM_TABLE,
     WEAPON_ITEM_TABLE,
     WEAPON_PROGRESSIVE_ITEM_TABLE,
     WEAPON_PROGRESSIVE_STEPS,
@@ -89,6 +92,7 @@ class RACSizeMatterWorld(World):
 
     def create_items(self) -> None:
         pool: list[str] = []
+        challenges_on = bool(self.options.clank_challenges)
 
         if self.options.progressive_weapons:
             for display, steps in WEAPON_PROGRESSIVE_STEPS.items():
@@ -96,13 +100,21 @@ class RACSizeMatterWorld(World):
         else:
             pool += list(WEAPON_ITEM_TABLE)
 
-        pool += list(GADGET_ITEM_TABLE)
+        gadgets = [n for n in GADGET_ITEM_TABLE if challenges_on or n not in CHALLENGE_ONLY_ITEMS]
+        pool += gadgets
+
+        pool += list(INFOBOT_ITEM_TABLE)
 
         if self.options.progressive_armour:
-            for name in ARMOUR_PROGRESSIVE_ITEM_TABLE:
-                pool += [name] * 4
+            _ARMOUR_PIECES = ("Chestplate", "Helmet", "Gloves", "Boots")
+            for display, _ in ARMOUR_SETS:
+                steps = sum(
+                    1 for piece in _ARMOUR_PIECES
+                    if challenges_on or f"{display} {piece}" not in CHALLENGE_ONLY_ITEMS
+                )
+                pool += [f"{display} Progressive Pickup"] * steps
         else:
-            pool += list(ARMOUR_ITEM_TABLE)
+            pool += [n for n in ARMOUR_ITEM_TABLE if challenges_on or n not in CHALLENGE_ONLY_ITEMS]
 
         # Fill any remaining slots (e.g. when skill_points_as_checks adds locations)
         unfilled = len(self.multiworld.get_unfilled_locations(self.player))
@@ -122,6 +134,10 @@ class RACSizeMatterWorld(World):
                 break
 
     def generate_basic(self) -> None:
+        # The player always starts on Pokitaru — there is currently no way to
+        # change the starting planet, so the Pokitaru Infobot is always granted.
+        self._precollect("Pokitaru Infobot")
+
         if self.options.starting_bolts.value > 0:
             self.multiworld.push_precollected(self.create_item("Bolts"))
 
@@ -143,7 +159,9 @@ class RACSizeMatterWorld(World):
     def fill_slot_data(self) -> dict[str, Any]:
         return {
             "death_link": bool(self.options.death_link.value),
-            "skill_points_as_checks": bool(self.options.skill_points_as_checks.value),
+            "clank_challenges": bool(self.options.clank_challenges.value),
+            "skyboard_challenges": bool(self.options.skyboard_challenges.value),
+            "skill_points_as_checks": self.options.skill_points_as_checks.value,
             "armour_set_checks": bool(self.options.armour_set_checks.value),
             "starting_bolts": self.options.starting_bolts.value,
             "death_amnesty": self.options.death_amnesty.value,

@@ -52,7 +52,8 @@ SKILL_POINTS: dict[str, SkillPoint] = {
     # Outpost Omega
     "Be An Awesome Skyboarder":                  SkillPoint(0x06, 20, "Outpost Omega"),
     # Challax
-    "Skill Point Take Them Down A Shock":        SkillPoint(0x07, 24, "Challax"),
+    # "Skill Point Take Them Down A Shock": SkillPoint(0x07, 24, "Challax")
+    # Excluded: only one opportunity to complete this in the whole game (bit 24).
     "Skill Point High Tech Weapons Master":      SkillPoint(0x07, 25, "Challax"),
     "Skill Point No More Varmints":              SkillPoint(0x07, 26, "Challax"),
     # Dayni Moon
@@ -66,6 +67,16 @@ SKILL_POINTS: dict[str, SkillPoint] = {
     "Skill Point Elite Annihilation":            SkillPoint(0x0A, 36, "Quodrona"),
     "Skill Point Storm The Front":               SkillPoint(0x0A, 37, "Quodrona"),
 }
+
+CHALLENGE_SKILL_POINTS: frozenset[str] = frozenset({
+    "Skill Point Be A Cool Skyboarder",
+    "Skill Point Shutout",
+    "Skill Point Terror of the Skies",
+    "Skill Point Ultimate Gladiator",
+    "Skill Point Ultimate Gladiator Dayni Moon",
+    "Be An Awesome Skyboarder",
+    "Skill Point No More Varmints",
+})
 
 # (planet_id, mask) → location name — mirrors BOLT_BY_PLANET_AND_DELTA
 SKILL_POINT_BY_PLANET_AND_MASK: dict[tuple[int, int], str] = {

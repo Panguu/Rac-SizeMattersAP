@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Options import DeathLink, DefaultOnToggle, PerGameCommonOptions, Range, Toggle
+from Options import Choice, DeathLink, DefaultOnToggle, PerGameCommonOptions, Range, Toggle
 
 
 class ProgressiveWeapons(Toggle):
@@ -14,14 +14,31 @@ class ProgressiveArmour(Toggle):
 
 
 
+class ClankChallenges(Toggle):
+    """Include Clank challenge arenas as location checks. Adds 9 locations and makes
+    challenge-exclusive items (Polarizer, Shrink Ray, and several armour pieces) accessible."""
+    display_name = "Clank Challenges"
+
+
+class SkyboardChallenges(Toggle):
+    """Include Skyboard race challenges as location checks."""
+    display_name = "Skyboard Challenges"
+
+
 class ArmourSetChecks(DefaultOnToggle):
     """Treat equipping a complete armour set as a location check. Adds 13 locations to the pool."""
     display_name = "Armour Set Checks"
 
 
-class SkillPointsAsChecks(Toggle):
-    """Treat skill point unlocks as location checks. Adds 25 locations to the pool."""
+class SkillPointsAsChecks(Choice):
+    """Treat skill point unlocks as location checks.
+    normal: excludes Clank and Skyboard challenge skill points (adds 18 locations).
+    with_challenges: includes all skill points (adds 25 locations)."""
     display_name = "Skill Points as Checks"
+    option_off            = 0
+    option_normal         = 1
+    option_with_challenges = 2
+    default = 0
 
 
 class StartingWeapons(Range):
@@ -54,7 +71,7 @@ class StartingBolts(Range):
     display_name = "Starting Bolts"
     range_start = 0
     range_end = 100_000
-    default = 0
+    default = 45_000
 
 
 @dataclass
@@ -63,6 +80,8 @@ class RACSizeMatterOptions(PerGameCommonOptions):
     progressive_armour: ProgressiveArmour
     death_link: DeathLink
     death_amnesty: DeathAmnesty
+    clank_challenges: ClankChallenges
+    skyboard_challenges: SkyboardChallenges
     skill_points_as_checks: SkillPointsAsChecks
     armour_set_checks: ArmourSetChecks
     starting_weapons: StartingWeapons

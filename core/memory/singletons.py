@@ -6,6 +6,7 @@ from ...pypine.pypine.pine import Pine
 from ..data import (
     ARMOUR_BASE,
     TITANIUM_BOLT_BASE,
+    WEAPON_ARRAY_BASE_BY_PLANET,
     WEAPON_MIN_CONSECUTIVE,
     WEAPON_STRUCT_SIZE,
     ArmourAddresses,
@@ -34,6 +35,18 @@ _PIECE_TO_SLOTS: dict[ArmourPiece, list[str]] = {
     ArmourPiece.BOOTS:      ["boots_left", "boots_right"],
 }
 _ARMOUR_SET_ORDER = ["wildfire", "sludge", "crystallix", "electroshock", "mega_bomb", "hyperborean", "chameleon"]
+
+
+def load_weapons_for_planet(planet_id: int) -> bool:
+    array_base = WEAPON_ARRAY_BASE_BY_PLANET.get(planet_id)
+    if array_base is None:
+        return False
+    weapons, gadgets = build_weapons(array_base)
+    WEAPONS.clear()
+    GADGETS.clear()
+    WEAPONS.update(weapons)
+    GADGETS.update(gadgets)
+    return True
 
 
 def sync_weapons(ipc: Pine) -> None:

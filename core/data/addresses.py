@@ -6,8 +6,21 @@ SKILL_POINTS           = 0x21F4B437
 CHEATS                 = 0x21F4C440
 CURRENT_PLANET_ADDRESS = 0x21F4C76C
 PLAYER_BOLT_COUNT      = 0x21F4C768
+BOLT_PICKUP_MASK       = 0x000000FFFFFFFFFF
 PLANET_LOAD_ADDRESS    = 0x21F4C770
-
+CHALLENGE_MODE_ADDRESS = 0x21F4C778 # 1 - 255 when challange mode is active, 0 otherwise
+PLANET_UNLOCK_ADDRESSES: dict[str, int] = { # each value must be 3 in order to unlock next planet
+    "POKITARU": 0x21F4C661,
+    "RYLLUS": 0x21F4C662,
+    "KALIDON": 0x21F4C663,
+    "METALIS": 0x21F4C664,
+    "DREAMTIME": 0x21F4C665,
+    "OUTPOST_OMEGA": 0x21F4C666,
+    "CHALLAX": 0x21F4C667,
+    "DAYNI_MOON": 0x21F4C668,
+    "INSIDE_CLANK": 0x21F4C669,
+    "QUODRONA": 0x21F4C66A,
+}
 # Per-planet player state/health addresses
 PLAYER_ADDRS: dict[int, tuple[int, int]] = {
     0x01: (0x20F805C0, 0x20F80E2C),  # pokitaru
@@ -50,6 +63,27 @@ PRELOAD_MENU_ADDR_BY_PLANET_ID: dict[int, int] = {
     0x17: 0xF54CC0,    # outpost omega 2
 }
 
+# Lacerator unlock address per planet (slot 0, offset 0x45 within struct).
+# All other weapon/gadget addresses are derived from these via build_weapons().
+_LACERATOR_UNLOCK: dict[int, int] = {
+    0x01: 0x20F3EA5C,  # Pokitaru
+    0x02: 0x20F3AEDC,  # Ryllus
+    0x03: 0x20F3B0DC,  # Kalidon
+    0x04: 0x20F3BBDC,  # Metalis
+    0x05: 0x20F37DDC,  # Dreamtime
+    0x06: 0x20F4215C,  # Outpost Omega
+    0x07: 0x20F3D55C,  # Challax
+    0x08: 0x20F315DC,  # Dayni Moon
+    0x09: 0x20F4305C,  # Inside Clank
+    0x0A: 0x20F3EA5C,  # Quodrona (shares layout with Pokitaru)
+    0x17: 0x20F46E5C,  # Outpost Omega 2
+}
+_UNLOCKED_OFFSET = 0x45
+WEAPON_ARRAY_BASE_BY_PLANET: dict[int, int] = {
+    planet: addr - _UNLOCKED_OFFSET
+    for planet, addr in _LACERATOR_UNLOCK.items()
+}
+
 # value 3f37 when vendor text is loaded; value 01 when text is on screen
 @dataclass(frozen=True)
 class DisplayedTextBox:
@@ -71,4 +105,50 @@ TextBoxDisplayAddrs: list[DisplayedTextBox] = [
     DisplayedTextBox(planet_id=0x17, message_str_pointer=0xF4FE10, is_visible=0xF4FE08, vendor_value=0x3f37, countdown_timer=0xF4FDE8), # outpost omega 2 unknown vendor  # noqa: E501
 ]
 
+DAYNI_MOON_CLANK_CHALLANGES_COMPLETED_ADDR: dict[str, int] = {
+    "Two's A Crowd": 0x1F4B400,
+    "Reverse Into Victory": 0x1F4B401,
+    "Emergency Bridge": 0x1F4B402,
+    "Leap Of Faith": 0x1F4B403,
+    "Infinite Improbability": 0x1F4B404,
+    "Welcome to Dayni": 0x1F4B3F6,
+    "Round Up!": 0x1F4B3F7,
+    "Variety Is Shocking": 0x1F4B3F8,
+    "Tom Sawyer": 0x1F4B3F9,
+    "Smasherbot Returns!": 0x1F4B3FA,
+    "Tri-bomb Tournament": 0x1F4B3FC,
+    "A-rooouund the Bend": 0x1F4B3FD,
+    "The Thin Bouncy Line": 0x1F4B3FE,
+    "The Ultimate Showdown": 0x1F4B3FF,
+}
+METALIS_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
+    "Buzzsaw Blitz": 0x1F4B3DE,
+    "Take Two For The Team": 0x1F4B3E8,
+    "CHARGE!": 0x1F4B3DF,
+    "Bridge The Gap": 0x1F4B3E9,
+    "Electric Boogaloo": 0x1F4B3E0,
+    "Of Trapeze and Teleporters": 0x1F4B3EA,
+    "Showdown": 0x1F4B3E1,
+    "Brain Trip": 0x1F4B3EB,
+    "Smasherbot's Revenge": 0x1F4B3E2,
+    "Nigh Impossible": 0x1F4B3EC,
+    "Little League": 0x1F4B3E3,
+    "Varsity Bracket": 0x1F4B3E4,
+    "Collegiate Division": 0x1F4B3E5,
+    "Professional Level": 0x1F4B3E6,
+    "The Uber Finals": 0x1F4B3E7,
+}
 
+KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
+    "Learner's Permit": 0x1F4B407,
+    "Speeding Ticket": 0x1F4B408,
+    "Tricky Air": 0x1F4B409,
+    "Master's Challenge": 0x1F4B40A,
+}
+
+OUTPOST_OMEGA_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
+    "Interior Decorating": 0x1F4B40B,
+    "Danger, High Voltage": 0x1F4B40C,
+    "The Vortex": 0x1F4B40D,
+    "Vertigo": 0x1F4B40E,
+}

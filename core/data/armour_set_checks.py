@@ -3,11 +3,10 @@
 Each armour slot (chestplate, helmet, gloves_left, gloves_right, boots_left, boots_right)
 holds a uint8 value encoding which piece is currently equipped:
 
-    slot_value = set_index * 4 + piece_index + 1
+    slot_value = set_index + 1   (wildfire=1, sludge=2, crystallix=3, …)
 
-    Sets  (set_index): wildfire=0, sludge=1, crystallix=2, electroshock=3, mega_bomb=4
-    Pieces(piece_index): chestplate=0, helmet=1, gloves=2, boots=3
-    0 means the slot is empty.
+    The slot address itself identifies the piece (chestplate/helmet/gloves/boots);
+    the value only encodes which set is equipped in that slot. 0 means empty.
 
 ArmourSetCheck describes the expected slot values for a location check.
 None means "don't care" — that slot is not required by this check.
