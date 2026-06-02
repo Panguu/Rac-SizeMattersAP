@@ -96,11 +96,24 @@ ARMOUR_SET_CHECK_LOCATIONS: dict[str, RACLocationData] = {
 
 GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
     "Ryllus Sprout-O-Matic":            RACLocationData(BASE_ID + 1401, "Ryllus"),
-    "Kalidon Learner's Permit (SC)":    RACLocationData(BASE_ID + 1402, "Kalidon"),
-    "Kalidon Speeding Ticket (SC)":     RACLocationData(BASE_ID + 1403, "Kalidon"),
-    "Kalidon Tricky Air (SC)":          RACLocationData(BASE_ID + 1404, "Kalidon"),
-    "Kalidon Master's Challenge (SC)":  RACLocationData(BASE_ID + 1405, "Kalidon"),
     "Metalis Electroshock Gloves":      RACLocationData(BASE_ID + 1406, "Metalis"),
+}
+
+# ── Skyboard challenge locations ──────────────────────────────────────────────
+# item_checks (1): race reward pickups only.
+SKYBOARD_ITEM_LOCATIONS: dict[str, RACLocationData] = {
+    "Kalidon Learner's Permit (SC)":         RACLocationData(BASE_ID + 1402, "Kalidon"),
+    "Kalidon Speeding Ticket (SC)":          RACLocationData(BASE_ID + 1403, "Kalidon"),
+    "Kalidon Tricky Air (SC)":               RACLocationData(BASE_ID + 1404, "Kalidon"),
+    "Kalidon Master's Challenge (SC)":       RACLocationData(BASE_ID + 1405, "Kalidon"),
+    "Outpost Omega Electroshock Boots (CC)": RACLocationData(BASE_ID + 1800, "Outpost Omega"),
+}
+
+# all_challenges (2): every individual race completion is also a check.
+EXTRA_SKYBOARD_LOCATIONS: dict[str, RACLocationData] = {
+    "Outpost Omega Interior Decorating (SC)":  RACLocationData(BASE_ID + 1801, "Outpost Omega"),
+    "Outpost Omega Danger, High Voltage (SC)": RACLocationData(BASE_ID + 1802, "Outpost Omega"),
+    "Outpost Omega The Vortex (SC)":           RACLocationData(BASE_ID + 1803, "Outpost Omega"),
 }
 
 CHALLENGE_LOCATIONS: dict[str, RACLocationData] = {
@@ -126,6 +139,8 @@ ALL_LOCATIONS: dict[str, RACLocationData] = {
     **ARMOUR_SET_CHECK_LOCATIONS,
     **CHALLENGE_LOCATIONS,
     **ALL_CLANK_LOCATIONS,
+    **SKYBOARD_ITEM_LOCATIONS,
+    **EXTRA_SKYBOARD_LOCATIONS,
 }
 
 LOCATION_ID_TO_NAME: dict[int, str] = {data.code: name for name, data in ALL_LOCATIONS.items()}

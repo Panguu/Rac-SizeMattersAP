@@ -150,6 +150,7 @@ class RACSizeMatterWorld(World):
         return {
             "death_link": bool(self.options.death_link.value),
             "clank_challenges": self.options.clank_challenges.value,
+            "skyboard_challenges": self.options.skyboard_challenges.value,
             "vendor_mods_randomized": bool(self.options.vendor_mods_randomized.value),
             "skill_points_as_checks": self.options.skill_points_as_checks.value,
             "armour_set_checks": bool(self.options.armour_set_checks.value),

@@ -27,7 +27,18 @@ class ClankChallenges(Choice):
 
 
 
-class VendorModsRandomized(DefaultOnToggle):
+class SkyboardChallenges(Choice):
+    """Controls how Skyboard race challenges are included as location checks.
+    item_checks: only the race reward locations (default).
+    all_challenges: every individual race completion is a separate check."""
+    display_name = "Skyboard Challenges"
+    option_off            = 0
+    option_item_checks    = 1
+    option_all_challenges = 2
+    default = 1
+
+
+class VendorModsRandomized(Toggle):
     """Include vendor mod purchases as randomized location checks.
     When off, mods can be bought freely at vendors without AP involvement."""
     display_name = "Vendor Mods Randomized"
@@ -89,6 +100,7 @@ class RACSizeMatterOptions(PerGameCommonOptions):
     death_link: DeathLink
     death_amnesty: DeathAmnesty
     clank_challenges: ClankChallenges
+    skyboard_challenges: SkyboardChallenges
     vendor_mods_randomized: VendorModsRandomized
     skill_points_as_checks: SkillPointsAsChecks
     armour_set_checks: ArmourSetChecks

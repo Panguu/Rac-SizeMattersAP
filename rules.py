@@ -193,6 +193,15 @@ def set_rules(world: RACSizeMatterWorld) -> None:
         multiworld.get_location("Be A Cool Skyboarder (SP)",         player).access_rule = \
             _kalidon_shrink
 
+    if world.options.skyboard_challenges.value >= 1:
+        for _loc in (
+            "Kalidon Learner's Permit (SC)",
+            "Kalidon Speeding Ticket (SC)",
+            "Kalidon Tricky Air (SC)",
+            "Kalidon Master's Challenge (SC)",
+        ):
+            multiworld.get_location(_loc, player).access_rule = _kalidon_shrink
+
     # ── Metalis ───────────────────────────────────────────────────────────────
     # Auto-unlocked, all checks freely accessible once on the planet.
     multiworld.get_location("Metalis Behind the Polarized Door (TB)", player).access_rule = \
@@ -230,10 +239,18 @@ def set_rules(world: RACSizeMatterWorld) -> None:
     ):
         multiworld.get_location(_loc, player).access_rule = _outpost_omega
 
-    multiworld.get_location("Outpost Omega Electroshock Boots (CC)", player).access_rule = _outpost_omega
-
     if world.options.skill_points_as_checks.value >= 2:
         multiworld.get_location("Be An Awesome Skyboarder (SC)", player).access_rule = _outpost_omega
+
+    if world.options.skyboard_challenges.value >= 1:
+        multiworld.get_location("Outpost Omega Electroshock Boots (CC)", player).access_rule = _outpost_omega
+    if world.options.skyboard_challenges.value >= 2:
+        for _loc in (
+            "Outpost Omega Interior Decorating (SC)",
+            "Outpost Omega Danger, High Voltage (SC)",
+            "Outpost Omega The Vortex (SC)",
+        ):
+            multiworld.get_location(_loc, player).access_rule = _outpost_omega
 
     # ── Challax ───────────────────────────────────────────────────────────────
     # Entrance requires Shrink Ray + Polarizer (rule above).

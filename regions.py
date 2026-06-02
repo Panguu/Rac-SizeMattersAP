@@ -11,9 +11,11 @@ from .locations import (
     ARMOUR_SET_CHECK_LOCATIONS,
     BOSS_LOCATIONS,
     CHALLENGE_LOCATIONS,
+    EXTRA_SKYBOARD_LOCATIONS,
     GADGET_PICKUP_LOCATIONS,
     GADGET_VENDOR_LOCATIONS,
     SKILL_POINT_LOCATIONS,
+    SKYBOARD_ITEM_LOCATIONS,
     TITANIUM_BOLT_LOCATIONS,
     WEAPON_MOD_VENDOR_LOCATIONS,
     WEAPON_VENDOR_LOCATIONS,
@@ -61,6 +63,10 @@ def create_regions(world: RACSizeMatterWorld) -> None:
     location_tables.append(CHALLENGE_LOCATIONS)
     if world.options.clank_challenges.value >= 2:
         location_tables.append(ALL_CLANK_LOCATIONS)
+    if world.options.skyboard_challenges.value >= 1:
+        location_tables.append(SKYBOARD_ITEM_LOCATIONS)
+    if world.options.skyboard_challenges.value >= 2:
+        location_tables.append(EXTRA_SKYBOARD_LOCATIONS)
     sp_opt = world.options.skill_points_as_checks.value
     if sp_opt == 1:
         location_tables.append({

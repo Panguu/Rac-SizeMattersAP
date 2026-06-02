@@ -5,7 +5,7 @@ from collections.abc import Callable
 from CommonClient import logger
 
 from ..pypine.pypine.pine import Pine
-from .data.challenges import SKYBOARD_ADDRESS_MASK_MAP, SKYBOARD_UNLOCK_ADDRESSES
+from .data.challenges import SKYBOARD_ADDRESS_MASK_MAP, SKYBOARD_UNLOCK_MASK
 
 
 class SkyboardPoller:
@@ -26,10 +26,11 @@ class SkyboardPoller:
             self._prev[addr] = ipc.read_int8(addr)
 
     def write_defaults(self, ipc: Pine) -> None:
-        """Write 1 to every unlock address that is currently 0, then snapshot completed values."""
-        for addr in SKYBOARD_UNLOCK_ADDRESSES:
-            if ipc.read_int8(addr) == 0:
-                ipc.write_int8(addr, 1)
+        """OR the full race-unlock bitmask into each planet's unlock address, then snapshot completed values."""
+        for addr, full_mask in SKYBOARD_UNLOCK_MASK.items():
+            current = ipc.read_int8(addr)
+            if current | full_mask != current:
+                ipc.write_int8(addr, current | full_mask)
         for addr in {addr for addr, _ in SKYBOARD_ADDRESS_MASK_MAP}:
             self._prev[addr] = ipc.read_int8(addr)
 

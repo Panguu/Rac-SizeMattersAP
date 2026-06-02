@@ -105,10 +105,12 @@ SKYBOARD_ADDRESS_MASK_MAP: dict[tuple[int, int], str] = {
     if sp.completed_addr != 0
 }
 
-# Unique unlock addresses — written to at first planet load
-SKYBOARD_UNLOCK_ADDRESSES: list[int] = list({
-    sp.unlock_addr for sp in ALL_SKYBOARD_PICKUPS if sp.unlock_addr != 0
-})
+# unlock_addr → OR of all race masks for that planet (0x55 when all 4 races present).
+# Written to the unlock address at first planet load to make all races available.
+SKYBOARD_UNLOCK_MASK: dict[int, int] = {}
+for _sp in ALL_SKYBOARD_PICKUPS:
+    if _sp.unlock_addr != 0:
+        SKYBOARD_UNLOCK_MASK[_sp.unlock_addr] = SKYBOARD_UNLOCK_MASK.get(_sp.unlock_addr, 0) | int(_sp.mask)
 
 # ── Challenge-only AP items ───────────────────────────────────────────────────
 CHALLENGE_ONLY_ITEMS: frozenset[str] = frozenset({
