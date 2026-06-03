@@ -188,7 +188,7 @@ def set_rules(world: RACSizeMatterWorld) -> None:
         multiworld.get_location("Super Lombax (SP)",                 player).access_rule = \
             lambda state: (state.has("Shrink Ray", player)
                            and state.has("Hypershot", player)
-                           and state.has("Static Barrier", player))
+                           and _has_weapon(state, player, "Static Barrier"))
     if world.options.skill_points_as_checks.value >= 2:
         multiworld.get_location("Be A Cool Skyboarder (SP)",         player).access_rule = \
             _kalidon_shrink

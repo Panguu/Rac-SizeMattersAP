@@ -113,6 +113,7 @@ class RACContext(
     command_processor = RACCommandProcessor
     items_handling = 0b111
     current_planet: str = "Galaxy"
+    tags = CommonContext.tags - {"Tracker"}
 
     def __init__(self, server_address: str | None, password: str | None) -> None:
         super().__init__(server_address, password)
