@@ -112,19 +112,17 @@ def set_rules(world: RACSizeMatterWorld) -> None:
     # Inside Clank and Challax require Shrink Ray (obtained on Kalidon).
     # Dreamtime is auto-unlocked; no extra item requirement.
 
-    multiworld.get_entrance("To Ryllus",        player).access_rule = \
-        lambda state: state.has("Ryllus Infobot", player)
     multiworld.get_entrance("To Kalidon",       player).access_rule = \
         lambda state: (state.has("Kalidon Infobot", player)
                        and _has_projectile_weapon(state, player)
                        and state.has("Hypershot", player)
                        and state.has("Sprout-O-Matic", player))
-    multiworld.get_entrance("To Metalis",       player).access_rule = lambda _: True
+    multiworld.get_entrance("To Metalis",       player).access_rule = _infobot("Metalis")
     multiworld.get_entrance("To Dreamtime",     player).access_rule = \
         lambda state: (state.has("Shrink Ray", player)
                        and state.has("Hypershot", player)
                        and state.has("Sprout-O-Matic", player))
-    multiworld.get_entrance("To Outpost Omega", player).access_rule = lambda _: True
+    multiworld.get_entrance("To Outpost Omega", player).access_rule = _infobot("Outpost Omega")
     multiworld.get_entrance("To Challax",       player).access_rule = \
         lambda state: (state.has("Challax Infobot", player)
                        and state.has("Shrink Ray", player)
@@ -268,11 +266,10 @@ def set_rules(world: RACSizeMatterWorld) -> None:
     multiworld.get_location("Challax Hidden Room (TB)",    player).access_rule = _challax_base
     multiworld.get_location("Challax Mimic Plant Lob (TB)", player).access_rule = _challax_sprout
 
-    for _loc in (
-        "Challax Electroshock Chestplate",
-        "Challax Electroshock Helmet",
-    ):
-        multiworld.get_location(_loc, player).access_rule = _challax_base
+    multiworld.get_location("Challax Electroshock Chestplate", player).access_rule = _challax_base
+    multiworld.get_location("Challax Electroshock Helmet",    player).access_rule = \
+        lambda state: (_challax_base(state)
+                       or state.has("Dayni Moon Infobot", player))
 
     if world.options.skill_points_as_checks:
         multiworld.get_location("High Tech Weapons Master (SP)", player).access_rule = _challax_base
@@ -344,9 +341,11 @@ def set_rules(world: RACSizeMatterWorld) -> None:
                                         and _has_projectile_weapon(state, player)
                                         and state.has("Hypershot", player)
                                         and state.has("Sprout-O-Matic", player)),
-        "Metalis":       lambda state: state.has("Shrink Ray", player),
+        "Metalis":       lambda state: (state.has("Metalis Infobot", player)
+                                        and state.has("Shrink Ray", player)),
         "Dreamtime":     _dreamtime,
-        "Outpost Omega": lambda state: state.has("Shrink Ray", player),
+        "Outpost Omega": lambda state: (state.has("Outpost Omega Infobot", player)
+                                        and state.has("Shrink Ray", player)),
         "Challax":       lambda state: (state.has("Challax Infobot", player)
                                         and state.has("Shrink Ray", player)
                                         and state.has("Polarizer", player)),

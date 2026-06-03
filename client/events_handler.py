@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+
 from ..core.data import (
     ARMOUR_FLAG_TO_LOCATION,
     ARMOUR_SET_CHECKS,
@@ -67,6 +69,8 @@ class EventsHandlerMixin:
         self._pending_armour_pickup_locs.clear()
         self._armour_pickup_state.restore(self.pine)
         self._armour_slot_state.restore(self.pine)
+        if self._pending_item_apply:
+            asyncio.get_event_loop().create_task(self._apply_inventory_after_pickup())
 
     def _on_armour_pickup_update(self, key: str, new_value: int) -> None:
         """Callback fired by _armour_pickup_state.update() when the game writes

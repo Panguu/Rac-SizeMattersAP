@@ -60,13 +60,13 @@ from .addresses import (
 from .armour import ArmourAddresses, ArmourPiece, PlayerArmour
 
 # ── Armour pickups ────────────────────────────────────────────────────────────
-from .armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPickup
+from .locations.armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPickup
 
 # ── Armour set checks ─────────────────────────────────────────────────────────
-from .armour_set_checks import ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
+from .locations.armour_set_checks import ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
 
 # ── Challenges ────────────────────────────────────────────────────────────────
-from .challenges import (
+from .locations.challenges import (
     ALL_CLANK_ADDRESS_MAP,
     CHALLENGE_ADDRESS_MAP,
     CHALLENGE_ONLY_ITEMS,
@@ -102,7 +102,7 @@ from .planets import BY_ID, Planet, Planets
 from .player_states import PlayerState
 
 # ── Skill points ──────────────────────────────────────────────────────────────
-from .skill_points import (
+from .locations.skill_points import (
     CHALLENGE_SKILL_POINTS,
     LOCATION_SKILL_POINTS,
     SKILL_POINT_ADDRESS,
@@ -112,7 +112,7 @@ from .skill_points import (
 )
 
 # ── Titanium bolts ────────────────────────────────────────────────────────────
-from .titanium_bolts import BOLT_BY_PLANET_AND_DELTA, TITANIUM_BOLTS, TitaniumBolt
+from .locations.titanium_bolts import BOLT_BY_PLANET_AND_DELTA, TITANIUM_BOLTS, TitaniumBolt
 
 # ── Weapon/gadget address resolvers ───────────────────────────────────────────
 from .weapons import (

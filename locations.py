@@ -1,9 +1,9 @@
 from typing import NamedTuple
 
-from .core.data.armour_pickups import ARMOUR_PICKUPS
-from .core.data.challenges import CHALLENGE_PICKUPS, DAYNI_MOON_CLANK_PICKUPS, METALIS_CLANK_PICKUPS
-from .core.data.skill_points import SKILL_POINTS
-from .core.data.titanium_bolts import TITANIUM_BOLTS
+from .core.data.locations.armour_pickups import ARMOUR_PICKUPS
+from .core.data.locations.challenges import CHALLENGE_PICKUPS, DAYNI_MOON_CLANK_PICKUPS, METALIS_CLANK_PICKUPS
+from .core.data.locations.skill_points import SKILL_POINTS
+from .core.data.locations.titanium_bolts import TITANIUM_BOLTS
 
 BASE_ID = 77_700_000
 
@@ -88,7 +88,7 @@ WEAPON_MOD_VENDOR_LOCATIONS: dict[str, RACLocationData] = {
     if mod is not None
 }
 
-from .core.data.armour_set_checks import ARMOUR_SET_CHECKS
+from .core.data.locations.armour_set_checks import ARMOUR_SET_CHECKS
 
 ARMOUR_SET_CHECK_LOCATIONS: dict[str, RACLocationData] = {
     name: RACLocationData(BASE_ID + 1500 + idx, "Pokitaru")

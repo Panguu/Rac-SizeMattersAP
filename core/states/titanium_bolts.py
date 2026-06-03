@@ -1,34 +1,22 @@
-import asyncio
-from collections.abc import Callable
+from __future__ import annotations
+
 from dataclasses import dataclass
 
-from worlds.rac_size_matters.core.states.state import State
-from worlds.rac_size_matters.pypine.pypine.pine import Pine
-
-
-class TitaniumBoltAddresses:
-    """Resolves titanium bolt field addresses from a single base address.
-
-    Layout (identical on PSP and PS2):
-      +0x00  pickup  — increments each time a bolt is picked up
-      +0x05  total   — cumulative bolt count
-    """
-
-    def __init__(self, base: int) -> None:
-        self.base   = base
-        self.pickup = base + 0x00
-        self.total  = base + 0x05
+from ...interface_orchestrator.memory.accessor import MemoryAccessor
+from ...interface_orchestrator.state.base_state import BaseState
+from ...interface_orchestrator.storage.local import LocalStorage
+from ...interface_orchestrator.structs.address_map import AddressMap
+from ..structs.titanium_bolts import TitaniumBoltStruct
 
 @dataclass(frozen=True)
 class TitaniumBolt:
-    planet_id: int  # used with delta for unambiguous detection
-    bit:       int  # bit position in the pickup int64
-    region:    str  # AP region name
+    planet_id: int
+    bit:       int
+    region:    str
 
     @property
     def delta(self) -> int:
         return 1 << self.bit
-
 
 TITANIUM_BOLTS: dict[str, TitaniumBolt] = {
     "Pokitaru Above Zipline (TB)":                      TitaniumBolt(0x01,  0, "Pokitaru"),
@@ -53,87 +41,61 @@ TITANIUM_BOLTS: dict[str, TitaniumBolt] = {
     "Quodrona Ratchet Clones and Dummies (TB)":         TitaniumBolt(0x0A, 36, "Quodrona"),
 }
 
-# (planet_id, delta) → location name — used by the client for unambiguous detection
 BOLT_BY_PLANET_AND_DELTA: dict[tuple[int, int], str] = {
     (bolt.planet_id, bolt.delta): name
     for name, bolt in TITANIUM_BOLTS.items()
 }
 
+class TitaniumBoltState(BaseState):
 
-class TitaniumBoltState(State):
-    """
-    Global titanium bolt tracker. Reads a fixed-address int64 bitmask and fires
-    on_bolt_collected() when a new bit is set. No planet-specific addresses.
-    """
-
-    def __init__(self, pine: Pine, base: int):
-        super().__init__(pine)
-        self._addrs       = TitaniumBoltAddresses(base)
-        self._pickup:     int = 0
+    def __init__(
+        self,
+        accessor: MemoryAccessor,
+        addresses: AddressMap,
+        storage: LocalStorage,
+    ) -> None:
+        super().__init__(accessor, addresses, storage)
+        self._poll_last:   int = 0
         self._synced_mask: int = 0
-        self._poll_last:  int = 0
-        self._task: asyncio.Task | None = None
 
-    # --- State interface ---
+    def on_enter(self) -> None:
+        pass
 
-    async def read(self) -> bool:
-        async with self._lock:
-            self._pickup = self.pine.read_int64(self._addrs.pickup)
-        return True
+    def on_exit(self) -> None:
+        pass
 
-    async def apply(self) -> bool:
-        async with self._lock:
-            current = self.pine.read_int64(self._addrs.pickup)
-            new_val = current | self._synced_mask
-            self.pine.write_int64(self._addrs.pickup, new_val)
-            self._poll_last = new_val
-        return True
+    def _register_handlers(self) -> None:
+        self.accessor.on_struct_change(TitaniumBoltStruct, self._on_struct_change)
+
+    def _unregister_handlers(self) -> None:
+        self.accessor.remove_struct_handler(TitaniumBoltStruct, self._on_struct_change)
+
+    def _on_struct_change(self, address: int, new_bytes: bytes) -> None:
+        del address
+        instance = TitaniumBoltStruct.from_bytes(new_bytes)
+        current  = instance.pickup
+        delta    = current - self._poll_last
+        self._poll_last = current
+        if delta > 0 and (delta & (delta - 1)) == 0:
+            self.on_bolt_delta(delta)
+
+    def sync(self) -> None:
+        instance = self.accessor.read_struct(TitaniumBoltStruct)
+        self._poll_last = instance.pickup
+        new_val = instance.pickup | self._synced_mask
+        if new_val != instance.pickup:
+            instance.pickup = new_val
+            self.accessor.write_struct(instance)
 
     def sync_from_ap(self, checked_location_names: set[str]) -> None:
-        """Rebuild _synced_mask from AP-confirmed checked bolt locations."""
         mask = 0
         for loc_name, bolt in TITANIUM_BOLTS.items():
             if loc_name in checked_location_names:
                 mask |= bolt.delta
         self._synced_mask = mask
 
-    async def poll(self, mem_address: int, interval: int, callback: Callable[[int, int], None]) -> None:
-        del mem_address, callback
-        while True:
-            async with self._lock:
-                current = self.pine.read_int64(self._addrs.pickup)
-            delta = current - self._poll_last
-            self._poll_last = current
-            if delta > 0 and (delta & (delta - 1)) == 0:
-                self.on_bolt_delta(delta)
-            await asyncio.sleep(interval / 1000)
-
-    # --- Lifecycle ---
-
-    async def activate(self, interval: int, callback: Callable[[int, int], None]) -> None:
-        if self._task is not None:
-            return
-        self._task = asyncio.create_task(self.poll(0, interval, callback))
-
-    async def deactivate(self) -> None:
-        if self._task is not None:
-            self._task.cancel()
-            self._task = None
-
-    # --- Hook ---
-
     def on_bolt_delta(self, _delta: int) -> None:
-        """Fired with the arithmetic delta when a single new bolt is detected."""
         del _delta
-
-    # --- Dunder ---
-
-    __hash__ = object.__hash__
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, TitaniumBoltState):
-            return NotImplemented
-        return self is other
 
     def __repr__(self) -> str:
         collected = bin(self._poll_last).count("1")

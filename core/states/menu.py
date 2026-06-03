@@ -1,11 +1,20 @@
-import asyncio
-from collections.abc import Callable
+from __future__ import annotations
+
+import logging
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
-from worlds.rac_size_matters.core.states.state import State
-from worlds.rac_size_matters.pypine.pypine.pine import Pine
+from ...interface_orchestrator.memory.accessor import MemoryAccessor
+from ...interface_orchestrator.state.base_state import BaseState
+from ...interface_orchestrator.storage.local import LocalStorage
+from ...interface_orchestrator.structs.address_map import AddressMap
+from ..structs.menu import MenuStruct, PreloadMenuStruct
 
+logger = logging.getLogger("CommonClient")
+
+if TYPE_CHECKING:
+    from .planets import PlanetState
+    from .vendor import VendorState
 
 class MenuStateValue(IntEnum):
     CLOSED         = 0x00
@@ -15,99 +24,97 @@ class MenuStateValue(IntEnum):
     PLANET_MENU    = 0x10
     PRELOAD_READY  = 0x13
 
-if TYPE_CHECKING:
-    from worlds.rac_size_matters.core.states.planets import PlanetState
-    from worlds.rac_size_matters.core.states.vendor import VendorState
+class MenuState(BaseState):
 
-
-class MenuState(State):
-    """
-    Global coordinator for menu state. Polls the planet-specific menu address
-    and drives VendorState when a vendor menu is detected.
-
-    Activated per-planet by PlanetState.on_enter() with that planet's addresses.
-    """
-
-    def __init__(self, pine: Pine):
-        super().__init__(pine)
-        self.current: MenuStateValue     = MenuStateValue.CLOSED
-        self._preload_addr: int | None   = None
-        self._vendor: VendorState | None = None
-        self._planet: PlanetState | None = None
-        self._task: asyncio.Task | None  = None
-
-    # --- State interface ---
-
-    async def read(self) -> bool:
-        return True
-
-    async def apply(self) -> bool:
-        return True
-
-    async def poll(self, mem_address: int, interval: int, callback: Callable[[int, int], None]) -> None:
-        last: MenuStateValue | None = None
-        last_preload: int = 0
-        while True:
-            async with self._lock:
-                raw     = self.pine.read_int8(mem_address)
-                preload = self.pine.read_int8(self._preload_addr) if self._preload_addr else 0
-            try:
-                current = MenuStateValue(raw)
-            except ValueError:
-                current = self.current
-
-            preload_became_ready = (
-                preload == MenuStateValue.PRELOAD_READY
-                and last_preload != MenuStateValue.PRELOAD_READY
-            )
-
-            if last is not None and current != last:
-                callback(int(last), int(current))
-                self._on_transition(last, current)
-
-            if preload_became_ready and not self.is_vendor:
-                if self._vendor:
-                    self._vendor.start_menu_preload()
-                if self._planet:
-                    asyncio.create_task(self._planet.on_menu_preload())
-
-            self.current = current
-            last = current
-            last_preload = preload
-            await asyncio.sleep(interval / 1000)
-
-    # --- Lifecycle ---
-
-    async def activate(
+    def __init__(
         self,
-        menu_addr: int,
-        preload_addr: int,
-        vendor: "VendorState",
-        planet: "PlanetState",
-        interval: int,
-        callback: Callable[[int, int], None],
+        accessor: MemoryAccessor,
+        addresses: AddressMap,
+        storage: LocalStorage,
     ) -> None:
-        """Start polling. Called from PlanetState.on_enter()."""
-        if self._task is not None:
-            return
-        self._preload_addr = preload_addr
+        super().__init__(accessor, addresses, storage)
+        self.current: MenuStateValue       = MenuStateValue.CLOSED
+        self._last_preload: MenuStateValue = MenuStateValue.CLOSED
+        self._vendor: VendorState | None   = None
+        self._planet: PlanetState | None   = None
+
+    def bind(self, vendor: VendorState, planet: PlanetState) -> None:
         self._vendor = vendor
         self._planet = planet
-        self._task = asyncio.create_task(self.poll(menu_addr, interval, callback))
 
-    async def deactivate(self) -> None:
-        """Stop polling. Called from PlanetState.on_exit()."""
-        if self._task is not None:
-            self._task.cancel()
-            self._task = None
-        if self._vendor and self.is_vendor:
-            self._vendor.on_menu_close()
-            self._vendor.deactivate()
-        self.current = MenuStateValue.CLOSED
+    def unbind(self) -> None:
         self._vendor = None
         self._planet = None
 
-    # --- Transition handler ---
+    def on_enter(self) -> None:
+        pass
+
+    def on_exit(self) -> None:
+        if self._vendor and self.is_vendor:
+            self._vendor.on_menu_close()
+            self._vendor.deactivate()
+        self.current       = MenuStateValue.CLOSED
+        self._last_preload = MenuStateValue.CLOSED
+        self.unbind()
+
+    def _register_handlers(self) -> None:
+        menu_cls    = self._menu_struct()
+        preload_cls = self._preload_struct()
+        if menu_cls is not None:
+            self.accessor.on_struct_change(menu_cls, self._on_menu_change)
+        if preload_cls is not None:
+            self.accessor.on_struct_change(preload_cls, self._on_preload_change)
+
+    def _unregister_handlers(self) -> None:
+        menu_cls    = self._menu_struct()
+        preload_cls = self._preload_struct()
+        if menu_cls is not None:
+            self.accessor.remove_struct_handler(menu_cls, self._on_menu_change)
+        if preload_cls is not None:
+            self.accessor.remove_struct_handler(preload_cls, self._on_preload_change)
+
+    def _menu_struct(self) -> type[MenuStruct] | None:
+        for cls in self.addresses.structs():
+            if issubclass(cls, MenuStruct) and cls is not MenuStruct:
+                return cls
+        return None
+
+    def _preload_struct(self) -> type[PreloadMenuStruct] | None:
+        for cls in self.addresses.structs():
+            if issubclass(cls, PreloadMenuStruct) and cls is not PreloadMenuStruct:
+                return cls
+        return None
+
+    def _on_menu_change(self, address: int, new_bytes: bytes) -> None:
+        del address
+        raw = new_bytes[0] if new_bytes else 0
+        try:
+            new_state = MenuStateValue(raw)
+        except ValueError:
+            return
+        prev = self.current
+        self.current = new_state
+        if new_state != prev:
+            self._on_transition(prev, new_state)
+
+    def _on_preload_change(self, address: int, new_bytes: bytes) -> None:
+        del address
+        raw = new_bytes[0] if new_bytes else 0
+        try:
+            value = MenuStateValue(raw)
+        except ValueError:
+            value = MenuStateValue.CLOSED
+        prev = self._last_preload
+        self._last_preload = value
+
+        if value == MenuStateValue.PRELOAD_READY and prev != MenuStateValue.PRELOAD_READY:
+            if self._vendor is not None:
+                self._vendor.start_menu_preload()
+            if self._planet is not None:
+                self._planet.on_menu_preload()
+        elif prev == MenuStateValue.PRELOAD_READY and value != MenuStateValue.PRELOAD_READY:
+            if self._planet is not None:
+                self._planet.on_menu_preload_exit()
 
     def _on_transition(self, prev: MenuStateValue, current: MenuStateValue) -> None:
         if self._vendor is None:
@@ -116,18 +123,21 @@ class MenuState(State):
         is_vendor  = current in (MenuStateValue.WEAPONS_VENDOR, MenuStateValue.MOD_VENDOR)
 
         if is_vendor and not was_vendor:
+            logger.info(f"[RAC] MenuState: vendor opened ({current.name}).")
             self._vendor.exit_menu_preload()
             self._vendor.activate(current)
             self._vendor.on_menu_open()
-            if self._planet:
-                asyncio.create_task(self._planet.on_menu_open())
+            if self._planet is not None:
+                self._planet.on_menu_open()
         elif was_vendor and not is_vendor:
+            logger.info(f"[RAC] MenuState: vendor closed ({prev.name} → {current.name}).")
             self._vendor.on_menu_close()
             self._vendor.deactivate()
-            if self._planet:
-                asyncio.create_task(self._planet.on_menu_close())
+            if self._planet is not None:
+                self._planet.on_menu_close()
 
-    # --- Properties ---
+    def sync(self) -> None:
+        pass
 
     @property
     def is_vendor(self) -> bool:
@@ -148,13 +158,6 @@ class MenuState(State):
     @property
     def is_planet_menu(self) -> bool:
         return self.current == MenuStateValue.PLANET_MENU
-
-    __hash__ = object.__hash__
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, MenuState):
-            return NotImplemented
-        return self.current == other.current
 
     def __repr__(self) -> str:
         return f"MenuState(current={self.current.name})"

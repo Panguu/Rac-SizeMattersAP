@@ -73,29 +73,16 @@ class VendorSession:
         self.purchased_gadgets.clear()
         self.purchased_mods.clear()
 
-    # ── Ammo passthrough ─────────────────────────────────────────────────────
-
-    def _snapshot_ammo(self, ipc) -> dict[str, int]:
-        return {name: ipc.read_int32(w.ammo) for name, w in WEAPONS.items()}
-
-    def _restore_ammo(self, ipc, ammo: dict[str, int]) -> None:
-        for name, w in WEAPONS.items():
-            if name in ammo:
-                ipc.write_int32(w.ammo, ammo[name])
-
     # ── Memory operations ─────────────────────────────────────────────────────
 
     def apply(self, ipc) -> None:
-        """Write vendor state to memory.  Snapshots ammo because the game
-        resets it when unlocked flips 0→1."""
-        ammo = self._snapshot_ammo(ipc)
+        """Write vendor state to memory."""
         for w in WEAPONS.values():
             zero_weapon(ipc, w)
         for g in GADGETS.values():
             ipc.write_int8(g.unlocked, 0)
         self.weapon_state.give(ipc)
         self.gadget_state.give(ipc)
-        self._restore_ammo(ipc, ammo)
 
     def detect_purchases(self, ipc, gs: GameState) -> None:
         """Poll addresses; fire on_purchase immediately for each new detection
@@ -178,10 +165,12 @@ class VendorPoller:
         ms           = MenuState.read(ipc, gs.current_planet)
         textbox      = _TEXTBOX_BY_PLANET.get(gs.current_planet)
         if textbox:
-            raw      = ipc.read_int16(textbox.message_str_pointer)
-            msg_val  = ((raw & 0xFF) << 8) | (raw >> 8)
-            is_preloaded = msg_val == textbox.vendor_value and bool(ipc.read_int8(textbox.is_visible))
+            raw        = ipc.read_int16(textbox.message_str_pointer)
+            msg_val    = ((raw & 0xFF) << 8) | (raw >> 8)
+            is_visible = bool(ipc.read_int16(textbox.is_visible))
+            is_preloaded = msg_val == textbox.vendor_value and is_visible
         else:
+            is_visible   = False
             is_preloaded = False
         is_in_menu    = ms.is_vendor
         was_preloaded = gs.is_preloaded
@@ -190,31 +179,31 @@ class VendorPoller:
         # Stage 1: preload rising edge — player entered vendor proximity
         if is_preloaded and not was_preloaded and not is_in_menu and not gs.is_dead and not gs.is_picking_up:
             if not WEAPONS or not gs.weapons_ready:
-                logger.warning("Vendor preload: weapon addresses not ready yet — waiting for planet load.")
-                return
-            gs.vendor_session.refresh(gs.tracked_vendor_weapons, gs.tracked_vendor_gadgets, gs.tracked_vendor_mods)
-            self._log("Vendor preload detected.")
-            gs.vendor_session.apply(ipc)
-            self._log(
-                f"Vendor state applied: {gs.vendor_session.weapon_state!r}  "
-                f"{gs.vendor_session.gadget_state!r}"
-            )
+                self._log("Vendor preload: weapon addresses not ready yet — waiting for planet load.")
+            else:
+                gs.vendor_session.refresh(gs.tracked_vendor_weapons, gs.tracked_vendor_gadgets, gs.tracked_vendor_mods)
+                self._log("Vendor preload detected.")
+                gs.vendor_session.apply(ipc)
+                self._log(
+                    f"Vendor state applied: {gs.vendor_session.weapon_state!r}  "
+                    f"{gs.vendor_session.gadget_state!r}"
+                )
 
         # Stage 1: falling edge — player left without opening menu
-        if was_preloaded and not is_preloaded and not is_in_menu and not was_in_menu:
+        if was_preloaded and not is_visible and not is_in_menu and not was_in_menu:
             restore_tracked_weapon_state(gs)
-            self._log("Vendor area left. State restored.")
+            self._log("Vendor preload exit. State restored.")
 
         # Stage 2: menu opened
         if is_in_menu and not was_in_menu and not gs.is_dead and not gs.is_picking_up:
             self._log(f"Vendor menu opened ({ms!r}).")
             if not WEAPONS or not gs.weapons_ready:
-                logger.warning("Vendor menu: weapon addresses not ready yet.")
-                return
-            gs.vendor_session.apply(ipc)
-            ms.write(ipc, MenuStateValue.CLOSED)
-            ms.write(ipc, MenuStateValue(ms.raw))
-            self._log("Vendor menu refreshed.")
+                self._log("Vendor menu: weapon addresses not ready yet.")
+            else:
+                gs.vendor_session.apply(ipc)
+                ms.write(ipc, MenuStateValue.CLOSED)
+                ms.write(ipc, MenuStateValue(ms.raw))
+                self._log("Vendor menu refreshed.")
 
         # Stage 2: ongoing purchase detection — fires on_purchase immediately per item
         if is_in_menu and not gs.is_dead:
@@ -233,7 +222,7 @@ class VendorPoller:
         vs.detect_purchases(ipc, gs)
         total = vs.total()
         self._log(f"Vendor closed. {total} purchase(s) processed.")
-        ammo = vs._snapshot_ammo(ipc)
         restore_tracked_weapon_state(gs)
-        vs._restore_ammo(ipc, ammo)
         self._log("Vendor state restored.")
+        if gs.on_vendor_close:
+            gs.on_vendor_close()

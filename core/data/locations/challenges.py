@@ -8,7 +8,7 @@ from __future__ import annotations
 from enum import IntFlag
 from typing import NamedTuple
 
-from .addresses import (
+from ..addresses import (
     DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR,
     KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR,
     METALIS_CLANK_CHALLENGES_COMPLETED_ADDR,
@@ -47,8 +47,6 @@ CHALLENGE_PICKUPS: list[ChallengePickup] = [
     # Dayni Moon
     ChallengePickup(0x1F4B3FF, "Dayni Moon Mega Bomb Gloves (CC)",  "Dayni Moon"),  # The Ultimate Showdown
     ChallengePickup(0x1F4B404, "Dayni Moon Mega Bomb Boots (CC)",   "Dayni Moon"),  # Infinite Improbability
-    # Outpost Omega — detected via SkyboardPoller (Vertigo completion)
-    # ChallengePickup(0x00, "Outpost Omega Electroshock Boots (CC)", "Outpost Omega"),
 ]
 
 # Reward address map (used by item_challenges and for _append_location lookup)

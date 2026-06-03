@@ -124,9 +124,9 @@ class RACSizeMatterWorld(World):
                 break
 
     def generate_basic(self) -> None:
-        # The player always starts on Pokitaru — there is currently no way to
-        # change the starting planet, so the Pokitaru Infobot is always granted.
+        # Pokitaru and Ryllus are always the starting planets.
         self._precollect("Pokitaru Infobot")
+        self._precollect("Ryllus Infobot")
 
         if self.options.starting_bolts.value > 0:
             self.multiworld.push_precollected(self.create_item("Bolts"))

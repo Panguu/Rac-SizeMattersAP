@@ -1,94 +1,155 @@
-import asyncio
-from collections.abc import Callable
+from __future__ import annotations
+
+import struct
 from typing import TYPE_CHECKING
 
-from worlds.rac_size_matters.core.states.state import State
-from worlds.rac_size_matters.pypine.pypine.pine import Pine
+from ...interface_orchestrator.memory.accessor import MemoryAccessor
+from ...interface_orchestrator.state.base_state import BaseState
+from ...interface_orchestrator.storage.local import LocalStorage
+from ...interface_orchestrator.structs.address_map import AddressMap
+from ..structs.display_text import CountdownTimerStruct, VendorVisibilityStruct
 
 if TYPE_CHECKING:
-    from worlds.rac_size_matters.core.data.addresses import DisplayedTextBox
+    from ..data.addresses import DisplayedTextBox
 
+class DisplayedTextBoxState(BaseState):
 
-class DisplayTextBoxState(State):
-    """
-    Global vendor proximity tracker. Polls the planet-specific is_visible
-    address and fires hooks when the vendor prompt appears or disappears.
+    def __init__(
+        self,
+        accessor: MemoryAccessor,
+        addresses: AddressMap,
+        storage: LocalStorage,
+    ) -> None:
+        super().__init__(accessor, addresses, storage)
+        self.is_displayed: bool = False
+        self._active_config: DisplayedTextBox | None = None
 
-    vendor_value is the int16 value written to is_visible when the vendor
-    text box is active — it differs per planet.
+    def activate(self, config: DisplayedTextBox) -> None:
+        self._active_config = config
 
-    Activated per-planet by PlanetState.on_enter() with that planet's config.
-    """
+    def deactivate(self) -> None:
+        self._active_config = None
+        self.is_displayed = False
 
-    def __init__(self, pine: Pine):
-        super().__init__(pine)
-        self._is_visible_addr: int | None = None
-        self._vendor_value: int           = 0
-        self.is_vendor_prompt: bool       = False
-        self._task: asyncio.Task | None   = None
+    def on_enter(self) -> None:
+        pass
 
-    # --- State interface ---
+    def on_exit(self) -> None:
+        self.is_displayed = False
 
-    async def read(self) -> bool:
-        if self._is_visible_addr is None:
-            return False
-        async with self._lock:
-            raw = self.pine.read_int16(self._is_visible_addr)
-        self.is_vendor_prompt = raw == self._vendor_value
-        return True
+    def _register_handlers(self) -> None:
+        cls = self._countdown_struct()
+        if cls is not None:
+            self.accessor.on_struct_change(cls, self._on_countdown_change)
 
-    async def apply(self) -> bool:
-        return True
+    def _unregister_handlers(self) -> None:
+        cls = self._countdown_struct()
+        if cls is not None:
+            self.accessor.remove_struct_handler(cls, self._on_countdown_change)
 
-    async def poll(self, mem_address: int, interval: int, callback: Callable[[int, int], None]) -> None:
-        del mem_address, callback
-        last: bool | None = None
-        while True:
-            async with self._lock:
-                raw = self.pine.read_int16(self._is_visible_addr)
-            current = raw == self._vendor_value
-            if last is not None and current != last:
-                if current:
-                    self.on_vendor_prompt_shown()
-                else:
-                    self.on_vendor_prompt_hidden()
-            self.is_vendor_prompt = current
-            last = current
-            await asyncio.sleep(interval / 1000)
+    def _countdown_struct(self) -> type[CountdownTimerStruct] | None:
+        for cls in self.addresses.structs():
+            if issubclass(cls, CountdownTimerStruct) and cls is not CountdownTimerStruct:
+                return cls
+        return None
 
-    # --- Lifecycle ---
-
-    async def activate(self, config: "DisplayedTextBox", interval: int) -> None:
-        """Start polling. Called from PlanetState.on_enter()."""
-        if self._task is not None:
+    def _on_countdown_change(self, address: int, new_bytes: bytes) -> None:
+        del address
+        if len(new_bytes) < 4:
             return
-        self._is_visible_addr = config.is_visible
-        self._vendor_value    = config.vendor_value
-        self._task = asyncio.create_task(self.poll(0, interval, lambda *_: None))
+        timer = struct.unpack_from("<f", new_bytes)[0]
+        was_displayed = self.is_displayed
+        self.is_displayed = timer > 0
+        if self.is_displayed and not was_displayed:
+            self.on_text_box_shown()
+        elif not self.is_displayed and was_displayed:
+            self.on_text_box_hidden()
 
-    async def deactivate(self) -> None:
-        """Stop polling. Called from PlanetState.on_exit()."""
-        if self._task is not None:
-            self._task.cancel()
-            self._task = None
+    def sync(self) -> None:
+        cls = self._countdown_struct()
+        if cls is None:
+            return
+        raw = self.accessor.read_raw(cls.BASE_ADDRESS, 4)
+        if len(raw) < 4:
+            return
+        timer = struct.unpack_from("<f", raw)[0]
+        self.is_displayed = timer > 0
+
+    def on_text_box_shown(self) -> None:
+        pass
+
+    def on_text_box_hidden(self) -> None:
+        pass
+
+    def __repr__(self) -> str:
+        return f"DisplayedTextBoxState(is_displayed={self.is_displayed})"
+
+class DisplayTextBoxState(BaseState):
+
+    def __init__(
+        self,
+        accessor: MemoryAccessor,
+        addresses: AddressMap,
+        storage: LocalStorage,
+    ) -> None:
+        super().__init__(accessor, addresses, storage)
+        self.is_vendor_prompt: bool    = False
+        self._vendor_value: int        = 0
+        self._active_config: DisplayedTextBox | None = None
+        self.on_vendor_prompt_shown:  callable = lambda: None
+        self.on_vendor_prompt_hidden: callable = lambda: None
+
+    def activate(self, config: DisplayedTextBox) -> None:
+        self._active_config = config
+        self._vendor_value  = config.vendor_value
+
+    def deactivate(self) -> None:
+        self._active_config = None
         self.is_vendor_prompt = False
 
-    # --- Hooks ---
+    def on_enter(self) -> None:
+        pass
 
-    def on_vendor_prompt_shown(self) -> None:
-        """Fired when the player enters vendor range. This is the menu preload signal."""
+    def on_exit(self) -> None:
+        self.is_vendor_prompt = False
 
-    def on_vendor_prompt_hidden(self) -> None:
-        """Fired when the player leaves vendor range."""
+    def _register_handlers(self) -> None:
+        cls = self._visibility_struct()
+        if cls is not None:
+            self.accessor.on_struct_change(cls, self._on_visibility_change)
 
-    # --- Dunder ---
+    def _unregister_handlers(self) -> None:
+        cls = self._visibility_struct()
+        if cls is not None:
+            self.accessor.remove_struct_handler(cls, self._on_visibility_change)
 
-    __hash__ = object.__hash__
+    def _visibility_struct(self) -> type[VendorVisibilityStruct] | None:
+        for cls in self.addresses.structs():
+            if issubclass(cls, VendorVisibilityStruct) and cls is not VendorVisibilityStruct:
+                return cls
+        return None
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, DisplayTextBoxState):
-            return NotImplemented
-        return self is other
+    def _on_visibility_change(self, address: int, new_bytes: bytes) -> None:
+        del address
+        if len(new_bytes) < 2:
+            return
+        raw = struct.unpack_from("<h", new_bytes)[0]
+        was_prompt = self.is_vendor_prompt
+        self.is_vendor_prompt = (raw == self._vendor_value)
+        if self.is_vendor_prompt and not was_prompt:
+            self.on_vendor_prompt_shown()
+        elif not self.is_vendor_prompt and was_prompt:
+            self.on_vendor_prompt_hidden()
+
+    def sync(self) -> None:
+        cls = self._visibility_struct()
+        if cls is None:
+            return
+        raw_bytes = self.accessor.read_raw(cls.BASE_ADDRESS, 2)
+        if len(raw_bytes) < 2:
+            return
+        raw = struct.unpack_from("<h", raw_bytes)[0]
+        self.is_vendor_prompt = (raw == self._vendor_value)
 
     def __repr__(self) -> str:
         return f"DisplayTextBoxState(vendor_prompt={self.is_vendor_prompt})"

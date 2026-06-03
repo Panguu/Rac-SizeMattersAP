@@ -1,92 +1,77 @@
-import asyncio
-from collections.abc import Callable
+from __future__ import annotations
+
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
-from worlds.rac_size_matters.core.states.state import State
-from worlds.rac_size_matters.pypine.pypine.pine import Pine
+from ...interface_orchestrator.memory.accessor import MemoryAccessor
+from ...interface_orchestrator.state.base_state import BaseState
+from ...interface_orchestrator.storage.local import LocalStorage
+from ...interface_orchestrator.structs.address_map import AddressMap
 
 if TYPE_CHECKING:
-    from worlds.rac_size_matters.core.states.menu import MenuStateValue
-
+    from .menu import MenuStateValue
 
 class VendorSessionState(IntEnum):
     CLOSED     = 0
     PRELOADING = 1
     OPEN       = 2
 
+class VendorState(BaseState):
 
-class VendorState(State):
-    """
-    Global vendor session tracker. Lifecycle is driven entirely by MenuState —
-    activate()/deactivate() are called when MenuState detects a vendor opening or closing.
-    Override the on_* hooks to add vendor-specific logic.
-    """
-
-    def __init__(self, pine: Pine):
-        super().__init__(pine)
-        self.session: VendorSessionState = VendorSessionState.CLOSED
+    def __init__(
+        self,
+        accessor: MemoryAccessor,
+        addresses: AddressMap,
+        storage: LocalStorage,
+    ) -> None:
+        super().__init__(accessor, addresses, storage)
+        self.session: VendorSessionState        = VendorSessionState.CLOSED
         self.vendor_type: MenuStateValue | None = None
-        self.vendor_locations: dict[str, bool] = {}
+        self.vendor_locations: dict[str, bool]  = {}
 
-    # --- State interface ---
+    def on_enter(self) -> None:
+        pass
 
-    async def read(self) -> bool:
-        return True
+    def on_exit(self) -> None:
+        pass
 
-    async def apply(self) -> bool:
-        return True
+    def _register_handlers(self) -> None:
+        pass
 
-    async def poll(self, mem_address: int, interval: int, callback: Callable[[int, int], None]) -> None:
-        del mem_address, callback  # polling driven by MenuState, not this instance
-        while True:
-            await asyncio.sleep(interval / 1000)
+    def _unregister_handlers(self) -> None:
+        pass
 
-    # --- Lifecycle (called by MenuState) ---
+    def sync(self) -> None:
+        pass
 
     def activate(self, vendor_type: "MenuStateValue") -> None:
-        """Called by MenuState when a vendor menu opens."""
         self.vendor_type = vendor_type
         self.session = VendorSessionState.OPEN
 
     def deactivate(self) -> None:
-        """Called by MenuState when the vendor menu closes."""
         self.vendor_type = None
         self.session = VendorSessionState.CLOSED
 
-    # --- Hooks (override per use case) ---
-
     def start_menu_preload(self) -> None:
-        """Fired by MenuState when PRELOAD_READY is detected before the vendor opens."""
         self.session = VendorSessionState.PRELOADING
 
     def exit_menu_preload(self) -> None:
-        """Fired by MenuState when the vendor menu transitions from preload to open."""
+        pass
 
     def on_menu_open(self) -> None:
-        """Fired by MenuState when the vendor menu is fully open."""
+        pass
 
     def on_menu_close(self) -> None:
-        """Fired by MenuState when the vendor menu closes."""
+        pass
 
     def sync_from_ap(self, checked_location_names: set[str]) -> None:
-        """Rebuild vendor_locations from AP-confirmed purchase locations."""
         self.vendor_locations.clear()
         for loc_name in checked_location_names:
             if loc_name.startswith("Purchase "):
                 self.vendor_locations[loc_name] = True
 
     def on_purchase(self, kind: str, name: str, slot: str | None) -> None:
-        """Fired when a weapon, gadget, or mod purchase is detected."""
-
-    # --- Dunder ---
-
-    __hash__ = object.__hash__
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, VendorState):
-            return NotImplemented
-        return self is other
+        del kind, name, slot
 
     def __repr__(self) -> str:
         t = self.vendor_type.name if self.vendor_type else "None"

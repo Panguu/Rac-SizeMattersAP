@@ -12,7 +12,7 @@ Electroshock Boots) are defined in challenges.py, not here.
 """
 from typing import NamedTuple
 
-from .armour import ArmourPiece
+from ..armour import ArmourPiece
 
 
 class ArmourPickup(NamedTuple):

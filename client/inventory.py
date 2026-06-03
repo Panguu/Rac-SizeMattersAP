@@ -87,22 +87,34 @@ def _build_gadget_addresses() -> dict[str, int]:
 
 
 class InventoryMixin:
+    async def _apply_inventory_after_pickup(self) -> None:
+        """Deferred inventory flush called after pickup ends.
+
+        GameWiring's on_pickup_end reads armour from memory after a 0.3 s sleep.
+        We wait 0.5 s so that detection window has closed before we write AP items,
+        preventing false armour-pickup location checks.
+        """
+        await asyncio.sleep(0.5)
+        if not self._pending_item_apply or self._gs.is_picking_up:
+            return
+        loop = asyncio.get_event_loop()
+        async with self._pine_lock:
+            await loop.run_in_executor(None, self._apply_world_states_sync)
+            await loop.run_in_executor(None, self._apply_player_inventory_sync)
+        self._pending_item_apply = False
+
     async def _apply_received_items(self) -> None:
         if not self.pine_connected:
             self._pending_item_apply = True
             return
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
-            await loop.run_in_executor(None, self._apply_player_inventory_sync)
+            await loop.run_in_executor(None, self._rebuild_player_inventory)
+            if self._gs.is_picking_up:
+                self._pending_item_apply = True
+                return
+            await loop.run_in_executor(None, self._apply_world_states_sync)
             self._grant_new_bolt_items()
-        armour_pieces = sum(v.bit_count() for v in self._player_armour_state.values.values())
-        weapon_count  = sum(1 for k, v in self._player_weapon_state.values.items()
-                            if "_mod_" not in k and v)
-        gadget_count  = sum(1 for v in self._player_gadget_state.values.values() if v)
-        self._log(
-            f"[RAC] Applied AP inventory: {weapon_count} weapons, "
-            f"{gadget_count} gadgets, {armour_pieces} armour pieces."
-        )
         self._pending_item_apply = False
 
     # ── Rebuild from received AP items ────────────────────────────────────────
@@ -296,7 +308,12 @@ class InventoryMixin:
         self._armour_slot_state.give(self.pine)
         # Never write weapons or gadgets while vendor owns the weapon state.
         if self._gs.is_preloaded or self._gs.is_in_menu or self._wiring.vendor_active:
+            self._log(f"[RAC] _apply_player_inventory_sync: weapon write blocked — "
+                      f"is_preloaded={self._gs.is_preloaded}, is_in_menu={self._gs.is_in_menu}, "
+                      f"vendor_active={self._wiring.vendor_active}")
             return
+        unlocked = [k for k, v in self._player_weapon_state.values.items() if v and "_mod_" not in k]
+        self._log(f"[RAC] _apply_player_inventory_sync: writing {len(unlocked)} AP weapons: {unlocked}")
         if WEAPONS:
             self._player_weapon_state.give(self.pine)
         if GADGETS:

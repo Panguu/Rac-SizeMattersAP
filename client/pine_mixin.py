@@ -6,6 +6,7 @@ from CommonClient import logger
 
 from ..core.data import (
     AUTO_UNLOCK_ADDRESSES,
+    BOLT_PICKUP_MASK,
     CURRENT_PLANET_ADDRESS,
     CUTSCENE_BEFORE_SPROUT_O_MATIC,
     ELECTROSHOCK_GLOVES_CUTSCENE,
@@ -16,7 +17,8 @@ from ..core.data import (
     Planets,
     arm_cutscenes,
 )
-from ..core.states.memory import load_weapons_for_planet
+from ..core.states.memory import BOLTS, load_weapons_for_planet
+from ..core.states.titanium_bolts import TITANIUM_BOLTS
 from ..universal_tracker import PLANET_ID_TO_REGION
 from .constants import EXPECTED_GAME_ID, POLL_INTERVAL
 from .cutscene_handler import _GOAL_CUTSCENE
@@ -122,7 +124,7 @@ class PineMixin:
             try:
                 await self._poll_game()
             except Exception as exc:
-                self._log(f"[RAC] Lost PINE connection or poll failed: {exc}", "warning")
+                logger.warning(f"[RAC] Lost PINE connection or poll failed: {exc}")
                 self.pine_connected = False
 
     async def _poll_game(self) -> None:
@@ -172,13 +174,26 @@ class PineMixin:
             self._prev_before_sprout_cutscene = None
             self._prev_sprout_cutscene      = None
             self._prev_electroshock_cutscene = None
+            self._apply_player_inventory_sync()
 
         self._poll_cutscenes_sync(planet, new_checks)
 
         if not planet_changed:
             self._enforce_planet_unlocks()
 
+        self._vendor_poller.tick(self.pine)
+        self._poll_titanium_bolts(new_checks)
+
         return new_checks
+
+    def _poll_titanium_bolts(self, new_checks: list[int]) -> None:
+        current  = self.pine.read_int64(BOLTS.pickup) & BOLT_PICKUP_MASK
+        new_bits = current & ~self._prev_bolt_pickup
+        if new_bits:
+            self._prev_bolt_pickup = current
+            for name, bolt in TITANIUM_BOLTS.items():
+                if new_bits & bolt.delta:
+                    self._append_location(new_checks, name, "TitaniumBolt")
 
     def _append_location_by_name(self, name: str) -> None:
         """Single-name variant used by GameWiring hooks — dispatches async immediately."""

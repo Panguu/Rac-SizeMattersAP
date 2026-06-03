@@ -1,30 +1,31 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-logger = logging.getLogger("CommonClient")
-
-from worlds.rac_size_matters.core.data.armour import ArmourPiece
-from worlds.rac_size_matters.core.states.state import State
-from worlds.rac_size_matters.pypine.pypine.pine import Pine
-
+from ...interface_orchestrator.memory.accessor import MemoryAccessor
+from ...interface_orchestrator.state.base_state import BaseState
+from ...interface_orchestrator.storage.local import LocalStorage
+from ...interface_orchestrator.structs.address_map import AddressMap
 from ..data.addresses import MENU_ADDR_BY_PLANET_ID
+from ..data.armour import ArmourPiece
 from ..data.cutscenes import arm_cutscenes, suppress_disabled_cutscenes
-
-_PIECE_ORDER = [ArmourPiece.CHESTPLATE, ArmourPiece.HELMET, ArmourPiece.GLOVES, ArmourPiece.BOOTS]
+from ..structs.game_status import GameStatusStruct
 
 if TYPE_CHECKING:
-    from worlds.rac_size_matters.core.data.addresses import DisplayedTextBox
-    from worlds.rac_size_matters.core.states.armour import ArmourState
-    from worlds.rac_size_matters.core.states.display_text_box import DisplayTextBoxState
-    from worlds.rac_size_matters.core.states.menu import MenuState
-    from worlds.rac_size_matters.core.states.player import PlayerState
-    from worlds.rac_size_matters.core.states.vendor import VendorState
-    from worlds.rac_size_matters.core.states.weapon import WeaponState
+    from ..data.addresses import DisplayedTextBox
+    from .armour import ArmourState
+    from .display_text_box import DisplayTextBoxState, DisplayedTextBoxState
+    from .menu import MenuState
+    from .player import PlayerState
+    from .vendor import VendorState
+    from .weapon import WeaponState
+
+logger = logging.getLogger("CommonClient")
+
+_PIECE_ORDER = [ArmourPiece.CHESTPLATE, ArmourPiece.HELMET, ArmourPiece.GLOVES, ArmourPiece.BOOTS]
 
 
 @dataclass(frozen=True)
@@ -34,81 +35,48 @@ class Planet:
     menu_addr: int | None = None
 
 
-class PlanetState(State):
-    """
-    State for a single planet. Activated when the player lands; deactivated on exit.
-
-    Call the set_* methods to bind global states and addresses, then poll() to
-    start detecting planet transitions. on_enter / on_exit activate and deactivate
-    all bound states with this planet's addresses.
-    """
-
+class PlanetState(BaseState):
     def __init__(
         self,
-        pine: Pine,
+        accessor: MemoryAccessor,
+        addresses: AddressMap,
+        storage: LocalStorage,
         name: str,
         planet_id: int,
-        current_planet_addr: int,
         menu_addr: int | None = None,
-    ):
-        super().__init__(pine)
-        self.name                = name
-        self.planet_id           = planet_id
-        self.current_planet_addr = current_planet_addr
-        self.menu_addr           = menu_addr
-
-        # ── global state references (set via set_* methods) ───────────────────
-        self._armour:       ArmourState | None        = None
-        self._weapons:      WeaponState | None        = None
-        self._player:       PlayerState | None        = None
-        self._menu:         MenuState | None          = None
-        self._vendor:       VendorState | None        = None
-        self._display_text: DisplayTextBoxState | None = None
-
-        # ── per-planet addresses ──────────────────────────────────────────────
-        self._movement_addr:      int | None          = None
-        self._health_addr:        int | None          = None
-        self._weapon_array_base:  int | None          = None
-        self._preload_addr:       int                 = 0
-        self._display_text_cfg:   DisplayedTextBox | None = None
-
-        # ── callbacks ─────────────────────────────────────────────────────────
-        self._reapply_inv:         Callable[[], None]       | None = None
-        self._get_checked_locs:    Callable[[], set[str]]   | None = None
-
-        # ── internal ──────────────────────────────────────────────────────────
-        self._poll_interval:       int                = 100
-        self._vendor_poll_task:    asyncio.Task | None = None
-        self._on_enter_callbacks:  list[Callable[[], None]] = []
-
-    # ── wiring setters ────────────────────────────────────────────────────────
-
-    def set_player_state(
-        self,
-        player: PlayerState,
-        movement_addr: int,
-        health_addr: int,
     ) -> None:
-        self._player       = player
-        self._movement_addr = movement_addr
-        self._health_addr   = health_addr
+        super().__init__(accessor, addresses, storage)
+        self.name      = name
+        self.planet_id = planet_id
+        self.menu_addr = menu_addr
 
-    def set_weapon_state(self, weapons: WeaponState, array_base: int) -> None:
-        self._weapons            = weapons
-        self._weapon_array_base  = array_base
+        self._armour:             ArmourState | None           = None
+        self._weapons:            WeaponState | None           = None
+        self._player:             PlayerState | None           = None
+        self._menu:               MenuState | None             = None
+        self._vendor:             VendorState | None           = None
+        self._display_text:       DisplayTextBoxState | None   = None
+        self._displayed_text_box: DisplayedTextBoxState | None = None
+        self._display_text_cfg:   DisplayedTextBox | None     = None
+
+        self._reapply_inv:        Callable[[], None]     | None = None
+        self._get_checked_locs:   Callable[[], set[str]] | None = None
+        self._on_enter_callbacks: list[Callable[[], None]] = []
+        self._on_exit_callbacks:  list[Callable[[], None]] = []
+        self._active_planet: int = 0
+
+    def set_player_state(self, player: PlayerState) -> None:
+        self._player = player
+
+    def set_weapon_state(self, weapons: WeaponState) -> None:
+        self._weapons = weapons
 
     def set_armour(self, armour: ArmourState) -> None:
         self._armour = armour
 
-    def set_menu_state(
-        self,
-        menu: MenuState,
-        preload_addr: int,
-        vendor: VendorState,
-    ) -> None:
-        self._menu         = menu
-        self._preload_addr = preload_addr
-        self._vendor       = vendor
+    def set_menu_state(self, menu: MenuState, vendor: VendorState) -> None:
+        self._menu   = menu
+        self._vendor = vendor
 
     def set_display_text_box(
         self,
@@ -117,8 +85,9 @@ class PlanetState(State):
     ) -> None:
         self._display_text     = display_text
         self._display_text_cfg = config
-        display_text.on_vendor_prompt_shown  = lambda: asyncio.create_task(self.on_menu_preload())
-        display_text.on_vendor_prompt_hidden = lambda: asyncio.create_task(self.on_menu_preload_exit())
+
+    def set_displayed_text_box(self, displayed_text_box: DisplayedTextBoxState) -> None:
+        self._displayed_text_box = displayed_text_box
 
     def set_inventory_callbacks(
         self,
@@ -128,103 +97,116 @@ class PlanetState(State):
         self._reapply_inv      = reapply_inv
         self._get_checked_locs = get_checked_locations
 
-    def set_poll_interval(self, ms: int) -> None:
-        self._poll_interval = ms
-
     def add_enter_callback(self, fn: Callable[[], None]) -> None:
         self._on_enter_callbacks.append(fn)
 
-    # ── State interface ───────────────────────────────────────────────────────
+    def add_exit_callback(self, fn: Callable[[], None]) -> None:
+        self._on_exit_callbacks.append(fn)
 
-    async def read(self) -> bool:
-        return True
+    def on_enter(self) -> None:
+        pass
 
-    async def apply(self) -> bool:
-        return True
+    def on_exit(self) -> None:
+        pass
 
-    async def poll(self, mem_address: int, interval: int, callback: Callable[[int, int], None]) -> None:
-        last: int | None = None
-        while True:
-            async with self._lock:
-                current = self.pine.read_int8(mem_address)
-            if last is None:
-                if current == self.planet_id:
-                    asyncio.create_task(self.on_enter())
-            elif current != last:
-                callback(last, current)
-                now_active = current == self.planet_id
-                was_active = last    == self.planet_id
-                if now_active and not was_active:
-                    asyncio.create_task(self.on_enter())
-                elif was_active and not now_active:
-                    asyncio.create_task(self.on_exit())
-            last = current
-            await asyncio.sleep(interval / 1000)
+    def _register_handlers(self) -> None:
+        self.accessor.on_struct_change(GameStatusStruct, self._on_game_status_change)
 
-    # ── Planet lifecycle ──────────────────────────────────────────────────────
+    def _unregister_handlers(self) -> None:
+        self.accessor.remove_struct_handler(GameStatusStruct, self._on_game_status_change)
 
-    async def on_enter(self) -> None:
-        """Activate all per-planet states and apply AP inventory."""
-        arm_cutscenes(self.pine, self.planet_id, "armed")
+    def _on_game_status_change(self, address: int, new_bytes: bytes) -> None:
+        del address
+        offset = GameStatusStruct.field_offset("current_planet")
+        if len(new_bytes) <= offset:
+            return
+        new_planet = new_bytes[offset]
+        was_active = self._active_planet == self.planet_id
+        now_active = new_planet == self.planet_id
+        self._active_planet = new_planet
+        if now_active and not was_active:
+            self.planet_enter()
+        elif was_active and not now_active:
+            self.planet_exit()
+
+    def sync(self) -> None:
+        pass
+
+    def planet_enter(self) -> None:
+        logger.info(f"[RAC] [{self.name}] planet_enter")
+        arm_cutscenes(self._pine_proxy(), self.planet_id, "armed")
         for cb in self._on_enter_callbacks:
             cb()
-        interval = self._poll_interval
-
-        if self._player and self._movement_addr is not None:
-            await self._player.activate(
-                self._movement_addr, self._health_addr, interval, lambda *_: None
-            )
-
-        if self._weapons and self._weapon_array_base is not None:
-            await self._weapons.activate(self._weapon_array_base, interval, lambda *_: None)
-
-        if self._menu and self.menu_addr is not None and self._vendor is not None:
-            await self._menu.activate(
-                self.menu_addr, self._preload_addr,
-                self._vendor, self, interval, lambda *_: None,
-            )
-
-        if self._display_text and self._display_text_cfg is not None:
-            await self._display_text.activate(self._display_text_cfg, interval)
-
-        if self._get_checked_locs and self._weapons:
+        if self._player is not None:
+            self._player.set_planet(self.planet_id)
+        if self._menu is not None and self._vendor is not None:
+            self._menu.bind(self._vendor, self)
+        if self._display_text is not None and self._display_text_cfg is not None:
+            self._display_text.activate(self._display_text_cfg)
+            self._display_text.on_vendor_prompt_shown  = self.on_menu_preload
+            self._display_text.on_vendor_prompt_hidden = self.on_menu_preload_exit
+        if self._displayed_text_box is not None and self._display_text_cfg is not None:
+            self._displayed_text_box.activate(self._display_text_cfg)
+        if self._get_checked_locs is not None and self._weapons is not None:
             self._weapons.sync_from_ap(self._get_checked_locs())
-
-        if self._reapply_inv:
+        if self._reapply_inv is not None:
             self._reapply_inv()
 
-    async def on_exit(self) -> None:
-        """Deactivate all per-planet states."""
-        if self._player:
-            await self._player.deactivate()
-        if self._weapons:
-            await self._weapons.deactivate()
-        if self._menu:
-            await self._menu.deactivate()
-        if self._display_text:
-            await self._display_text.deactivate()
-        if self._vendor_poll_task:
-            self._vendor_poll_task.cancel()
-            self._vendor_poll_task = None
+    def planet_exit(self) -> None:
+        logger.info(f"[RAC] [{self.name}] planet_exit")
+        for cb in self._on_exit_callbacks:
+            cb()
+        if self._menu is not None:
+            self._menu.on_exit()
+        if self._display_text is not None:
+            self._display_text.deactivate()
+        if self._displayed_text_box is not None:
+            self._displayed_text_box.deactivate()
 
-    # ── Pickup hooks ──────────────────────────────────────────────────────────
+    def _pine_proxy(self):
+        accessor = self.accessor
 
-    async def on_pickup_start(self) -> None:
-        """Reads slot state, applies location armour so the game writes only the new piece during animation."""
-        suppress_disabled_cutscenes(self.pine, self.planet_id)
+        class _Proxy:
+            def read_int8(self, addr: int) -> int:
+                raw = accessor.read_raw(addr, 1)
+                return raw[0] if raw else 0
+            def write_int8(self, addr: int, val: int) -> None:
+                accessor.write_raw(addr, bytes([val & 0xFF]))
+            def read_int16(self, addr: int) -> int:
+                raw = accessor.read_raw(addr, 2)
+                return int.from_bytes(raw, "little", signed=True) if len(raw) >= 2 else 0
+            def write_int16(self, addr: int, val: int) -> None:
+                accessor.write_raw(addr, val.to_bytes(2, "little", signed=True))
+            def read_int32(self, addr: int) -> int:
+                raw = accessor.read_raw(addr, 4)
+                return int.from_bytes(raw, "little", signed=True) if len(raw) >= 4 else 0
+            def write_int32(self, addr: int, val: int) -> None:
+                accessor.write_raw(addr, val.to_bytes(4, "little", signed=False))
+            def read_int64(self, addr: int) -> int:
+                raw = accessor.read_raw(addr, 8)
+                return int.from_bytes(raw, "little") if len(raw) >= 8 else 0
+            def write_int64(self, addr: int, val: int) -> None:
+                accessor.write_raw(addr, val.to_bytes(8, "little"))
+            def read_bytes(self, addr: int, size: int) -> bytes:
+                return accessor.read_raw(addr, size)
+            def write_bytes(self, addr: int, data: bytes) -> None:
+                accessor.write_raw(addr, data)
+
+        return _Proxy()
+
+    def on_pickup_start(self) -> None:
+        suppress_disabled_cutscenes(self._pine_proxy(), self.planet_id)
         logger.info(f"[RAC] [{self.name}] Pickup start — applying collected armour")
         if self._armour is not None:
-            await self._armour.read_armour_slots()
-            await self._armour.apply_location_armour()
+            self._armour.sync_slots()
+            self._armour.apply_location_armour()
 
-    async def on_pickup_end(self) -> None:
-        """Detects newly written armour bits, fires location checks, then restores AP state."""
-        suppress_disabled_cutscenes(self.pine, self.planet_id)
+    def on_pickup_end(self) -> None:
+        suppress_disabled_cutscenes(self._pine_proxy(), self.planet_id)
         logger.info(f"[RAC] [{self.name}] Pickup end — reading armour state")
         if self._armour is None:
             return
-        await asyncio.sleep(0.3)
-        await self._armour.read()
+        self._armour.sync()
         bitmask_summary = {k: hex(v) for k, v in self._armour.sets_bitmask.items() if v}
         logger.info(f"[RAC] [{self.name}] Pickup end sets_bitmask: {bitmask_summary}")
         for name, mask in self._armour.sets_bitmask.items():
@@ -232,114 +214,73 @@ class PlanetState(State):
             for piece in _PIECE_ORDER:
                 if new_bits & int(piece):
                     self.on_armour_acquired(name, piece)
-        await self._armour.apply_item_pickup_armour()
+        self._armour.apply_item_pickup_armour()
 
     def on_armour_acquired(self, _name: str, _piece: ArmourPiece) -> None:
-        """Fired for each newly acquired armour piece after a pickup."""
         del _name, _piece
 
-    # ── Menu hooks ────────────────────────────────────────────────────────────
-
-    async def on_menu_preload(self) -> None:
-        """Sets vendor session to preloading and applies vendor purchase locations to memory."""
+    def on_menu_preload(self) -> None:
+        logger.info(f"[RAC] [{self.name}] Vendor preload started.")
         if self._vendor is not None:
             self._vendor.start_menu_preload()
         if self._weapons is not None:
-            await self._weapons.apply_vendor_locations()
+            self._weapons.apply_vendor_locations()
 
-    async def on_menu_preload_exit(self) -> None:
-        """Closes vendor session and restores full AP inventory."""
+    def on_menu_preload_exit(self) -> None:
+        from .vendor import VendorSessionState
+        session = self._vendor.session if self._vendor is not None else VendorSessionState.CLOSED
+        logger.info(f"[RAC] [{self.name}] Vendor preload exit — session={session.name}.")
+        if session != VendorSessionState.PRELOADING:
+            return
         if self._vendor is not None:
             self._vendor.deactivate()
-        if self._reapply_inv:
+        if self._reapply_inv is not None:
             self._reapply_inv()
 
-    async def on_menu_open(self) -> None:
-        """Polls weapon/mod/gadget unlock addresses for purchases while the vendor is open."""
-        if self._weapons is None:
-            return
-        from worlds.rac_size_matters.core.states.weapon import (
-            GADGET_INTERNAL_TO_LOCATION,
-            MOD_INTERNAL_TO_LOCATION,
-            WEAPON_INTERNAL_TO_LOCATION,
-        )
-        await self._weapons.apply_vendor_locations()
-        snapshot_vendor = dict(self._weapons.vendor_locations)
+    def on_menu_open(self) -> None:
+        logger.info(f"[RAC] [{self.name}] Vendor menu open.")
+        if self._weapons is not None:
+            self._weapons.apply_vendor_locations()
 
-        async def _poll_purchases() -> None:
-            while True:
-                await self._weapons.read()
-                for name, unlocked in self._weapons.weapons.items():
-                    loc = WEAPON_INTERNAL_TO_LOCATION.get(name)
-                    if unlocked and loc and not snapshot_vendor.get(loc, False):
-                        snapshot_vendor[loc] = True
-                        self._weapons.vendor_locations[loc] = True
-                        self.on_vendor_weapon_purchased(name)
-                for name, unlocked in self._weapons.gadgets.items():
-                    loc = GADGET_INTERNAL_TO_LOCATION.get(name)
-                    if unlocked and loc and not snapshot_vendor.get(loc, False):
-                        snapshot_vendor[loc] = True
-                        self._weapons.vendor_locations[loc] = True
-                        self.on_vendor_gadget_purchased(name)
-                for weapon, slots in self._weapons.mods.items():
-                    for slot, unlocked in slots.items():
-                        loc = MOD_INTERNAL_TO_LOCATION.get((weapon, slot))
-                        if unlocked and loc and not snapshot_vendor.get(loc, False):
-                            snapshot_vendor[loc] = True
-                            self._weapons.vendor_locations[loc] = True
-                            self.on_vendor_mod_purchased(weapon, slot)
-                await asyncio.sleep(self._poll_interval / 1000)
-
-        self._vendor_poll_task = asyncio.create_task(_poll_purchases())
-
-    async def on_menu_close(self) -> None:
-        """Stops purchase polling and restores full AP inventory."""
-        if self._vendor_poll_task is not None:
-            self._vendor_poll_task.cancel()
-            self._vendor_poll_task = None
-        if self._reapply_inv:
+    def on_menu_close(self) -> None:
+        logger.info(f"[RAC] [{self.name}] Vendor menu closed — restoring AP inventory.")
+        if self._vendor is not None:
+            self._vendor.deactivate()
+        if self._reapply_inv is not None:
             self._reapply_inv()
 
     def on_vendor_weapon_purchased(self, _name: str) -> None:
-        """Fired when a weapon is purchased from the vendor."""
         del _name
 
     def on_vendor_gadget_purchased(self, _name: str) -> None:
-        """Fired when a gadget is purchased from the vendor."""
         del _name
 
     def on_vendor_mod_purchased(self, _weapon: str, _slot: str) -> None:
-        """Fired when a weapon mod is purchased from the vendor."""
         del _weapon, _slot
-
-    # ── Dunder ────────────────────────────────────────────────────────────────
-
-    __hash__ = object.__hash__
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PlanetState):
             return NotImplemented
         return self.planet_id == other.planet_id
 
+    def __hash__(self) -> int:  # type: ignore[override]
+        return hash(self.planet_id)
+
     def __repr__(self) -> str:
         return f"PlanetState(name={self.name!r}, planet_id={self.planet_id:#04x})"
 
 
 class Planets:
-    POKITARU        = Planet("Pokitaru",              0x01, menu_addr=MENU_ADDR_BY_PLANET_ID[0x01])
-    RYLLUS          = Planet("Ryllus",                0x02, menu_addr=MENU_ADDR_BY_PLANET_ID[0x02])
-    KALIDON         = Planet("Kalidon",               0x03, menu_addr=MENU_ADDR_BY_PLANET_ID[0x03])
-    METALIS         = Planet("Metalis",               0x04, menu_addr=MENU_ADDR_BY_PLANET_ID[0x04])
-    DREAMTIME       = Planet("Dreamtime",             0x05, menu_addr=MENU_ADDR_BY_PLANET_ID[0x05])
-    # OUTPOST_OMEGA_1 = Planet("Outpost Omega 1",       0x06)
-    CHALLAX         = Planet("Challax",               0x07, menu_addr=MENU_ADDR_BY_PLANET_ID[0x07])
-    DAYNI_MOON      = Planet("Dayni Moon",            0x08, menu_addr=MENU_ADDR_BY_PLANET_ID[0x08])
-    INSIDE_CLANK    = Planet("Inside Clank",          0x09)
-    QUODRONA        = Planet("Quodrona",              0x0A, menu_addr=MENU_ADDR_BY_PLANET_ID[0x0A])
-    # GIANT_CLANK_META = Planet("Giant Clank (Metalis)", 0x0F)
-    # GIANT_CLANK_CHAL = Planet("Giant Clank (Challax)", 0x15)
-    # KALIDON_RACE    = Planet("Kalidon Race Track",    0x16)
-    OUTPOST_OMEGA_2 = Planet("Outpost Omega 2",       0x17, menu_addr=MENU_ADDR_BY_PLANET_ID[0x17])
+    POKITARU        = Planet("Pokitaru",        0x01, menu_addr=MENU_ADDR_BY_PLANET_ID[0x01])
+    RYLLUS          = Planet("Ryllus",          0x02, menu_addr=MENU_ADDR_BY_PLANET_ID[0x02])
+    KALIDON         = Planet("Kalidon",         0x03, menu_addr=MENU_ADDR_BY_PLANET_ID[0x03])
+    METALIS         = Planet("Metalis",         0x04, menu_addr=MENU_ADDR_BY_PLANET_ID[0x04])
+    DREAMTIME       = Planet("Dreamtime",       0x05, menu_addr=MENU_ADDR_BY_PLANET_ID[0x05])
+    CHALLAX         = Planet("Challax",         0x07, menu_addr=MENU_ADDR_BY_PLANET_ID[0x07])
+    DAYNI_MOON      = Planet("Dayni Moon",      0x08, menu_addr=MENU_ADDR_BY_PLANET_ID[0x08])
+    INSIDE_CLANK    = Planet("Inside Clank",    0x09)
+    QUODRONA        = Planet("Quodrona",        0x0A, menu_addr=MENU_ADDR_BY_PLANET_ID[0x0A])
+    OUTPOST_OMEGA_2 = Planet("Outpost Omega 2", 0x17, menu_addr=MENU_ADDR_BY_PLANET_ID[0x17])
 
 
 BY_ID: dict[int, Planet] = {

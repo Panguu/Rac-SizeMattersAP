@@ -5,7 +5,7 @@ from collections.abc import Callable
 from CommonClient import logger
 
 from ..pypine.pypine.pine import Pine
-from .states.challenges import ALL_CLANK_ADDRESS_MAP, CHALLENGE_ADDRESS_MAP
+from .data.locations.challenges import ALL_CLANK_ADDRESS_MAP, CHALLENGE_ADDRESS_MAP
 
 
 class ChallengePoller:
@@ -32,13 +32,18 @@ class ChallengePoller:
 
     def write_defaults(self, ipc: Pine) -> None:
         """On first planet load: write 1 to every challenge address that is still 0
-        (unavailable), making all challenges available. Updates _prev to match."""
+        (unavailable), making all challenges available.
+
+        Only snapshots incomplete challenges (val < 2) into _prev.  Already-completed
+        ones (val >= 2) are left untracked so the next tick sees the default prev of 1
+        and fires the location check — catching challenges completed before connecting."""
         for addr in ALL_CLANK_ADDRESS_MAP:
             val = ipc.read_int8(addr)
             if val == 0:
                 ipc.write_int8(addr, 1)
                 val = 1
-            self._prev[addr] = val
+            if val < 2:
+                self._prev[addr] = val
 
     def tick(self, ipc: Pine, new_checks: list[int], append_fn: Callable[[list[int], str, str], None]) -> None:
         addr_map = ALL_CLANK_ADDRESS_MAP if self._mode >= 2 else CHALLENGE_ADDRESS_MAP
