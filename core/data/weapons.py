@@ -62,34 +62,15 @@ def is_ps2_weapon_candidate(data: bytes, i: int) -> bool:
 
 
 class WeaponAddresses:
-    """Resolves all weapon field addresses from a single base (start_object).
+    """Resolves weapon unlock and mod-slot addresses from a single base (start_object).
 
-    All offsets were derived from Shock Rocket (most complete weapon) and hold for every weapon:
-      title            = base + 0x0D
-      item             = base + 0x15
-      menu_icon        = base + 0x1D
-      mod_icon_one     = base + 0x21
-      mod_icon_two     = base + 0x25
-      mod_icon_three   = base + 0x29
-      level            = base + 0x2D
-      ammo             = base + 0x31
-      experience       = base + 0x35
-      mod_slot_one     = base + 0x3D  (uint8 boolean)
-      mod_slot_two     = base + 0x3E  (uint8 boolean)
-      mod_slot_three   = base + 0x3F  (uint8 boolean)
-      unlocked         = base + 0x45  (uint8 boolean)
+      mod_slot_one   = base + 0x3D  (uint8 boolean)
+      mod_slot_two   = base + 0x3E  (uint8 boolean)
+      mod_slot_three = base + 0x3F  (uint8 boolean)
+      unlocked       = base + 0x45  (uint8 boolean)
     """
 
     _OFFSETS: dict[str, int] = {
-        "title":          0x0D,
-        "item":           0x15,
-        "menu_icon":      0x1D,
-        "mod_icon_one":   0x21,
-        "mod_icon_two":   0x25,
-        "mod_icon_three": 0x29,
-        "level":          0x2D,
-        "ammo":           0x31,
-        "experience":     0x35,
         "mod_slot_one":   0x3D,
         "mod_slot_two":   0x3E,
         "mod_slot_three": 0x3F,

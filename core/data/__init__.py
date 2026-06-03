@@ -17,9 +17,9 @@ __all__ = [
     # planets
     "Planet", "Planets", "BY_ID",
     # cutscenes
-    "Cutscene", "arm_cutscenes",
+    "Cutscene", "arm_cutscenes", "suppress_disabled_cutscenes",
     "ENTER_CUTSCENES", "CUTSCENE_BEFORE_SPROUT_O_MATIC", "SPROUT_O_MATIC_CUTSCENE",
-    "ELECTROSHOCK_GLOVES_CUTSCENE", "CUTSCENES",
+    "ELECTROSHOCK_GLOVES_CUTSCENE", "POKITARU_RYLLUS_ALT_TRIGGER", "CUTSCENES",
     # skill points
     "SkillPoint", "SKILL_POINT_ADDRESS", "SKILL_POINTS", "LOCATION_SKILL_POINTS", "SKILL_POINT_BY_PLANET_AND_MASK",
     "CHALLENGE_SKILL_POINTS",
@@ -82,9 +82,11 @@ from .cutscenes import (
     CUTSCENES,
     ELECTROSHOCK_GLOVES_CUTSCENE,
     ENTER_CUTSCENES,
+    POKITARU_RYLLUS_ALT_TRIGGER,
     SPROUT_O_MATIC_CUTSCENE,
     Cutscene,
     arm_cutscenes,
+    suppress_disabled_cutscenes,
 )
 
 # ── Infobots ──────────────────────────────────────────────────────────────────

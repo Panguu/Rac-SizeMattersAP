@@ -60,13 +60,13 @@ _LOCATION_TO_ARMOUR: dict[str, tuple[str, int]] = {
 }
 
 from ..core.data import ArmourPiece
-from ..core.memory import (
+from ..core.states.memory import (
     ARMOUR_ADDRESSES,
     GADGETS,
     PLAYER_ARMOUR_SLOTS,
     WEAPONS,
 )
-from ..core.memory.singletons import _ARMOUR_PIECES, _ARMOUR_SET_ORDER, _PIECE_TO_SLOTS
+from ..core.states.memory.singletons import _ARMOUR_PIECES, _ARMOUR_SET_ORDER, _PIECE_TO_SLOTS
 
 _MOD_SLOT_ATTRS = ("mod_slot_one", "mod_slot_two", "mod_slot_three")
 
@@ -121,6 +121,7 @@ class InventoryMixin:
         gadget_unlocked:    dict[str, int] = {}
         weapon_mods:        dict[str, int] = {}  # internal_name → max mods count
 
+        infobot_planets: set[str] = set()
         for network_item in self.items_received:
             item_name = self.item_names[self.game].get(network_item.item, "")
 
@@ -134,7 +135,9 @@ class InventoryMixin:
                 continue
 
             if item_name in INFOBOT_ITEM_TO_PLANET:
-                self._planet_state.add(INFOBOT_ITEM_TO_PLANET[item_name], INFOBOT_UNLOCK_VALUE)
+                planet_key = INFOBOT_ITEM_TO_PLANET[item_name]
+                self._planet_state.add(planet_key, INFOBOT_UNLOCK_VALUE)
+                infobot_planets.add(planet_key.upper())
             elif item_name in WEAPON_DISPLAY_TO_INTERNAL:
                 weapon_unlocked[WEAPON_DISPLAY_TO_INTERNAL[item_name]] = 1
             elif item_name in GADGET_DISPLAY_TO_INTERNAL:
@@ -145,6 +148,8 @@ class InventoryMixin:
                     set_key,
                     self._player_armour_state.get(set_key) | int(piece),
                 )
+
+        self._wiring.planet_unlock.set_unlocked_planets(infobot_planets)
 
         # Progressive armour
         for display, count in armour_prog_counts.items():
@@ -290,21 +295,10 @@ class InventoryMixin:
         self._sync_armour_slot_state()
         self._armour_slot_state.give(self.pine)
         # Never write weapons or gadgets while vendor owns the weapon state.
-        if self._gs.is_preloaded or self._gs.is_in_menu:
+        if self._gs.is_preloaded or self._gs.is_in_menu or self._wiring.vendor_active:
             return
         if WEAPONS:
-            # Snapshot ammo/level/exp before writing unlocked flags — the game
-            # resets those fields when unlocked changes, so we restore them after.
-            snap = {n: (self.pine.read_int32(w.ammo),
-                        self.pine.read_int32(w.level),
-                        self.pine.read_int32(w.experience))
-                    for n, w in WEAPONS.items()}
             self._player_weapon_state.give(self.pine)
-            for n, w in WEAPONS.items():
-                ammo, lvl, exp = snap[n]
-                self.pine.write_int32(w.ammo, ammo)
-                self.pine.write_int32(w.level, lvl)
-                self.pine.write_int32(w.experience, exp)
         if GADGETS:
             self._player_gadget_state.give(self.pine)
 

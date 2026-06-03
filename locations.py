@@ -42,14 +42,15 @@ VENDOR_WEAPON_PLANET: dict[str, str] = {
     "Suck Cannon":     "Dreamtime",
     "Bee Mine Glove":  "Outpost Omega",
     "Sniper Mine":     "Challax",
-    "Mootator":        "Dayni Moon",
     "Shock Rocket":    "Dayni Moon",
     "Static Barrier":  "Inside Clank",
     "Laser Tracer":    "Quodrona",
 }
 
 VENDOR_GADGET_PLANET: dict[str, str] = {
-    "Hypershot": "Pokitaru",
+    "Hypershot":   "Pokitaru",
+    "PDA":         "Challax",
+    "Map-O-Matic": "Dayni Moon",
 }
 
 WEAPON_VENDOR_LOCATIONS: dict[str, RACLocationData] = {
@@ -73,7 +74,7 @@ VENDOR_WEAPON_MOD_PLANET: dict[tuple, str | None] = {
     ("Concussion Gun",  "Lock On Mod"):       "Challax",
     ("Concussion Gun",  "Charge Up Mod"):     "Challax",
     ("Agents of Doom",  None):                None,    # mod slot 1 inaccessible at vendor
-    ("Agents of Doom",  "Launcher Mod"):      "Kalidon",
+    ("Agents of Doom",  "Launcher Mod"):      "Quodrona",
     ("Scorcher",        "Spitfire Mod"):      "Quodrona",
     ("Bee Mine Glove",  "Worker Mod"):        "Challax",
     ("Sniper Mine",     "Split Beam Mod"):    "Quodrona",

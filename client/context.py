@@ -17,16 +17,17 @@ from CommonClient import logger
 from ..core.challenge import ChallengePoller
 from ..core.data import PLANET_STATE_ADDRESSES, PLAYER_STATE, SKILL_POINT_ADDRESS
 from ..core.data.controller import ButtonState
-from ..core.memory import (
+from ..core.game_wiring import GameWiring
+from ..core.skyboard import SkyboardPoller
+from ..core.states.game_state import GameState
+from ..core.states.memory import (
     ARMOUR_ADDRESSES,
     BOLTS,
     PLAYER_ARMOUR_SLOTS,
     Int64State,
     MemoryItemState,
 )
-from ..core.skyboard import SkyboardPoller
-from ..core.state import GameState
-from ..core.vendor import VendorPoller, VendorSession
+from ..core.states.vendor_session import VendorPoller, VendorSession
 from ..locations import ALL_LOCATIONS
 from ..pypine.pypine.pine import Pine
 from .constants import GAME_NAME
@@ -200,6 +201,16 @@ class RACContext(
         self._debug_messages = False
         self._challenge_defaults_written = False
 
+        self._wiring = GameWiring(self.pine)
+
+    def _checked_location_names(self) -> set[str]:
+        id_to_name = {v: k for k, v in self._location_name_to_id.items()}
+        return {
+            id_to_name[lid]
+            for lid in (self.checked_locations | self._locally_checked_locations)
+            if lid in id_to_name
+        }
+
     def _log(self, msg: str, level: str = "info") -> None:
         if not self._debug_messages:
             return
@@ -225,11 +236,22 @@ class RACContext(
             self._gs.vendor_session.mods_randomized = bool(self.slot_data.get("vendor_mods_randomized", True))
             if self._death_link_enabled:
                 asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": ["DeathLink"]}]))
+            self._wiring.wire(
+                send_location  = self._append_location_by_name,
+                send_deathlink = self._send_death_link_from_sync,
+                kill_player    = self._kill_player_sync,
+                reapply_inv    = self._apply_player_inventory_sync,
+                death_amnesty  = lambda: int(self.slot_data.get("death_amnesty", 1)),
+            )
+            checked = self._checked_location_names()
+            asyncio.create_task(self._wiring.on_ap_connected(self.slot_data, checked))
             self._pending_item_apply = True
             asyncio.create_task(self._apply_received_items())
             return
 
         if cmd == "ReceivedItems":
+            checked = self._checked_location_names()
+            asyncio.create_task(self._wiring.on_ap_received_items(checked))
             self._pending_item_apply = True
             asyncio.create_task(self._apply_received_items())
             return

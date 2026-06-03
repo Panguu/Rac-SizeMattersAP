@@ -6,32 +6,25 @@ from CommonClient import logger
 
 from ..core.data import (
     AUTO_UNLOCK_ADDRESSES,
-    BOLT_BY_PLANET_AND_DELTA,
-    BOLT_PICKUP_MASK,
     CURRENT_PLANET_ADDRESS,
     CUTSCENE_BEFORE_SPROUT_O_MATIC,
     ELECTROSHOCK_GLOVES_CUTSCENE,
     ENTER_CUTSCENES,
     INFOBOT_UNLOCK_VALUE,
-    LOCATION_SKILL_POINTS,
     PLANET_STATE_ADDRESSES,
-    PLAYER_ADDRS,
-    PLAYER_STATE,
-    SKILL_POINT_ADDRESS,
     SPROUT_O_MATIC_CUTSCENE,
     Planets,
-    PlayerState,
     arm_cutscenes,
 )
-from ..core.memory import BOLTS, load_weapons_for_planet
+from ..core.states.memory import load_weapons_for_planet
 from ..universal_tracker import PLANET_ID_TO_REGION
 from .constants import EXPECTED_GAME_ID, POLL_INTERVAL
 from .cutscene_handler import _GOAL_CUTSCENE
-from .deathlink import _dead
 
 
 class PineMixin:
     async def disconnect_pine(self) -> None:
+        await self._wiring.stop()
         async with self._pine_lock:
             self.pine_connected = False
             try:
@@ -90,6 +83,7 @@ class PineMixin:
                 )
                 self.pine_connected = False
                 return
+        await self._wiring.start()
         await self._apply_received_items()
         await self._send_map_page(self.current_planet)
 
@@ -102,15 +96,9 @@ class PineMixin:
             self._log(f"[RAC] Initial state read failed: {exc}", "warning")
 
     def _read_initial_state_sync(self) -> None:
-        self._challenge_defaults_written = False
-        self._challenge_poller.initialize()
-        self._prev_skill_points = self.pine.read_int64(SKILL_POINT_ADDRESS)
-        self._prev_bolt_pickup = self.pine.read_int64(BOLTS.pickup) & BOLT_PICKUP_MASK
         self._prev_planet = self.pine.read_int8(CURRENT_PLANET_ADDRESS)
         self.current_planet = PLANET_ID_TO_REGION.get(self._prev_planet, "Galaxy")
         self._gs.weapons_ready = load_weapons_for_planet(self._prev_planet)
-        self._state_addr = PLAYER_ADDRS.get(self._prev_planet, (PLAYER_STATE,))[0]
-        self._prev_player_state = self.pine.read_int16(self._state_addr)
         self._prev_goal_cutscene = self.pine.read_int32(_GOAL_CUTSCENE.address)
         if self._prev_planet == Planets.RYLLUS.planet_id:
             self._prev_ryllus_enter = self.pine.read_int32(ENTER_CUTSCENES["ryllus"])
@@ -119,14 +107,10 @@ class PineMixin:
         if self._prev_planet == Planets.METALIS.planet_id:
             self._prev_electroshock_cutscene = self.pine.read_int32(ELECTROSHOCK_GLOVES_CUTSCENE)
         self._gs.current_planet = self._prev_planet
-        self._gs.state_addr = self._state_addr
-        self._gs.is_dead = _dead(self._prev_player_state)
-        self._gs.is_picking_up = self._prev_player_state == PlayerState.Pickup
         self._gs.is_preloaded = False
         self._gs.is_in_menu = False
         self._gs.tracked_vendor = self._prev_planet if self._on_known_planet else None
         arm_cutscenes(self.pine, self._prev_planet, "armed")
-        self._skyboard_poller.initialize(self.pine)
         self._apply_player_inventory_sync()
         self._apply_world_states_sync()
 
@@ -173,84 +157,35 @@ class PineMixin:
         planet_changed = planet != self._prev_planet
         if planet_changed:
             self._prev_planet = planet
-            self._state_addr = PLAYER_ADDRS.get(planet, (PLAYER_STATE,))[0]
             self._gs.current_planet = planet
             self.current_planet = PLANET_ID_TO_REGION.get(planet, "Galaxy")
-            self._gs.state_addr = self._state_addr
-            arm_cutscenes(self.pine, planet, "armed")
-            self._prev_bolt_pickup = self.pine.read_int64(BOLTS.pickup) & BOLT_PICKUP_MASK
-            logger.info(f"[RAC] Planet loaded: {self.current_planet}")
-            if not self._challenge_defaults_written:
-                self._challenge_poller.write_defaults(self.pine)
-                self._skyboard_poller.write_defaults(self.pine)
-                self._challenge_defaults_written = True
-                logger.info("[RAC] Challenge and skyboard addresses initialised.")
             if self._on_known_planet:
                 load_weapons_for_planet(planet)
                 self._gs.weapons_ready = True
                 self._gs.tracked_vendor = planet
-                self._apply_player_inventory_sync()
-                self._apply_world_states_sync()
             else:
                 self._gs.weapons_ready = False
                 self._gs.tracked_vendor = None
-                self._log(f"[RAC] Unknown planet {self._prev_planet:#04x} — skipping inventory writes.")
-
-        player_state = self.pine.read_int16(self._state_addr)
-        if not _dead(self._prev_player_state) and _dead(player_state):
-            self._on_player_death(player_state)
-        elif _dead(self._prev_player_state) and player_state == PlayerState.Alive:
-            self._on_player_respawn()
-        elif self._prev_player_state != PlayerState.Pickup and player_state == PlayerState.Pickup:
-            self._on_pickup_start()
-        elif self._prev_player_state == PlayerState.Pickup and player_state != PlayerState.Pickup:
-            self._on_pickup_end(new_checks)
-        elif (self._prev_player_state != PlayerState.Alive
-              and player_state == PlayerState.Alive
-              and not _dead(self._prev_player_state)):
-            self._on_menu_close(new_checks)
-        self._prev_player_state = player_state
-
-        skill_points = self.pine.read_int64(SKILL_POINT_ADDRESS)
-        new_skill_bits = skill_points & ~self._prev_skill_points
-        if new_skill_bits:
-            self._log(
-                f"[RAC] Skill point address changed by 0x{new_skill_bits:016X} (raw value 0x{skill_points:016X})"
-            )
-        for name, mask in LOCATION_SKILL_POINTS.items():
-            if new_skill_bits & mask:
-                self._append_location(new_checks, name, "Skill point")
-        self._prev_skill_points = skill_points
-
-        bolt_pickup = self.pine.read_int64(BOLTS.pickup) & BOLT_PICKUP_MASK
-        bolt_delta = bolt_pickup - self._prev_bolt_pickup
-        if bolt_delta > 0 and (bolt_delta & (bolt_delta - 1)) == 0:
-            self._log(f"[RAC] Titanium bolt address changed by {bolt_delta}")
-            name = BOLT_BY_PLANET_AND_DELTA.get((planet, bolt_delta))
-            if name:
-                self._append_location(new_checks, name, "Titanium bolt")
-        elif bolt_delta > 0:
-            self._log(
-                f"[RAC] Titanium bolt delta {bolt_delta} is not a power of 2 — ignoring (likely init noise).",
-                "warning",
-            )
-        self._prev_bolt_pickup = bolt_pickup
+            # Reset cutscene tracking so stale pre-load values don't fire false triggers.
+            self._prev_goal_cutscene        = 0
+            self._prev_ryllus_enter         = None
+            self._prev_before_sprout_cutscene = None
+            self._prev_sprout_cutscene      = None
+            self._prev_electroshock_cutscene = None
 
         self._poll_cutscenes_sync(planet, new_checks)
 
-        self._vendor_poller.tick(self.pine)
-        self._challenge_poller.tick(self.pine, new_checks, self._append_location)
-        self._skyboard_poller.tick(self.pine, new_checks, self._append_location)
-
-        for loc_name in self._pending_vendor_checks:
-            self._append_location(new_checks, loc_name, "Vendor purchase")
-        self._pending_vendor_checks.clear()
-
-        self._enforce_locks(new_checks)
         if not planet_changed:
             self._enforce_planet_unlocks()
 
         return new_checks
+
+    def _append_location_by_name(self, name: str) -> None:
+        """Single-name variant used by GameWiring hooks — dispatches async immediately."""
+        checks: list[int] = []
+        self._append_location(checks, name, "GameWiring")
+        if checks:
+            asyncio.create_task(self._check_locations(checks))
 
     def _append_location(self, checks: list[int], name: str, kind: str) -> None:
         loc_id = self._location_name_to_id.get(name)

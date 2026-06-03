@@ -15,6 +15,17 @@ def arm_cutscenes(ipc: Pine, planet_id: int, label: str) -> None:
             logger.debug(f"  Cutscene {label}: {c.name} @ {c.address:#010x} = {c.init_val:#04x}")
 
 
+def suppress_disabled_cutscenes(ipc: Pine, planet_id: int) -> None:
+    """Force all 'disabled' cutscene addresses to 0 for the given planet.
+
+    Called on pickup start and pickup end so the game cannot trigger a
+    disabled cutscene during the pickup animation window.
+    """
+    for c in CUTSCENES:
+        if c.planet_id == planet_id and c.kind == "disabled":
+            ipc.write_int32(c.address, 0x00)
+
+
 @dataclass(frozen=True)
 class Cutscene:
     name:      str
@@ -35,11 +46,14 @@ ENTER_CUTSCENES: dict[str, int] = {
 CUTSCENE_BEFORE_SPROUT_O_MATIC: int = 0x5A7904
 SPROUT_O_MATIC_CUTSCENE:        int = 0x5A6EA8
 
-ELECTROSHOCK_GLOVES_CUTSCENE: int = 0x1CE9C0
+ELECTROSHOCK_GLOVES_CUTSCENE:       int = 0x1CE9C0
+POKITARU_RYLLUS_ALT_TRIGGER:        int = 0x2F9CC6  # releases Ryllus when it changes from 0x00 to any value
 
 CUTSCENES: list[Cutscene] = [
-    Cutscene("End Boss",             planet_id=0x0A, address=0x3D7FC8,  kind="goal"),
-    Cutscene("Electroshock Gloves",  planet_id=0x04, address=0x1CE9C0,  kind="pickup"),
+    Cutscene("End Boss",                           planet_id=0x0A, address=0x3D7FC8,  kind="goal"),
+    Cutscene("Electroshock Gloves",                planet_id=0x04, address=0x1CE9C0,  kind="pickup"),
+    Cutscene("Disable Pokitaru Complete Cutscene", planet_id=0x01, address=0x2CC454,  kind="disabled", init_val=0x00),
+    # Cutscene("Disable Kalidon Complete Cutscene", planet_id=0x03, address=0xF52BD9, kind="disabled", init_val=0x00),
 ]
 
 # pokitaru

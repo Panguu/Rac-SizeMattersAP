@@ -108,13 +108,15 @@ def set_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Entrance rules ────────────────────────────────────────────────────────
     # All planets connect directly from Menu (the in-game planet select screen).
-    # Pokitaru, Ryllus, Metalis, and Outpost Omega are auto-unlocked from the start.
+    # Metalis and Outpost Omega are auto-unlocked from the start.
     # Inside Clank and Challax require Shrink Ray (obtained on Kalidon).
     # Dreamtime is auto-unlocked; no extra item requirement.
 
-    multiworld.get_entrance("To Ryllus",        player).access_rule = lambda _: True
+    multiworld.get_entrance("To Ryllus",        player).access_rule = \
+        lambda state: state.has("Ryllus Infobot", player)
     multiworld.get_entrance("To Kalidon",       player).access_rule = \
-        lambda state: (_has_projectile_weapon(state, player)
+        lambda state: (state.has("Kalidon Infobot", player)
+                       and _has_projectile_weapon(state, player)
                        and state.has("Hypershot", player)
                        and state.has("Sprout-O-Matic", player))
     multiworld.get_entrance("To Metalis",       player).access_rule = lambda _: True
@@ -124,7 +126,8 @@ def set_rules(world: RACSizeMatterWorld) -> None:
                        and state.has("Sprout-O-Matic", player))
     multiworld.get_entrance("To Outpost Omega", player).access_rule = lambda _: True
     multiworld.get_entrance("To Challax",       player).access_rule = \
-        lambda state: (state.has("Shrink Ray", player)
+        lambda state: (state.has("Challax Infobot", player)
+                       and state.has("Shrink Ray", player)
                        and state.has("Polarizer", player))
     multiworld.get_entrance("To Dayni Moon",    player).access_rule = _infobot("Dayni Moon")
     multiworld.get_entrance("To Inside Clank",  player).access_rule = \
@@ -337,24 +340,34 @@ def set_rules(world: RACSizeMatterWorld) -> None:
     _planet_rule: dict[str, object] = {
         "Pokitaru":      lambda _: True,
         "Ryllus":        lambda state: _has_projectile_weapon(state, player),
-        "Kalidon":       lambda state: (_has_projectile_weapon(state, player)
+        "Kalidon":       lambda state: (state.has("Kalidon Infobot", player)
+                                        and _has_projectile_weapon(state, player)
                                         and state.has("Hypershot", player)
                                         and state.has("Sprout-O-Matic", player)),
         "Metalis":       lambda state: state.has("Shrink Ray", player),
         "Dreamtime":     _dreamtime,
         "Outpost Omega": lambda state: state.has("Shrink Ray", player),
-        "Challax":       lambda state: (state.has("Shrink Ray", player)
+        "Challax":       lambda state: (state.has("Challax Infobot", player)
+                                        and state.has("Shrink Ray", player)
                                         and state.has("Polarizer", player)),
         "Dayni Moon":    lambda state: (state.has("Dayni Moon Infobot", player)
                                         and state.has("Sprout-O-Matic", player)
                                         and _has_projectile_weapon(state, player)),
-        "Inside Clank":  _inside_clank_full,
-        "Quodrona":      lambda state: (state.has("Shrink Ray", player)
+        "Inside Clank":  lambda _: True,
+        "Quodrona":      lambda state: (state.has("Quodrona Infobot", player)
+                                        and state.has("Shrink Ray", player)
                                         and state.has("Hypershot", player)
                                         and state.has("Polarizer", player)),
     }
     for name, planet in {**VENDOR_WEAPON_PLANET, **VENDOR_GADGET_PLANET}.items():
         multiworld.get_location(f"Purchase {name}", player).access_rule = _planet_rule[planet]
+
+    # Sniper Mine and PDA are accessible on Challax with just the infobot + Shrink Ray,
+    # without needing Polarizer — override the general Challax planet rule.
+    _challax_no_polarizer = lambda state: (state.has("Challax Infobot", player)
+                                           and state.has("Shrink Ray", player))
+    multiworld.get_location("Purchase Sniper Mine", player).access_rule = _challax_no_polarizer
+    multiworld.get_location("Purchase PDA",         player).access_rule = _challax_no_polarizer
 
     if world.options.vendor_mods_randomized:
         for (weapon, mod), planet in VENDOR_WEAPON_MOD_PLANET.items():

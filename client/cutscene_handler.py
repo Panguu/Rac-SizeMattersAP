@@ -12,7 +12,7 @@ from ..core.data import (
     SPROUT_O_MATIC_CUTSCENE,
     Planets,
 )
-from ..core.memory import GADGETS
+from ..core.states.memory import GADGETS
 
 _GOAL_CUTSCENE = next(c for c in CUTSCENES if c.kind == "goal")
 

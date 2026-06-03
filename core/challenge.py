@@ -5,7 +5,7 @@ from collections.abc import Callable
 from CommonClient import logger
 
 from ..pypine.pypine.pine import Pine
-from .data.challenges import ALL_CLANK_ADDRESS_MAP, CHALLENGE_ADDRESS_MAP
+from .states.challenges import ALL_CLANK_ADDRESS_MAP, CHALLENGE_ADDRESS_MAP
 
 
 class ChallengePoller:

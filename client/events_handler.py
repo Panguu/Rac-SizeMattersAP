@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from ..core.data import ARMOUR_FLAG_TO_LOCATION, ARMOUR_SET_CHECKS, ArmourPiece, arm_cutscenes
+from ..core.data import (
+    ARMOUR_FLAG_TO_LOCATION,
+    ARMOUR_SET_CHECKS,
+    ArmourPiece,
+    arm_cutscenes,
+    suppress_disabled_cutscenes,
+)
 from .deathlink import _death_cause
 
 
@@ -39,6 +45,7 @@ class EventsHandlerMixin:
 
     def _on_pickup_start(self) -> None:
         self._gs.is_picking_up = True
+        suppress_disabled_cutscenes(self.pine, self._gs.current_planet)
         self._armour_slot_state.take(self.pine)
         self._armour_pickup_state.take(self.pine)
 
@@ -53,6 +60,7 @@ class EventsHandlerMixin:
 
     def _on_pickup_end(self, new_checks: list[int]) -> None:
         self._gs.is_picking_up = False
+        suppress_disabled_cutscenes(self.pine, self._gs.current_planet)
         self._armour_pickup_state.update(self.pine)
         for loc_name in self._pending_armour_pickup_locs:
             self._append_location(new_checks, loc_name, "Armour")
