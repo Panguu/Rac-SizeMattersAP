@@ -9,6 +9,7 @@ from ...interface_orchestrator.structs.address_map import AddressMap
 from ..data.locations.challenges import ALL_CLANK_ADDRESS_MAP, SKYBOARD_ADDRESS_MASK_MAP, SKYBOARD_UNLOCK_MASK
 from ..structs.challenges import ClankChallengeStruct, SkyboardStruct
 
+
 class ClankChallengeState(BaseState):
 
     def __init__(

@@ -11,6 +11,7 @@ from ..data.locations.armour_pickups import (
 )
 from ..structs.armour import ArmourStruct
 
+
 class ArmourState(BaseState):
 
     def __init__(

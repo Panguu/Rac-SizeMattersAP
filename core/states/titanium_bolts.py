@@ -8,6 +8,7 @@ from ...interface_orchestrator.storage.local import LocalStorage
 from ...interface_orchestrator.structs.address_map import AddressMap
 from ..structs.titanium_bolts import TitaniumBoltStruct
 
+
 @dataclass(frozen=True)
 class TitaniumBolt:
     planet_id: int

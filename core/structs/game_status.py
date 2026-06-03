@@ -7,6 +7,7 @@ from ..data.addresses import (
     PLAYER_BOLT_COUNT,
 )
 
+
 class GameStatusStruct(MemoryStruct):
 
     BASE_ADDRESS = PLAYER_BOLT_COUNT

@@ -9,6 +9,7 @@ from ...interface_orchestrator.structs.address_map import AddressMap
 from ..data.addresses import PLAYER_ADDRS
 from ..structs.player import PlayerMovementStruct
 
+
 class PlayerMovementState(IntEnum):
     Alive           = 0x00
     FishDeath       = 0x29

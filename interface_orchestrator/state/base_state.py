@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..memory.accessor import MemoryAccessor
-    from ..structs.address_map import AddressMap
     from ..storage.local import LocalStorage
+    from ..structs.address_map import AddressMap
 
 class BaseState(ABC):
 

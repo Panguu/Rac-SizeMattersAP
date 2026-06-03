@@ -8,6 +8,7 @@ from ...interface_orchestrator.storage.local import LocalStorage
 from ...interface_orchestrator.structs.address_map import AddressMap
 from ..structs.skill_points import SkillPointsStruct
 
+
 @dataclass(frozen=True)
 class SkillPoint:
     planet_id: int

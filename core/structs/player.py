@@ -4,6 +4,7 @@ import ctypes
 
 from ...interface_orchestrator.structs.base import MemoryStruct
 
+
 class PlayerMovementStruct(MemoryStruct):
 
     BASE_ADDRESS = 0

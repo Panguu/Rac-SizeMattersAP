@@ -7,6 +7,7 @@ from typing import Any
 
 from CommonClient import logger
 
+from ..interface_orchestrator import Orchestrator
 from ..pypine.pypine.pine import Pine
 from .address_maps.global_map import build_global_address_map
 from .address_maps.planet_map import build_combined_address_map, build_planet_address_map
@@ -14,20 +15,19 @@ from .data.addresses import (
     CURRENT_PLANET_ADDRESS,
     MENU_ADDR_BY_PLANET_ID,
     PLAYER_ADDRS,
-    TextBoxDisplayAddrs,
     WEAPON_ARRAY_BASE_BY_PLANET,
+    TextBoxDisplayAddrs,
 )
 from .data.armour import ArmourPiece
 from .data.cutscenes import POKITARU_RYLLUS_ALT_TRIGGER, arm_cutscenes
 from .data.locations.armour_pickups import ARMOUR_FLAG_TO_LOCATION
-from ..interface_orchestrator import Orchestrator
 from .memory.pine_interface import PineInterface
 from .states.armour import ArmourState
 from .states.challenges import ClankChallengeState, SkyboardChallengeState
-from .states.display_text_box import DisplayTextBoxState, DisplayedTextBoxState
+from .states.display_text_box import DisplayedTextBoxState, DisplayTextBoxState
 from .states.menu import MenuState
 from .states.planet_unlock import PlanetUnlockState
-from .states.planets import Planet, PlanetState, Planets
+from .states.planets import Planet, Planets, PlanetState
 from .states.player import PlayerMovementState, PlayerState
 from .states.skill_points import SkillPointState
 from .states.titanium_bolts import BOLT_BY_PLANET_AND_DELTA, TitaniumBoltState

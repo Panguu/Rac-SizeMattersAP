@@ -5,13 +5,10 @@ from ..data.addresses import (
     MENU_ADDR_BY_PLANET_ID,
     PLAYER_ADDRS,
     PRELOAD_MENU_ADDR_BY_PLANET_ID,
-    TextBoxDisplayAddrs,
     WEAPON_ARRAY_BASE_BY_PLANET,
+    TextBoxDisplayAddrs,
 )
 from ..data.weapons import (
-    GADGET_ORDER,
-    WEAPON_ORDER,
-    WEAPON_STRUCT_SIZE,
     build_weapons,
 )
 from ..structs.display_text import make_countdown_cls, make_vendor_visibility_cls

@@ -44,7 +44,7 @@ class VendorState(BaseState):
     def sync(self) -> None:
         pass
 
-    def activate(self, vendor_type: "MenuStateValue") -> None:
+    def activate(self, vendor_type: MenuStateValue) -> None:
         self.vendor_type = vendor_type
         self.session = VendorSessionState.OPEN
 

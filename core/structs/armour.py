@@ -3,6 +3,7 @@ import ctypes
 from ...interface_orchestrator.structs.base import MemoryStruct
 from ..data.addresses import ARMOUR_BASE
 
+
 class ArmourStruct(MemoryStruct):
 
     BASE_ADDRESS = ARMOUR_BASE

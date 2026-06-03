@@ -3,6 +3,7 @@ import ctypes
 from ...interface_orchestrator.structs.base import MemoryStruct
 from ..data.addresses import TITANIUM_BOLT_BASE
 
+
 class TitaniumBoltStruct(MemoryStruct):
 
     BASE_ADDRESS = TITANIUM_BOLT_BASE

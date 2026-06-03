@@ -3,6 +3,7 @@ from __future__ import annotations
 from ...interface_orchestrator.memory.base import MemoryInterface
 from ...pypine.pypine.pine import Pine
 
+
 class PineInterface(MemoryInterface):
 
     def __init__(self, pine: Pine) -> None:

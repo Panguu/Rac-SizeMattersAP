@@ -1,6 +1,7 @@
 from __future__ import annotations
+
 import ctypes
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ..memory.writer import MemoryWriter

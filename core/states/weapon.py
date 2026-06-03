@@ -6,7 +6,6 @@ from ...interface_orchestrator.memory.accessor import MemoryAccessor
 from ...interface_orchestrator.state.base_state import BaseState
 from ...interface_orchestrator.storage.local import LocalStorage
 from ...interface_orchestrator.structs.address_map import AddressMap
-from ..data.weapons import build_weapons
 from ...items import GADGET_DISPLAY_TO_INTERNAL, WEAPON_DISPLAY_TO_INTERNAL
 from ...locations import VENDOR_GADGET_PLANET, VENDOR_WEAPON_MOD_PLANET, VENDOR_WEAPON_PLANET
 from ..structs.weapon import GadgetStruct, WeaponStruct

@@ -59,6 +59,22 @@ from .addresses import (
 )
 from .armour import ArmourAddresses, ArmourPiece, PlayerArmour
 
+# ── Cutscenes ─────────────────────────────────────────────────────────────────
+from .cutscenes import (
+    CUTSCENE_BEFORE_SPROUT_O_MATIC,
+    CUTSCENES,
+    ELECTROSHOCK_GLOVES_CUTSCENE,
+    ENTER_CUTSCENES,
+    POKITARU_RYLLUS_ALT_TRIGGER,
+    SPROUT_O_MATIC_CUTSCENE,
+    Cutscene,
+    arm_cutscenes,
+    suppress_disabled_cutscenes,
+)
+
+# ── Infobots ──────────────────────────────────────────────────────────────────
+from .infobots import AUTO_UNLOCK_ADDRESSES, INFOBOT_ITEM_TO_PLANET, INFOBOT_UNLOCK_VALUE, PLANET_STATE_ADDRESSES
+
 # ── Armour pickups ────────────────────────────────────────────────────────────
 from .locations.armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPickup
 
@@ -76,31 +92,6 @@ from .locations.challenges import (
     ChallengePickup,
 )
 
-# ── Cutscenes ─────────────────────────────────────────────────────────────────
-from .cutscenes import (
-    CUTSCENE_BEFORE_SPROUT_O_MATIC,
-    CUTSCENES,
-    ELECTROSHOCK_GLOVES_CUTSCENE,
-    ENTER_CUTSCENES,
-    POKITARU_RYLLUS_ALT_TRIGGER,
-    SPROUT_O_MATIC_CUTSCENE,
-    Cutscene,
-    arm_cutscenes,
-    suppress_disabled_cutscenes,
-)
-
-# ── Infobots ──────────────────────────────────────────────────────────────────
-from .infobots import AUTO_UNLOCK_ADDRESSES, INFOBOT_ITEM_TO_PLANET, INFOBOT_UNLOCK_VALUE, PLANET_STATE_ADDRESSES
-
-# ── Pickup address resolvers ───────────────────────────────────────────────────
-from .pickups import TitaniumBoltAddresses
-
-# ── Planets ────────────────────────────────────────────────────────────────────
-from .planets import BY_ID, Planet, Planets
-
-# ── Player states ──────────────────────────────────────────────────────────────
-from .player_states import PlayerState
-
 # ── Skill points ──────────────────────────────────────────────────────────────
 from .locations.skill_points import (
     CHALLENGE_SKILL_POINTS,
@@ -113,6 +104,15 @@ from .locations.skill_points import (
 
 # ── Titanium bolts ────────────────────────────────────────────────────────────
 from .locations.titanium_bolts import BOLT_BY_PLANET_AND_DELTA, TITANIUM_BOLTS, TitaniumBolt
+
+# ── Pickup address resolvers ───────────────────────────────────────────────────
+from .pickups import TitaniumBoltAddresses
+
+# ── Planets ────────────────────────────────────────────────────────────────────
+from .planets import BY_ID, Planet, Planets
+
+# ── Player states ──────────────────────────────────────────────────────────────
+from .player_states import PlayerState
 
 # ── Weapon/gadget address resolvers ───────────────────────────────────────────
 from .weapons import (

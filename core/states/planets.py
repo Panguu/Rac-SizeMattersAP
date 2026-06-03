@@ -17,7 +17,7 @@ from ..structs.game_status import GameStatusStruct
 if TYPE_CHECKING:
     from ..data.addresses import DisplayedTextBox
     from .armour import ArmourState
-    from .display_text_box import DisplayTextBoxState, DisplayedTextBoxState
+    from .display_text_box import DisplayedTextBoxState, DisplayTextBoxState
     from .menu import MenuState
     from .player import PlayerState
     from .vendor import VendorState
