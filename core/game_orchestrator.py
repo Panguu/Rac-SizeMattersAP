@@ -132,8 +132,8 @@ class GameOrchestrator:
         self._swap_task: asyncio.Task | None      = None
         self._active_planet_id: int               = 0
         self._checked_locations: set[str]         = set()
-        self._defaults_written: bool              = False
         self._initial_load_done: bool             = False
+        self._first_swap_done: bool               = False
         self._death_count: int                    = 0
         self._transitioning: bool                 = False
         self._travel_close_time: float | None     = None
@@ -199,8 +199,8 @@ class GameOrchestrator:
         for ps in self.planet_states.values():
             ps.exit()
 
-        self._defaults_written       = False
         self._initial_load_done      = False
+        self._first_swap_done        = False
         self._transitioning         = False
         self._travel_close_time     = None
         self._transition_start_time = None
@@ -296,7 +296,8 @@ class GameOrchestrator:
         self._travel_close_time      = None
         self._transition_start_time  = None
         self._active_planet_id  = planet_id
-        self._maybe_write_defaults()
+        self.clank.write_unlocks()
+        self.skyboard.write_defaults()
         load_weapons_for_planet(planet_id)
         self._on_initial_planet_load(planet_id)
         if self._initial_load_done:
@@ -325,18 +326,15 @@ class GameOrchestrator:
         combined = build_combined_address_map(planet_id, self._global_map)
         self._orchestrator.swap_interface(self._pine_iface, combined)
         self._log(f"[RAC] Address map swapped for {_PLANET_NAMES.get(planet_id, hex(planet_id))}.")
-        await asyncio.sleep(1.5)
-        self.quick_select.apply()
-        self.quick_select.unfreeze()
-
-    def _maybe_write_defaults(self) -> None:
-        if self._defaults_written:
-            return
-        self._defaults_written = True
-        self.clank.write_defaults()
-        self.skyboard.write_defaults()
-        self.quick_select.zero()
-        self._log("[RAC] Challenge and skyboard defaults written.")
+        await asyncio.sleep(2.0)
+        if not self._first_swap_done:
+            self._first_swap_done = True
+            self.quick_select.zero()
+        else:
+            # Write the snapshot BEFORE enabling polling so the poller's first
+            # read after unfreeze sees our values, not the game's defaults.
+            self.quick_select.restore()
+            self.quick_select.unfreeze()
 
     def _on_initial_planet_load(self, planet_id: int) -> None:
         if self._initial_load_done:
@@ -345,6 +343,8 @@ class GameOrchestrator:
             return
         self._initial_load_done = True
         self._log(f"[RAC] Initial load on {_PLANET_NAMES[planet_id]} — applying world state.")
+        self.clank.write_defaults()
+        self.quick_select.zero()
         if planet_id == Planets.POKITARU.planet_id:
             asyncio.create_task(self._monitor_ryllus_cutscene())
         self.bolts.sync()

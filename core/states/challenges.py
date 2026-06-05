@@ -79,9 +79,13 @@ class ClankChallengeState(BaseState):
                 if count >= 2:
                     self._completed.add(name)
 
-    def write_defaults(self) -> None:
+    def write_unlocks(self) -> None:
+        """Write the arena-unlock bytes so all challenges are accessible. Safe to call every planet enter."""
         self.accessor.write_raw(METALIS_CLANK_UNLOCK_ADDR, METALIS_CLANK_UNLOCK_BYTES)
         self.accessor.write_raw(DAYNI_CLANK_UNLOCK_ADDR, DAYNI_CLANK_UNLOCK_BYTES)
+
+    def write_defaults(self) -> None:
+        self.write_unlocks()
         for addr in ALL_CLANK_ADDRESS_MAP:
             if addr not in COUNT_BASED_CHALLENGE_ADDRS:
                 raw = self.accessor.read_raw(addr, 1)

@@ -146,7 +146,8 @@ QUICK_SELECT_ADDRESSES: dict[str, int] = {
 CURRENT_WEAPON_IN_VENDOR = 0x21F4AB8C
 # This address designates what appears in vendor, i.e how many options there are in the menu.
 WEAPON_VENDOR_SLOTS = 0x21F4ABE4
-# each item is 4 bytes: 02 00 00 00 is lacerator
+# each item is 4 bytes until weapon vendor slots: 02 00 00 00 is lacerator Based on weapon array layout starting with lacerator as 0x02.
+# every 4 bytes after is the next weapon or gadget in the vendor. Weapons already owned by the player are skipped in the menu. 
 WEAPON_VENDOR_ITEMS = 0x21F4AB80
 # Metalis challenge unlock addresses — layout per byte is undocumented.
 # 0x1F4B3DB = unknown challenge type 1 unlock
