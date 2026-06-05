@@ -32,12 +32,12 @@ _ARMOUR_SET_ORDER = ["wildfire", "sludge", "crystallix", "electroshock", "mega_b
 
 
 def load_weapons_for_planet(planet_id: int) -> bool:
+    WEAPONS.clear()
+    GADGETS.clear()
     array_base = WEAPON_ARRAY_BASE_BY_PLANET.get(planet_id)
     if array_base is None:
         return False
     weapons, gadgets = build_weapons(array_base)
-    WEAPONS.clear()
-    GADGETS.clear()
     WEAPONS.update(weapons)
     GADGETS.update(gadgets)
     return True

@@ -26,7 +26,7 @@ TITANIUM_BOLTS: dict[str, TitaniumBolt] = {
     "Ryllus After the Wall (TB)":                       TitaniumBolt(0x02,  5, "Ryllus"),
     "Kalidon Behind The Ship (TB)":                     TitaniumBolt(0x03,  8, "Kalidon"),
     "Kalidon Side of Mechanoid Factory (TB)":           TitaniumBolt(0x03, 10, "Kalidon"),
-    "Kalidon Grav-Ramps (TB)":                          TitaniumBolt(0x03, 11, "Kalidon"),
+    "Kalidon Grav-Ramps (TB)":                          TitaniumBolt(0x03,  9, "Kalidon"),
     "Metalis Behind the Polarized Door (TB)":           TitaniumBolt(0x04, 12, "Metalis"),
     "Dreamtime Jump Across three moving parasols (TB)": TitaniumBolt(0x05, 16, "Dreamtime"),
     "Dreamtime To the left of Ratchets Garage (TB)":   TitaniumBolt(0x05, 17, "Dreamtime"),
@@ -73,20 +73,19 @@ class TitaniumBoltState(BaseState):
 
     def _on_struct_change(self, address: int, new_bytes: bytes) -> None:
         del address
-        instance = TitaniumBoltStruct.from_bytes(new_bytes)
-        current  = instance.pickup
-        delta    = current - self._poll_last
+        current = int.from_bytes(new_bytes[:5], "little")
+        delta   = current - self._poll_last
         self._poll_last = current
         if delta > 0 and (delta & (delta - 1)) == 0:
             self.on_bolt_delta(delta)
 
     def sync(self) -> None:
-        instance = self.accessor.read_struct(TitaniumBoltStruct)
-        self._poll_last = instance.pickup
-        new_val = instance.pickup | self._synced_mask
-        if new_val != instance.pickup:
-            instance.pickup = new_val
-            self.accessor.write_struct(instance)
+        raw = self.accessor.read_raw(TitaniumBoltStruct.BASE_ADDRESS, 5)
+        current = int.from_bytes(raw, "little") if raw else 0
+        self._poll_last = current
+        new_val = current | self._synced_mask
+        if new_val != current:
+            self.accessor.write_raw(TitaniumBoltStruct.BASE_ADDRESS, new_val.to_bytes(5, "little"))
 
     def sync_from_ap(self, checked_location_names: set[str]) -> None:
         mask = 0

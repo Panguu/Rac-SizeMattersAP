@@ -73,7 +73,7 @@ class PlayerState(BaseState):
         try:
             new_state = PlayerMovementState(raw)
         except ValueError:
-            return
+            new_state = PlayerMovementState.Alive
 
         if self._health_addr is not None:
             self.health = int.from_bytes(

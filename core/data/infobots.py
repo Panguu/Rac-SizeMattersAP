@@ -27,20 +27,21 @@ INFOBOT_ITEM_TO_PLANET: dict[str, str] = {
 }
 
 PLANET_STATE_ADDRESSES: dict[str, int] = {
-    "pokitaru":     PLANET_UNLOCK_ADDRESSES["POKITARU"],
-    "ryllus":       PLANET_UNLOCK_ADDRESSES["RYLLUS"],
-    "kalidon":      PLANET_UNLOCK_ADDRESSES["KALIDON"],
-    "metalis":      PLANET_UNLOCK_ADDRESSES["METALIS"],
-    "outpost_omega": PLANET_UNLOCK_ADDRESSES["OUTPOST_OMEGA"],
-    "challax":      PLANET_UNLOCK_ADDRESSES["CHALLAX"],
-    "dayni_moon":   PLANET_UNLOCK_ADDRESSES["DAYNI_MOON"],
-    "quodrona":     PLANET_UNLOCK_ADDRESSES["QUODRONA"],
+    "pokitaru":          PLANET_UNLOCK_ADDRESSES["POKITARU"],
+    "ryllus":            PLANET_UNLOCK_ADDRESSES["RYLLUS"],
+    "kalidon":           PLANET_UNLOCK_ADDRESSES["KALIDON"],
+    "metalis":           PLANET_UNLOCK_ADDRESSES["METALIS"],
+    "outpost_omega":     PLANET_UNLOCK_ADDRESSES["OUTPOST_OMEGA"],
+    "outpost_omega_oo2": 0x21F4C677,  # secondary state set alongside Outpost Omega
+    "challax":           PLANET_UNLOCK_ADDRESSES["CHALLAX"],
+    "dayni_moon":        PLANET_UNLOCK_ADDRESSES["DAYNI_MOON"],
+    "inside_clank":      PLANET_UNLOCK_ADDRESSES["INSIDE_CLANK"],  # unlocked via Dayni Moon infobot
+    "quodrona":          PLANET_UNLOCK_ADDRESSES["QUODRONA"],
 }
 
 # Planet unlock addresses always forced to INFOBOT_UNLOCK_VALUE because
 # these planets have no collectible infobot in the AP item pool.
 AUTO_UNLOCK_ADDRESSES: list[int] = [
-    0x21F4C661,  # Pokitaru      -- mandatory starting planet, always accessible
-    0x21F4C665,  # Dreamtime     -- auto-unlocked via Outpost Omega
-    0x21F4C669,  # Inside Clank  -- sub-area, entrance only from Dayni Moon
+    0x21F4C661,  # Pokitaru  -- mandatory starting planet, always accessible
+    0x21F4C665,  # Dreamtime -- auto-unlocked via Outpost Omega
 ]

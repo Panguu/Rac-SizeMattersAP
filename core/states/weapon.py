@@ -83,10 +83,11 @@ class WeaponState(BaseState):
 
         def handler(address: int, new_bytes: bytes) -> None:
             del address
-            instance    = WeaponStruct.from_bytes(new_bytes)
+            instance     = WeaponStruct.from_bytes(new_bytes)
             was_unlocked = self.weapons.get(weapon_name, False)
             is_unlocked  = bool(instance.unlocked)
             self.weapons[weapon_name] = is_unlocked
+            prev_mods = dict(self.mods.get(weapon_name, dict.fromkeys(_MOD_SLOTS, False)))
             self.mods.setdefault(weapon_name, dict.fromkeys(_MOD_SLOTS, False))
             self.mods[weapon_name]["mod_slot_one"]   = bool(instance.mod_slot_one)
             self.mods[weapon_name]["mod_slot_two"]   = bool(instance.mod_slot_two)
@@ -95,6 +96,13 @@ class WeaponState(BaseState):
                 self.on_weapon_acquired(weapon_name)
             elif not is_unlocked and was_unlocked:
                 self.on_weapon_lost(weapon_name)
+            for slot in _MOD_SLOTS:
+                is_mod  = self.mods[weapon_name][slot]
+                was_mod = prev_mods.get(slot, False)
+                if is_mod and not was_mod:
+                    self.on_mod_acquired(weapon_name, slot)
+                elif not is_mod and was_mod:
+                    self.on_mod_lost(weapon_name, slot)
         return handler
 
     def _make_gadget_handler(self, cls_name: str):

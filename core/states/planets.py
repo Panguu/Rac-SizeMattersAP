@@ -241,9 +241,16 @@ class PlanetState(BaseState):
         logger.info(f"[RAC] [{self.name}] Vendor menu open.")
         if self._weapons is not None:
             self._weapons.apply_vendor_locations()
+            self._weapons.on_weapon_acquired = lambda name: self.on_vendor_weapon_purchased(name)
+            self._weapons.on_gadget_acquired = lambda name: self.on_vendor_gadget_purchased(name)
+            self._weapons.on_mod_acquired    = lambda weapon, slot: self.on_vendor_mod_purchased(weapon, slot)
 
     def on_menu_close(self) -> None:
         logger.info(f"[RAC] [{self.name}] Vendor menu closed — restoring AP inventory.")
+        if self._weapons is not None:
+            self._weapons.on_weapon_acquired = lambda _: None
+            self._weapons.on_gadget_acquired = lambda _: None
+            self._weapons.on_mod_acquired    = lambda *_: None
         if self._vendor is not None:
             self._vendor.deactivate()
         if self._reapply_inv is not None:

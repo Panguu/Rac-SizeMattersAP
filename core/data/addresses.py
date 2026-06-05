@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 
-ARMOUR_BASE            = 0x21F4B354
+ARMOUR_BASE                = 0x21F4B354
+ARMOUR_SET_COLLECTED_ADDR  = 0x21F4B442  # byte 0: pure sets (bit N = ArmourSets(N+1) complete)
+                                           # byte 1 (0x21F4B443): hybrid sets equipped —
+                                           #   0x01=Shock Crystal  0x02=Wildburst  0x04=Triple Wave
+                                           #   0x08=Ice II         0x10=Stalker
 TITANIUM_BOLT_BASE     = 0x21F4B444
 SKILL_POINTS           = 0x21F4B437
 CHEATS                 = 0x21F4C440
@@ -123,6 +127,19 @@ DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
     "The Thin Bouncy Line": 0x1F4B3FE,
     "The Ultimate Showdown": 0x1F4B3FF,
 }
+# Metalis challenge unlock addresses — layout per byte is undocumented.
+# 0x1F4B3DB = unknown challenge type 1 unlock
+# 0x1F4B3DC = unknown challenge type 2 unlock
+# 0x1F4B3DD = unknown challenge type 3 unlock
+# All three are written as a single 3-byte value (0x0FFFFF).
+METALIS_CLANK_CHALLENGES_UNLOCK_ADDR: int = 0x1F4B3DB
+
+# Dayni Moon challenge unlock addresses — each byte unlocks a specific challenge type.
+DAYNI_MOON_DERBY_CHALLENGES_UNLOCK_ADDR:     int = 0x1F4B3F3  # Derby challenges
+DAYNI_MOON_DERBY_B_CHALLENGES_UNLOCK_ADDR:   int = 0x1F4B3F4  # Derby challenges (second type)
+DAYNI_MOON_GADGETBOT_CHALLENGES_UNLOCK_ADDR: int = 0x1F4B3F5  # Gadgetbot challenges
+DAYNI_MOON_CLANK_CHALLENGES_UNLOCK_ADDR:     int = DAYNI_MOON_DERBY_CHALLENGES_UNLOCK_ADDR
+
 METALIS_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
     "Buzzsaw Blitz": 0x1F4B3DE,
     "Take Two For The Team": 0x1F4B3E8,

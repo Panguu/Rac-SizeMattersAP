@@ -2,8 +2,8 @@ import ctypes
 
 from ...interface_orchestrator.structs.base import MemoryStruct
 
-CLANK_CHALLENGE_BASE = 0x1F4B3DE
-CLANK_CHALLENGE_SIZE = 39
+CLANK_CHALLENGE_BASE = 0x1F4B3DB  # starts at Metalis unlock addr; Dayni Moon unlock at +0x18
+CLANK_CHALLENGE_SIZE = 42          # covers 0x1F4B3DB–0x1F4B404
 
 SKYBOARD_BASE = 0x1F4B407
 

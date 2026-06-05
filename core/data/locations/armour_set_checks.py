@@ -42,6 +42,13 @@ class ArmourSetCheck:
     gloves:     int | None = None
     boots:      int | None = None
 
+    def required_mask(self) -> int:
+        """Bitmask of all armour sets needed for this check (bit N = ArmourSets(N+1))."""
+        mask = 0
+        for val in {self.chestplate, self.helmet, self.gloves, self.boots} - {None}:
+            mask |= 1 << (val - 1)
+        return mask
+
     def matches(self, slot_values: dict[str, int]) -> bool:
         """Return True when the current slot values satisfy every non-None field."""
         if self.chestplate is not None:
@@ -76,4 +83,23 @@ ARMOUR_SET_CHECKS: dict[str, ArmourSetCheck] = {
     "Equip Ice II Armour Set":        ArmourSetCheck(chestplate=ArmourSets.Hyperborean,  helmet=ArmourSets.Crystallix,   gloves=ArmourSets.Hyperborean,  boots=ArmourSets.Hyperborean),
     "Equip Chameleon Armour Set":     ArmourSetCheck(chestplate=ArmourSets.Chameleon,    helmet=ArmourSets.Chameleon,    gloves=ArmourSets.Chameleon,    boots=ArmourSets.Chameleon),
     "Equip Stalker Armour Set":       ArmourSetCheck(chestplate=ArmourSets.Chameleon,    helmet=ArmourSets.Wildfire,     gloves=ArmourSets.Sludge,       boots=ArmourSets.Chameleon),
+}
+
+# Hybrid sets have dedicated bits in byte 1 (0x21F4B443).
+# Shifted left by 8 so they occupy bits 8-15 of the combined 16-bit value.
+_HYBRID_BYTE1_BITS: dict[str, int] = {
+    "Equip Shock Crystal Armour Set": 0x01,
+    "Equip Wildburst Armour Set":     0x02,
+    "Equip Triple Wave Armour Set":   0x04,
+    "Equip Ice II Armour Set":        0x08,
+    "Equip Stalker Armour Set":       0x10,
+}
+
+# Pre-computed required bitmask per check — used by ArmourSetCollectedState.
+# Hybrid sets use the dedicated byte-1 bit (shifted to bits 8-15).
+# All other sets use the component mask from byte 0 (bits 0-7).
+ARMOUR_SET_CHECK_MASKS: dict[str, int] = {
+    name: (_HYBRID_BYTE1_BITS[name] << 8) if name in _HYBRID_BYTE1_BITS
+          else check.required_mask()
+    for name, check in ARMOUR_SET_CHECKS.items()
 }

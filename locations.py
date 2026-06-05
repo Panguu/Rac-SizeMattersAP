@@ -101,18 +101,18 @@ GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
 }
 
 # ── Skyboard challenge locations ──────────────────────────────────────────────
-# item_checks (1): race reward pickups only.
+# item_checks (1): races that award a randomised item only.
 SKYBOARD_ITEM_LOCATIONS: dict[str, RACLocationData] = {
-    "Kalidon Learner's Permit (SC)":         RACLocationData(BASE_ID + 1402, "Kalidon"),
-    "Kalidon Speeding Ticket (SC)":          RACLocationData(BASE_ID + 1403, "Kalidon"),
-    "Kalidon Tricky Air (SC)":               RACLocationData(BASE_ID + 1404, "Kalidon"),
-    "Kalidon Master's Challenge (SC)":       RACLocationData(BASE_ID + 1405, "Kalidon"),
-    "Outpost Omega Electroshock Boots (CC)": RACLocationData(BASE_ID + 1800, "Outpost Omega"),
+    "Kalidon Learner's Permit (SC)":                   RACLocationData(BASE_ID + 1402, "Kalidon"),
+    "Kalidon Master's Challenge (SC)":                 RACLocationData(BASE_ID + 1405, "Kalidon"),
+    "Outpost Omega Vertigo - Electroshock Boots (SC)": RACLocationData(BASE_ID + 1800, "Outpost Omega"),
+    "Outpost Omega Interior Decorating (SC)":          RACLocationData(BASE_ID + 1801, "Outpost Omega"),
 }
 
-# all_challenges (2): every individual race completion is also a check.
+# all_challenges (2): non-item races added on top of item_checks.
 EXTRA_SKYBOARD_LOCATIONS: dict[str, RACLocationData] = {
-    "Outpost Omega Interior Decorating (SC)":  RACLocationData(BASE_ID + 1801, "Outpost Omega"),
+    "Kalidon Speeding Ticket (SC)":            RACLocationData(BASE_ID + 1403, "Kalidon"),
+    "Kalidon Tricky Air (SC)":                 RACLocationData(BASE_ID + 1404, "Kalidon"),
     "Outpost Omega Danger, High Voltage (SC)": RACLocationData(BASE_ID + 1802, "Outpost Omega"),
     "Outpost Omega The Vortex (SC)":           RACLocationData(BASE_ID + 1803, "Outpost Omega"),
 }
@@ -126,6 +126,7 @@ _ALL_CLANK_PICKUPS = METALIS_CLANK_PICKUPS + DAYNI_MOON_CLANK_PICKUPS
 ALL_CLANK_LOCATIONS: dict[str, RACLocationData] = {
     cp.name: RACLocationData(BASE_ID + 1700 + idx, cp.planet)
     for idx, cp in enumerate(_ALL_CLANK_PICKUPS, start=1)
+    if cp.name not in CHALLENGE_LOCATIONS  # combined reward-challenge names live in CHALLENGE_LOCATIONS
 }
 
 ALL_LOCATIONS: dict[str, RACLocationData] = {

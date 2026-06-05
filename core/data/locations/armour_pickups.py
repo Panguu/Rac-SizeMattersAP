@@ -59,10 +59,10 @@ ARMOUR_FLAG_TO_LOCATION: dict[tuple[str, ArmourPiece], str] = {
 # Challenge reward locations that grant armour: location name → (set_key, piece).
 # Used by ArmourState.sync_from_ap() to restore location_collected_armour on connect.
 CHALLENGE_LOCATION_TO_ARMOUR_FLAG: dict[str, tuple[str, ArmourPiece]] = {
-    "Metalis Crystallix Helmet (CC)":        ("crystallix",   ArmourPiece.HELMET),
-    "Metalis Crystallix Gloves (CC)":        ("crystallix",   ArmourPiece.GLOVES),
-    "Metalis Sludge Mk9 Helmet (CC)":        ("sludge",       ArmourPiece.HELMET),
-    "Dayni Moon Mega Bomb Gloves (CC)":      ("mega_bomb",    ArmourPiece.GLOVES),
-    "Dayni Moon Mega Bomb Boots (CC)":       ("mega_bomb",    ArmourPiece.BOOTS),
-    "Outpost Omega Electroshock Boots (CC)": ("electroshock", ArmourPiece.BOOTS),
+    "Metalis Smasherbot's Revenge - Crystallix Helmet (CC)":          ("crystallix",   ArmourPiece.HELMET),
+    "Metalis The Uber Finals - Crystallix Gloves (CC)":               ("crystallix",   ArmourPiece.GLOVES),
+    "Metalis Nigh Impossible - Sludge Mk9 Gloves (CC)":               ("sludge",       ArmourPiece.GLOVES),
+    "Dayni Moon The Ultimate Showdown - Mega Bomb Gloves (CC)":       ("mega_bomb",    ArmourPiece.GLOVES),
+    "Dayni Moon Infinite Improbability - Mega Bomb Boots (CC)":       ("mega_bomb",    ArmourPiece.BOOTS),
+    "Outpost Omega Vertigo - Electroshock Boots (SC)":                ("electroshock", ArmourPiece.BOOTS),
 }

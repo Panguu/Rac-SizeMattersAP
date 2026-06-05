@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
@@ -22,7 +23,9 @@ class MenuStateValue(IntEnum):
     WEAPONS_VENDOR = 0x09
     MOD_VENDOR     = 0x0E
     PLANET_MENU    = 0x10
+    SKYBOARD_MENU = 0x15
     PRELOAD_READY  = 0x13
+
 
 class MenuState(BaseState):
 
@@ -37,10 +40,15 @@ class MenuState(BaseState):
         self._last_preload: MenuStateValue = MenuStateValue.CLOSED
         self._vendor: VendorState | None   = None
         self._planet: PlanetState | None   = None
+        self.on_pause_close:        Callable[[], None] = lambda: None
+        self.on_travel_menu_close:  Callable[[], None] = lambda: None
 
     def bind(self, vendor: VendorState, planet: PlanetState) -> None:
         self._vendor = vendor
         self._planet = planet
+
+    def set_pause_close_callback(self, cb: Callable[[], None]) -> None:
+        self.on_pause_close = cb
 
     def unbind(self) -> None:
         self._vendor = None
@@ -116,7 +124,14 @@ class MenuState(BaseState):
             if self._planet is not None:
                 self._planet.on_menu_preload_exit()
 
+    _TRAVEL_MENUS = frozenset({MenuStateValue.SKYBOARD_MENU, MenuStateValue.PLANET_MENU})
+
     def _on_transition(self, prev: MenuStateValue, current: MenuStateValue) -> None:
+        if prev == MenuStateValue.PAUSE_MENU and current != MenuStateValue.PAUSE_MENU:
+            self.on_pause_close()
+        if prev in self._TRAVEL_MENUS and current not in self._TRAVEL_MENUS:
+            self.on_travel_menu_close()
+
         if self._vendor is None:
             return
         was_vendor = prev    in (MenuStateValue.WEAPONS_VENDOR, MenuStateValue.MOD_VENDOR)

@@ -60,7 +60,8 @@ def create_regions(world: RACSizeMatterWorld) -> None:
     ]
     if world.options.vendor_mods_randomized:
         location_tables.append(WEAPON_MOD_VENDOR_LOCATIONS)
-    location_tables.append(CHALLENGE_LOCATIONS)
+    if world.options.clank_challenges.value >= 1:
+        location_tables.append(CHALLENGE_LOCATIONS)
     if world.options.clank_challenges.value >= 2:
         location_tables.append(ALL_CLANK_LOCATIONS)
     if world.options.skyboard_challenges.value >= 1:

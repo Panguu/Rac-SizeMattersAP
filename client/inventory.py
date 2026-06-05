@@ -95,7 +95,7 @@ class InventoryMixin:
         preventing false armour-pickup location checks.
         """
         await asyncio.sleep(0.5)
-        if not self._pending_item_apply or self._gs.is_picking_up:
+        if not self._pending_item_apply or self._wiring.is_picking_up:
             return
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
@@ -107,12 +107,14 @@ class InventoryMixin:
         if not self.pine_connected:
             self._pending_item_apply = True
             return
+        if not self.items_received:
+            return
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
-            await loop.run_in_executor(None, self._rebuild_player_inventory)
-            if self._gs.is_picking_up:
+            if self._wiring.is_picking_up:
                 self._pending_item_apply = True
                 return
+            await loop.run_in_executor(None, self._apply_player_inventory_sync)
             await loop.run_in_executor(None, self._apply_world_states_sync)
             self._grant_new_bolt_items()
         self._pending_item_apply = False
@@ -149,6 +151,8 @@ class InventoryMixin:
             if item_name in INFOBOT_ITEM_TO_PLANET:
                 planet_key = INFOBOT_ITEM_TO_PLANET[item_name]
                 self._planet_state.add(planet_key, INFOBOT_UNLOCK_VALUE)
+                if planet_key == "outpost_omega":
+                    self._planet_state.add("outpost_omega_oo2", INFOBOT_UNLOCK_VALUE)
                 infobot_planets.add(planet_key.upper())
             elif item_name in WEAPON_DISPLAY_TO_INTERNAL:
                 weapon_unlocked[WEAPON_DISPLAY_TO_INTERNAL[item_name]] = 1
@@ -218,7 +222,7 @@ class InventoryMixin:
         self._seed_armour_pickup_state()
 
         self._gs.tracked_armour = {
-            key: self._player_armour_state.get(key)
+            key: self._player_armour_state.get(key) | self._armour_pickup_state.get(key)
             for key in ARMOUR_ADDRESSES
         }
 
@@ -299,13 +303,16 @@ class InventoryMixin:
         # _rebuild_player_inventory already called _sync_game_state_inventory;
         # re-run it here to pick up the freshly updated weapon/gadget addresses.
         self._sync_game_state_inventory()
-        if self._gs.is_picking_up:
+        if self._wiring.is_picking_up:
+            return
+        if self._wiring.writes_blocked:
+            self._log("[RAC] _apply_player_inventory_sync: all writes blocked — planet transition or travel menu open")
             return
         self._planet_state.give(self.pine)
-        self._player_armour_state.remove(self.pine)
-        self._player_armour_state.give(self.pine)
-        self._sync_armour_slot_state()
-        self._armour_slot_state.give(self.pine)
+        for key, addr in ARMOUR_ADDRESSES.items():
+            ap_val = self._player_armour_state.get(key)
+            existing = self.pine.read_int8(addr)
+            self.pine.write_int8(addr, existing | ap_val)
         # Never write weapons or gadgets while vendor owns the weapon state.
         if self._gs.is_preloaded or self._gs.is_in_menu or self._wiring.vendor_active:
             self._log(f"[RAC] _apply_player_inventory_sync: weapon write blocked — "
@@ -377,6 +384,8 @@ class InventoryMixin:
         self._prev_bolt_pickup = new_bolt & BOLT_PICKUP_MASK
         new_sp   = self._skill_point_state.apply_or(self.pine)
         self._prev_skill_points = new_sp
+        # Write infobot-unlocked planet states (populated by _rebuild_player_inventory).
+        self._planet_state.give(self.pine)
         # Force-unlock planets that have no collectible infobot in the AP world.
         for address in AUTO_UNLOCK_ADDRESSES:
             self.pine.write_int8(address, INFOBOT_UNLOCK_VALUE)

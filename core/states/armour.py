@@ -22,6 +22,11 @@ class ArmourState(BaseState):
     ) -> None:
         super().__init__(accessor, addresses, storage)
         self.equipped: dict[str, ArmourPiece]  = dict.fromkeys(ArmourStruct.SLOT_FIELDS, ArmourPiece.NONE)
+        # Stable snapshot — only updated by sync_slots()/sync(), never by the
+        # continuous _on_armour_change handler.  Used for all restore operations
+        # so that a game reset during death or planet transition doesn't corrupt
+        # the values we write back.
+        self._stable_slots: dict[str, ArmourPiece] = dict.fromkeys(ArmourStruct.SLOT_FIELDS, ArmourPiece.NONE)
         self.sets_unlocked: dict[str, bool]    = dict.fromkeys(ArmourStruct.SET_FIELDS, False)
         self.sets_bitmask: dict[str, int]      = dict.fromkeys(ArmourStruct.SET_FIELDS, 0)
         self.location_collected_armour: dict[str, int] = dict.fromkeys(ArmourStruct.SET_FIELDS, 0)
@@ -53,7 +58,9 @@ class ArmourState(BaseState):
         instance = self.accessor.read_struct(ArmourStruct)
         for name in ArmourStruct.SLOT_FIELDS:
             raw = getattr(instance, name)
-            self.equipped[name] = ArmourPiece._value2member_map_.get(raw, ArmourPiece.NONE)
+            piece = ArmourPiece._value2member_map_.get(raw, ArmourPiece.NONE)
+            self.equipped[name]      = piece
+            self._stable_slots[name] = piece
         for name in ArmourStruct.SET_FIELDS:
             raw = getattr(instance, name)
             self.sets_bitmask[name]  = raw
@@ -62,10 +69,20 @@ class ArmourState(BaseState):
     def sync_slots(self) -> None:
         raw = self.accessor.read_raw(ArmourStruct.BASE_ADDRESS, len(ArmourStruct.SLOT_FIELDS))
         for i, name in enumerate(ArmourStruct.SLOT_FIELDS):
-            self.equipped[name] = ArmourPiece._value2member_map_.get(raw[i], ArmourPiece.NONE)
+            piece = ArmourPiece._value2member_map_.get(raw[i], ArmourPiece.NONE)
+            self.equipped[name]      = piece
+            self._stable_slots[name] = piece
+
+    def restore_equipped_slots(self) -> None:
+        """Write the stable slot snapshot back to memory without touching the set bytes."""
+        slot_bytes = bytes(int(self._stable_slots[name]) for name in ArmourStruct.SLOT_FIELDS)
+        self.accessor.write_raw(ArmourStruct.BASE_ADDRESS, slot_bytes)
 
     def apply_location_armour(self) -> None:
         data = bytearray(ArmourStruct.size())
+        for name in ArmourStruct.SLOT_FIELDS:
+            offset = ArmourStruct.field_offset(name)
+            data[offset] = int(self._stable_slots[name])
         for name in ArmourStruct.SET_FIELDS:
             offset = ArmourStruct.field_offset(name)
             data[offset] = self.location_collected_armour.get(name, 0)
@@ -75,7 +92,7 @@ class ArmourState(BaseState):
         data = bytearray(ArmourStruct.size())
         for name in ArmourStruct.SLOT_FIELDS:
             offset = ArmourStruct.field_offset(name)
-            data[offset] = int(self.equipped[name])
+            data[offset] = int(self._stable_slots[name])
         for name in ArmourStruct.SET_FIELDS:
             offset = ArmourStruct.field_offset(name)
             data[offset] = self.item_pickup_armour.get(name, 0)
@@ -94,14 +111,17 @@ class ArmourState(BaseState):
 
     def sync_from_ap(
         self,
-        armour_locations: set[str],
-        armour_item_pickups: set[tuple[str, ArmourPiece]],
+        checked_locations: set[str],
+        armour_item_pickups: set[tuple[str, ArmourPiece]] = frozenset(),
     ) -> None:
+        _loc_to_flag: dict[str, tuple[str, ArmourPiece]] = {
+            v: k for k, v in ARMOUR_FLAG_TO_LOCATION.items()
+        }
         for key in ArmourStruct.SET_FIELDS:
             self.location_collected_armour[key] = 0
             self.item_pickup_armour[key] = 0
-        for loc_name in armour_locations:
-            flag = CHALLENGE_LOCATION_TO_ARMOUR_FLAG.get(loc_name)
+        for loc_name in checked_locations:
+            flag = _loc_to_flag.get(loc_name) or CHALLENGE_LOCATION_TO_ARMOUR_FLAG.get(loc_name)
             if flag:
                 set_key, piece = flag
                 self.location_collected_armour[set_key] |= int(piece)

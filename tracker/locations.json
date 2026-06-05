@@ -926,12 +926,12 @@
         ]
       },
       {
-        "name": "Kalidon Remaining Checks",
+        "name": "Kalidon Sludge Mk9 Chestplate",
         "map_locations": [
           {
             "map": "Kalidon",
-            "x": 50,
-            "y": 480
+            "x": 152,
+            "y": 169
           }
         ],
         "sections": [
@@ -939,12 +939,36 @@
             "name": "Kalidon Sludge Mk9 Chestplate",
             "item_count": 1,
             "icon": "icons/Crate.png"
-          },
+          }
+        ]
+      },
+      {
+        "name": "Kalidon Wildfire Boots",
+        "map_locations": [
+          {
+            "map": "Kalidon",
+            "x": 290,
+            "y": 266
+          }
+        ],
+        "sections": [
           {
             "name": "Kalidon Wildfire Boots",
             "item_count": 1,
             "icon": "icons/Crate.png"
-          },
+          }
+        ]
+      },
+      {
+        "name": "Kalidon Vendor",
+        "map_locations": [
+          {
+            "map": "Kalidon",
+            "x": 348,
+            "y": 397
+          }
+        ],
+        "sections": [
           {
             "name": "Purchase Scorcher",
             "item_count": 1,
@@ -959,7 +983,19 @@
             "name": "Purchase Concussion Gun Split Barrel Mod",
             "item_count": 1,
             "icon": "icons/Crate.png"
-          },
+          }
+        ]
+      },
+      {
+        "name": "Kalidon Skill Points",
+        "map_locations": [
+          {
+            "map": "Kalidon",
+            "x": 50,
+            "y": 480
+          }
+        ],
+        "sections": [
           {
             "name": "Explosive Ordnance Disposal (SP)",
             "item_count": 1,

@@ -79,7 +79,7 @@ from .infobots import AUTO_UNLOCK_ADDRESSES, INFOBOT_ITEM_TO_PLANET, INFOBOT_UNL
 from .locations.armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPickup
 
 # ── Armour set checks ─────────────────────────────────────────────────────────
-from .locations.armour_set_checks import ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
+from .locations.armour_set_checks import ARMOUR_SET_CHECK_MASKS, ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
 
 # ── Challenges ────────────────────────────────────────────────────────────────
 from .locations.challenges import (

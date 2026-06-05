@@ -15,7 +15,7 @@ except ImportError:
 from CommonClient import logger
 
 from ..core.challenge import ChallengePoller
-from ..core.data import PLANET_STATE_ADDRESSES, PLAYER_STATE, SKILL_POINT_ADDRESS
+from ..core.data import PLANET_STATE_ADDRESSES, SKILL_POINT_ADDRESS
 from ..core.data.controller import ButtonState
 from ..core.game_wiring import GameWiring
 from ..core.skyboard import SkyboardPoller
@@ -135,13 +135,6 @@ class RACContext(
             debug_log=self._log,
         )
         self._prev_planet = 0
-        self._prev_player_state = 0
-        self._prev_goal_cutscene = 0
-        self._prev_ryllus_enter: int | None = None
-        self._prev_before_sprout_cutscene: int | None = None
-        self._prev_sprout_cutscene: int | None = None
-        self._prev_electroshock_cutscene: int | None = None
-        self._state_addr = PLAYER_STATE
 
         self._armour_pickup_state = MemoryItemState(
             ARMOUR_ADDRESSES,
@@ -211,6 +204,11 @@ class RACContext(
             if lid in id_to_name
         }
 
+    def _suppress_sprout_gadget(self) -> None:
+        from ..core.states.memory import GADGETS
+        if GADGETS and not self._player_gadget_state.get("sprout_o_matic"):
+            self.pine.write_int8(GADGETS["sprout_o_matic"].unlocked, 0)
+
     def _log(self, msg: str, level: str = "info") -> None:
         if not self._debug_messages:
             return
@@ -237,11 +235,14 @@ class RACContext(
             if self._death_link_enabled:
                 asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": ["DeathLink"]}]))
             self._wiring.wire(
-                send_location  = self._append_location_by_name,
-                send_deathlink = self._send_death_link_from_sync,
-                kill_player    = self._kill_player_sync,
-                reapply_inv    = self._apply_player_inventory_sync,
-                death_amnesty  = lambda: int(self.slot_data.get("death_amnesty", 1)),
+                send_location         = self._append_location_by_name,
+                send_deathlink        = self._send_death_link_from_sync,
+                kill_player           = self._kill_player_sync,
+                reapply_inv           = self._apply_player_inventory_sync,
+                death_amnesty         = lambda: int(self.slot_data.get("death_amnesty", 1)),
+                on_goal               = lambda: asyncio.create_task(self._send_goal_status()),
+                on_vendor_close       = self._on_menu_close_for_armour_sets,
+                on_sprout_suppress    = self._suppress_sprout_gadget,
             )
             checked = self._checked_location_names()
             asyncio.create_task(self._wiring.on_ap_connected(self.slot_data, checked))
