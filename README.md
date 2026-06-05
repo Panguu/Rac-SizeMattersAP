@@ -22,7 +22,6 @@ This a initial implementation for the PS2 version of the game.
 - vendor purchases currently set ratchets active weapon and can apply it to weapon select (change to a unlocked weapon and remove from weapon wheel to keep in logic)
 - vendor purchases sometimes does not display purchasable weapons (for this issue just walk away from the vendor wait a second and open the vendor again)
 - Kalidon cutscene forces player to Metalis (Just dont start the cutscene you can still collect the armour and fight the boss)
-- Boss Dayni Moon does not spawn
 - Giant Clank missions are currently not checks except for skill points
 - Outpost Omega 1 currently removed from game, until logic for level is completed.
 - Outpost Omega 2 pickups not being detected
