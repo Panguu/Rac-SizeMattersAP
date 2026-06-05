@@ -194,7 +194,7 @@ class RACContext(
         self._debug_messages = False
         self._challenge_defaults_written = False
 
-        self._wiring = GameWiring(self.pine)
+        self._wiring = GameWiring(self.pine, log=self._log)
 
     def _checked_location_names(self) -> set[str]:
         id_to_name = {v: k for k, v in self._location_name_to_id.items()}

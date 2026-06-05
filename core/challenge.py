@@ -51,7 +51,7 @@ class ChallengePoller:
             val  = ipc.read_int8(addr)
             prev = self._prev.get(addr, 1)
             if val >= 2 and prev < 2:
-                logger.info(f"[RAC] Challenge completed: {loc_name} (addr=0x{addr:08X} val={val})")
+                self._log(f"[RAC] Challenge completed: {loc_name} (addr=0x{addr:08X} val={val})")
                 append_fn(new_checks, loc_name, "Challenge")
             self._prev[addr] = val
 

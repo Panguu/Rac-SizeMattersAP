@@ -40,7 +40,7 @@ ARMOUR_PICKUPS: list[ArmourPickup] = [
     # Outpost Omega
     ArmourPickup("crystallix", ArmourPiece.BOOTS,    "Outpost Omega Crystallix Boots", "Outpost Omega"),
     # Challax
-    ArmourPickup("electroshock", ArmourPiece.CHESTPLATE, "Challax Electroshock Chestplate", "Challax"),
+    # ArmourPickup("electroshock", ArmourPiece.CHESTPLATE, "Challax Electroshock Chestplate", "Challax"),  # not reachable
     ArmourPickup("electroshock", ArmourPiece.HELMET, "Challax Electroshock Helmet",    "Challax"),
     # Dayni Moon
     ArmourPickup("mega_bomb", ArmourPiece.HELMET,    "Dayni Moon Mega Bomb Helmet",    "Dayni Moon"),

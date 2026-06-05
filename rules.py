@@ -261,7 +261,7 @@ def set_rules(world: RACSizeMatterWorld) -> None:
     multiworld.get_location("Challax Hidden Room (TB)",    player).access_rule = _challax_base
     multiworld.get_location("Challax Mimic Plant Lob (TB)", player).access_rule = _challax_sprout
 
-    multiworld.get_location("Challax Electroshock Chestplate", player).access_rule = _challax_base
+    # multiworld.get_location("Challax Electroshock Chestplate", player).access_rule = _challax_base  # not reachable
     multiworld.get_location("Challax Electroshock Helmet",    player).access_rule = \
         lambda state: (_challax_base(state)
                        or state.has("Dayni Moon Infobot", player))
@@ -380,6 +380,13 @@ def set_rules(world: RACSizeMatterWorld) -> None:
             multiworld.get_location(f"Purchase {weapon} {mod}", player).access_rule = (
                 lambda state, pr=_mod_rule, wr=_weapon_rule: pr(state) and wr(state)
             )
+
+        # Lacerator Double Barrel Mod is sold on Challax but requires the Kalidon
+        # Infobot — the mod vendor only becomes available after visiting Kalidon.
+        _challax_rule = _planet_rule["Challax"]
+        multiworld.get_location("Purchase Lacerator Double Barrel Mod", player).access_rule = (
+            lambda state, cr=_challax_rule: cr(state) and state.has("Kalidon Infobot", player)
+        )
 
     # ── Armour-set checks ─────────────────────────────────────────────────────
     if world.options.armour_set_checks:

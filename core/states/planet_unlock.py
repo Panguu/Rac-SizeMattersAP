@@ -6,6 +6,7 @@ from ...interface_orchestrator.memory.accessor import MemoryAccessor
 from ...interface_orchestrator.state.base_state import BaseState
 from ...interface_orchestrator.storage.local import LocalStorage
 from ...interface_orchestrator.structs.address_map import AddressMap
+from ..data.planet_unlock import PLANET_UNLOCKS
 from ..structs.planet_progress import PlanetProgressStruct
 
 PLANET_UNLOCK_BASE: int = PlanetProgressStruct.BASE_ADDRESS
@@ -84,10 +85,12 @@ class PlanetUnlockState(BaseState):
     def _write_desired(self) -> None:
         instance = PlanetProgressStruct()
         for field, name in zip(PlanetProgressStruct.PLANET_ORDER, PLANET_UNLOCK_ORDER):
-            setattr(
-                instance, field,
-                PlanetLockValue.UNLOCKED if self._desired[name] else PlanetLockValue.LOCKED,
-            )
+            unlock_val = PlanetLockValue.UNLOCKED if self._desired[name] else PlanetLockValue.LOCKED
+            setattr(instance, field, unlock_val)
+            pu = PLANET_UNLOCKS.get(name)
+            if pu is not None:
+                state_val = max(int(unlock_val), pu.default_state)
+                self.accessor.write_raw(pu.state_addr, bytes([state_val]))
         self.accessor.write_struct(instance)
 
     def set_unlocked_planets(self, planets: set[str]) -> None:

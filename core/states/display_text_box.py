@@ -133,9 +133,10 @@ class DisplayTextBoxState(BaseState):
         del address
         if len(new_bytes) < 2:
             return
-        raw = struct.unpack_from("<h", new_bytes)[0]
+        raw = struct.unpack_from("<H", new_bytes)[0]
+        msg_val = ((raw & 0xFF) << 8) | (raw >> 8)
         was_prompt = self.is_vendor_prompt
-        self.is_vendor_prompt = (raw == self._vendor_value)
+        self.is_vendor_prompt = (msg_val == self._vendor_value)
         if self.is_vendor_prompt and not was_prompt:
             self.on_vendor_prompt_shown()
         elif not self.is_vendor_prompt and was_prompt:
@@ -148,8 +149,9 @@ class DisplayTextBoxState(BaseState):
         raw_bytes = self.accessor.read_raw(cls.BASE_ADDRESS, 2)
         if len(raw_bytes) < 2:
             return
-        raw = struct.unpack_from("<h", raw_bytes)[0]
-        self.is_vendor_prompt = (raw == self._vendor_value)
+        raw = struct.unpack_from("<H", raw_bytes)[0]
+        msg_val = ((raw & 0xFF) << 8) | (raw >> 8)
+        self.is_vendor_prompt = (msg_val == self._vendor_value)
 
     def __repr__(self) -> str:
         return f"DisplayTextBoxState(vendor_prompt={self.is_vendor_prompt})"

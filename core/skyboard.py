@@ -44,7 +44,7 @@ class SkyboardPoller:
             val  = unique[addr]
             prev = self._prev.get(addr, 0)
             if (val & mask) and not (prev & mask):
-                logger.info(f"[RAC] Skyboard completed: {loc_name} (addr={addr:#010x} val={val:#04x})")
+                self._log(f"[RAC] Skyboard completed: {loc_name} (addr={addr:#010x} val={val:#04x})")
                 append_fn(new_checks, loc_name, "Skyboard")
 
         for addr, val in unique.items():

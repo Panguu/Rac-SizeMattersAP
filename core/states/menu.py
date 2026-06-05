@@ -34,12 +34,14 @@ class MenuState(BaseState):
         accessor: MemoryAccessor,
         addresses: AddressMap,
         storage: LocalStorage,
+        log: Callable[..., None] | None = None,
     ) -> None:
         super().__init__(accessor, addresses, storage)
         self.current: MenuStateValue       = MenuStateValue.CLOSED
         self._last_preload: MenuStateValue = MenuStateValue.CLOSED
         self._vendor: VendorState | None   = None
         self._planet: PlanetState | None   = None
+        self._log                          = log or logger.info
         self.on_pause_close:        Callable[[], None] = lambda: None
         self.on_travel_menu_close:  Callable[[], None] = lambda: None
 
@@ -118,10 +120,10 @@ class MenuState(BaseState):
         if value == MenuStateValue.PRELOAD_READY and prev != MenuStateValue.PRELOAD_READY:
             if self._vendor is not None:
                 self._vendor.start_menu_preload()
-            if self._planet is not None:
-                self._planet.on_menu_preload()
+                if self._planet is not None:
+                    self._planet.on_menu_preload()
         elif prev == MenuStateValue.PRELOAD_READY and value != MenuStateValue.PRELOAD_READY:
-            if self._planet is not None:
+            if self._vendor is not None and self._planet is not None:
                 self._planet.on_menu_preload_exit()
 
     _TRAVEL_MENUS = frozenset({MenuStateValue.SKYBOARD_MENU, MenuStateValue.PLANET_MENU})
@@ -138,14 +140,14 @@ class MenuState(BaseState):
         is_vendor  = current in (MenuStateValue.WEAPONS_VENDOR, MenuStateValue.MOD_VENDOR)
 
         if is_vendor and not was_vendor:
-            logger.info(f"[RAC] MenuState: vendor opened ({current.name}).")
+            self._log(f"[RAC] MenuState: vendor opened ({current.name}).")
             self._vendor.exit_menu_preload()
             self._vendor.activate(current)
             self._vendor.on_menu_open()
             if self._planet is not None:
                 self._planet.on_menu_open()
         elif was_vendor and not is_vendor:
-            logger.info(f"[RAC] MenuState: vendor closed ({prev.name} → {current.name}).")
+            self._log(f"[RAC] MenuState: vendor closed ({prev.name} → {current.name}).")
             self._vendor.on_menu_close()
             self._vendor.deactivate()
             if self._planet is not None:

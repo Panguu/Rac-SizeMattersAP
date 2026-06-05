@@ -28,11 +28,12 @@ from .states.armour_sets import ArmourSetCollectedState
 from .states.challenges import ClankChallengeState, SkyboardChallengeState
 from .states.cutscene import CutsceneState
 from .states.display_text_box import DisplayedTextBoxState, DisplayTextBoxState
+from .states.memory import load_weapons_for_planet
 from .states.menu import MenuState
 from .states.planet_unlock import PlanetUnlockState
-from .states.memory import load_weapons_for_planet
 from .states.planets import Planet, Planets, PlanetState
 from .states.player import PlayerMovementState, PlayerState
+from .states.quick_select import QuickSelectState
 from .states.skill_points import SkillPointState
 from .states.titanium_bolts import BOLT_BY_PLANET_AND_DELTA, TitaniumBoltState
 from .states.vendor import VendorState
@@ -55,10 +56,11 @@ _TEXT_BOX_BY_PLANET = {tb.planet_id: tb for tb in TextBoxDisplayAddrs}
 
 class GameOrchestrator:
 
-    def __init__(self, pine: Pine) -> None:
+    def __init__(self, pine: Pine, log: Callable[[str], None] | None = None) -> None:
         self._pine          = pine
         self._pine_iface    = PineInterface(pine)
         self._global_map    = build_global_address_map()
+        self._log           = log or logger.info
 
         self._orchestrator  = Orchestrator(
             self._pine_iface, self._global_map, poll_rate=_POLL_INTERVAL
@@ -70,13 +72,14 @@ class GameOrchestrator:
         self.armour_sets   = ArmourSetCollectedState(acc, self._global_map, storage)
         self.bolts         = TitaniumBoltState(acc, self._global_map, storage)
         self.skill_points  = SkillPointState(acc, self._global_map, storage)
-        self.planet_unlock = PlanetUnlockState(acc, self._global_map, storage)
-        self.clank         = ClankChallengeState(acc, self._global_map, storage)
+        self.planet_unlock  = PlanetUnlockState(acc, self._global_map, storage)
+        self.quick_select   = QuickSelectState(acc, self._global_map, storage)
+        self.clank          = ClankChallengeState(acc, self._global_map, storage)
         self.skyboard      = SkyboardChallengeState(acc, self._global_map, storage)
 
         self.weapons            = WeaponState(acc, self._global_map, storage)
         self.player             = PlayerState(acc, self._global_map, storage)
-        self.menu               = MenuState(acc, self._global_map, storage)
+        self.menu               = MenuState(acc, self._global_map, storage, log=self._log)
         self.vendor             = VendorState(acc, self._global_map, storage)
         self.display_text       = DisplayTextBoxState(acc, self._global_map, storage)
         self.displayed_text_box = DisplayedTextBoxState(acc, self._global_map, storage)
@@ -100,6 +103,7 @@ class GameOrchestrator:
             "bolts":              self.bolts,
             "skill_points":       self.skill_points,
             "planet_unlock":      self.planet_unlock,
+            "quick_select":       self.quick_select,
             "clank":              self.clank,
             "skyboard":           self.skyboard,
             "weapons":            self.weapons,
@@ -116,7 +120,7 @@ class GameOrchestrator:
 
         for state in (
             self.armour, self.armour_sets, self.bolts, self.skill_points, self.planet_unlock,
-            self.clank, self.skyboard, self.weapons, self.player,
+            self.quick_select, self.clank, self.skyboard, self.weapons, self.player,
             self.menu, self.vendor, self.display_text, self.displayed_text_box,
             self.cutscene,
         ):
@@ -150,7 +154,8 @@ class GameOrchestrator:
         self._send_location      = lambda name: send_location(name) if self._initial_load_done else None
         self._send_deathlink     = send_deathlink
         self._kill_player        = kill_player
-        self._reapply_inv        = reapply_inv
+        _raw_reapply             = reapply_inv
+        self._reapply_inv        = lambda: (_raw_reapply(), self.quick_select.apply())
         self._death_amnesty      = death_amnesty
         self._on_goal            = on_goal
         self._on_vendor_close    = on_vendor_close
@@ -168,7 +173,7 @@ class GameOrchestrator:
             self._active_planet_id = 0
 
         if self._active_planet_id in self.planet_states:
-            logger.info(
+            self._log(
                 f"[RAC] Connection on {_PLANET_NAMES[self._active_planet_id]} "
                 f"— triggering planet_enter immediately."
             )
@@ -186,7 +191,7 @@ class GameOrchestrator:
 
         for state in (
             self.armour, self.armour_sets, self.bolts, self.skill_points, self.planet_unlock,
-            self.clank, self.skyboard, self.weapons, self.player,
+            self.quick_select, self.clank, self.skyboard, self.weapons, self.player,
             self.menu, self.vendor, self.display_text, self.displayed_text_box,
             self.cutscene,
         ):
@@ -254,7 +259,7 @@ class GameOrchestrator:
         """Called when SKYBOARD_MENU or PLANET_MENU closes. Keeps writes blocked for 1 s
         to cover the gap before the planet actually changes."""
         self._travel_close_time = time.monotonic() + 3.0
-        logger.info("[RAC] Travel menu closed — writes blocked for 3 s.")
+        self._log("[RAC] Travel menu closed — writes blocked for 3 s.")
 
     # ── Planet transition fallback ────────────────────────────────────────────
 
@@ -278,7 +283,7 @@ class GameOrchestrator:
         except Exception:
             return
         if planet_id in _PLANET_NAMES:
-            logger.info(
+            self._log(
                 f"[RAC] Transition fallback: {_PLANET_NAMES[planet_id]} detected "
                 f"via CURRENT_PLANET_ADDRESS — firing planet_enter."
             )
@@ -308,17 +313,21 @@ class GameOrchestrator:
         self._travel_close_time     = None
         self._transition_start_time = time.monotonic()
         self.armour.sync_slots()
+        self.quick_select.freeze()
         if self._swap_task:
             self._swap_task.cancel()
             self._swap_task = None
         self.cutscene.reset()
         self._orchestrator.swap_interface(self._pine_iface, self._global_map)
-        logger.info(f"[RAC] Address map reverted to global on exit from {_PLANET_NAMES.get(planet_id, hex(planet_id))}.")
+        self._log(f"[RAC] Address map reverted to global on exit from {_PLANET_NAMES.get(planet_id, hex(planet_id))}.")
 
     async def _swap_to_planet(self, planet_id: int) -> None:
         combined = build_combined_address_map(planet_id, self._global_map)
         self._orchestrator.swap_interface(self._pine_iface, combined)
-        logger.info(f"[RAC] Address map swapped for {_PLANET_NAMES.get(planet_id, hex(planet_id))}.")
+        self._log(f"[RAC] Address map swapped for {_PLANET_NAMES.get(planet_id, hex(planet_id))}.")
+        await asyncio.sleep(1.5)
+        self.quick_select.apply()
+        self.quick_select.unfreeze()
 
     def _maybe_write_defaults(self) -> None:
         if self._defaults_written:
@@ -326,7 +335,8 @@ class GameOrchestrator:
         self._defaults_written = True
         self.clank.write_defaults()
         self.skyboard.write_defaults()
-        logger.info("[RAC] Challenge and skyboard defaults written.")
+        self.quick_select.zero()
+        self._log("[RAC] Challenge and skyboard defaults written.")
 
     def _on_initial_planet_load(self, planet_id: int) -> None:
         if self._initial_load_done:
@@ -334,7 +344,7 @@ class GameOrchestrator:
         if planet_id not in _PLANET_NAMES:
             return
         self._initial_load_done = True
-        logger.info(f"[RAC] Initial load on {_PLANET_NAMES[planet_id]} — applying world state.")
+        self._log(f"[RAC] Initial load on {_PLANET_NAMES[planet_id]} — applying world state.")
         if planet_id == Planets.POKITARU.planet_id:
             asyncio.create_task(self._monitor_ryllus_cutscene())
         self.bolts.sync()
@@ -401,6 +411,9 @@ class GameOrchestrator:
         def on_death(cause: PlayerMovementState) -> None:
             if not self.writes_blocked:
                 arm_cutscenes(_pine_proxy(), self._active_planet_id, "reset")
+            self.armour.freeze_slots()
+            self.armour.clear_all_memory()
+            self.armour.apply_item_pickup_armour()
             self._death_count += 1
             amnesty = self._death_amnesty()
             if self._death_count > amnesty:
@@ -408,20 +421,17 @@ class GameOrchestrator:
                 self._send_deathlink(int(cause))
             else:
                 logger.info(f"[RAC] Death {self._death_count} ({cause.name}): within amnesty.")
-            self.armour.sync_slots()
-            self.armour.apply_location_armour()
 
         def on_respawn() -> None:
             self._death_count = 0
             if not self.writes_blocked:
                 arm_cutscenes(_pine_proxy(), self._active_planet_id, "armed")
-            self.armour.apply_item_pickup_armour()
             self._reapply_inv()
+            self.armour.restore_equipped_slots()
 
         def on_pickup_start() -> None:
             if self.vendor_active:
                 return
-            self.armour.sync_slots()
             ps = self.planet_states.get(self._active_planet_id)
             if ps:
                 ps.on_pickup_start()
@@ -449,7 +459,7 @@ class GameOrchestrator:
         def on_bolt_delta(delta: int) -> None:
             name = BOLT_BY_PLANET_AND_DELTA.get((self._active_planet_id, delta))
             if name:
-                logger.info(f"[RAC] Titanium bolt collected: {name}")
+                self._log(f"[RAC] Titanium bolt collected: {name}")
                 self._send_location(name)
             else:
                 logger.warning(f"[RAC] Unknown bolt delta {delta} on {self._active_planet_id:#04x}")
@@ -458,14 +468,14 @@ class GameOrchestrator:
 
     def _wire_skill_point_hooks(self) -> None:
         def on_skill_point_earned(name: str) -> None:
-            logger.info(f"[RAC] Skill point earned: {name}")
+            self._log(f"[RAC] Skill point earned: {name}")
             self._send_location(name)
 
         self.skill_points.on_skill_point_earned = on_skill_point_earned
 
     def _wire_armour_set_hooks(self) -> None:
         def on_armour_set_collected(name: str) -> None:
-            logger.info(f"[RAC] Armour set collected: {name}")
+            self._log(f"[RAC] Armour set collected: {name}")
             self._send_location(name)
 
         self.armour_sets.on_location_check = on_armour_set_collected
@@ -477,7 +487,7 @@ class GameOrchestrator:
         async def _deferred_goal() -> None:
             if self._active_planet_id != Planets.QUODRONA.planet_id:
                 return
-            logger.info("[RAC] Goal cutscene fired — Defeat Otto Destruct.")
+            self._log("[RAC] Goal cutscene fired — Defeat Otto Destruct.")
             self._send_location("Defeat Otto Destruct")
             self._on_goal()
 
@@ -487,7 +497,7 @@ class GameOrchestrator:
         async def _deferred_electroshock() -> None:
             if self._active_planet_id != Planets.METALIS.planet_id:
                 return
-            logger.info("[RAC] Electroshock Gloves cutscene fired.")
+            self._log("[RAC] Electroshock Gloves cutscene fired.")
             self._send_location("Metalis Electroshock Gloves")
 
         def on_before_sprout() -> None:
@@ -496,7 +506,7 @@ class GameOrchestrator:
         async def _deferred_sprout() -> None:
             if self._active_planet_id != Planets.RYLLUS.planet_id:
                 return
-            logger.info("[RAC] Sprout-O-Matic cutscene fired.")
+            self._log("[RAC] Sprout-O-Matic cutscene fired.")
             self._send_location("Ryllus Sprout-O-Matic")
 
         def on_sprout_cutscene() -> None:
@@ -507,17 +517,18 @@ class GameOrchestrator:
         self.cutscene.on_electroshock_gloves = on_electroshock
         self.cutscene.on_before_sprout       = on_before_sprout
         self.cutscene.on_sprout_cutscene     = on_sprout_cutscene
-        self.vendor.on_menu_close           = lambda: self._on_vendor_close()
+        self.vendor.on_menu_open            = lambda: self.quick_select.freeze()
+        self.vendor.on_menu_close           = lambda: (self.quick_select.unfreeze(), self._on_vendor_close())
         self.menu.set_pause_close_callback(lambda: self._on_pause_close())
         self.menu.on_travel_menu_close      = lambda: self._on_travel_menu_close()
 
     def _wire_challenge_hooks(self) -> None:
         self.clank.set_location_check_callback(
-            lambda name: (logger.info(f"[RAC] Clank challenge completed: {name}"),
+            lambda name: (self._log(f"[RAC] Clank challenge completed: {name}"),
                           self._send_location(name))
         )
         self.skyboard.set_location_check_callback(
-            lambda name: (logger.info(f"[RAC] Skyboard race completed: {name}"),
+            lambda name: (self._log(f"[RAC] Skyboard race completed: {name}"),
                           self._send_location(name))
         )
 
@@ -528,7 +539,7 @@ class GameOrchestrator:
                     self.armour.add_location_piece(name, piece)
                     loc = ARMOUR_FLAG_TO_LOCATION.get((name, piece))
                     if loc:
-                        logger.info(f"[RAC] Armour acquired on {pid:#04x}: {loc}")
+                        self._log(f"[RAC] Armour acquired on {pid:#04x}: {loc}")
                         self._send_location(loc)
                 return on_armour_acquired
             ps.on_armour_acquired = make_armour_hook(planet_id)
@@ -559,7 +570,7 @@ class GameOrchestrator:
 
     def _build_planet_states(self, acc, storage) -> dict[int, PlanetState]:
         states: dict[int, PlanetState] = {}
-        for planet_id, (movement_addr, health_addr) in PLAYER_ADDRS.items():
+        for planet_id in PLAYER_ADDRS:
             name = _PLANET_NAMES.get(planet_id, f"Planet {planet_id:#04x}")
             planet_map = build_planet_address_map(planet_id)
 
@@ -570,6 +581,7 @@ class GameOrchestrator:
                 name=name,
                 planet_id=planet_id,
                 menu_addr=MENU_ADDR_BY_PLANET_ID.get(planet_id),
+                log=self._log,
             )
 
             ps.add_enter_callback(lambda pid=planet_id: self._on_planet_enter(pid))

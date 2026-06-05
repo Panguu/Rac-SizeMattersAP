@@ -44,11 +44,13 @@ class PlanetState(BaseState):
         name: str,
         planet_id: int,
         menu_addr: int | None = None,
+        log: Callable[..., None] | None = None,
     ) -> None:
         super().__init__(accessor, addresses, storage)
         self.name      = name
         self.planet_id = planet_id
         self.menu_addr = menu_addr
+        self._log      = log or logger.info
 
         self._armour:             ArmourState | None           = None
         self._weapons:            WeaponState | None           = None
@@ -133,7 +135,7 @@ class PlanetState(BaseState):
         pass
 
     def planet_enter(self) -> None:
-        logger.info(f"[RAC] [{self.name}] planet_enter")
+        self._log(f"[RAC] [{self.name}] planet_enter")
         arm_cutscenes(self._pine_proxy(), self.planet_id, "armed")
         for cb in self._on_enter_callbacks:
             cb()
@@ -153,7 +155,7 @@ class PlanetState(BaseState):
             self._reapply_inv()
 
     def planet_exit(self) -> None:
-        logger.info(f"[RAC] [{self.name}] planet_exit")
+        self._log(f"[RAC] [{self.name}] planet_exit")
         for cb in self._on_exit_callbacks:
             cb()
         if self._menu is not None:
@@ -196,19 +198,19 @@ class PlanetState(BaseState):
 
     def on_pickup_start(self) -> None:
         suppress_disabled_cutscenes(self._pine_proxy(), self.planet_id)
-        logger.info(f"[RAC] [{self.name}] Pickup start — applying collected armour")
+        self._log(f"[RAC] [{self.name}] Pickup start — applying collected armour")
         if self._armour is not None:
             self._armour.sync_slots()
             self._armour.apply_location_armour()
 
     def on_pickup_end(self) -> None:
         suppress_disabled_cutscenes(self._pine_proxy(), self.planet_id)
-        logger.info(f"[RAC] [{self.name}] Pickup end — reading armour state")
+        self._log(f"[RAC] [{self.name}] Pickup end — reading armour state")
         if self._armour is None:
             return
         self._armour.sync()
         bitmask_summary = {k: hex(v) for k, v in self._armour.sets_bitmask.items() if v}
-        logger.info(f"[RAC] [{self.name}] Pickup end sets_bitmask: {bitmask_summary}")
+        self._log(f"[RAC] [{self.name}] Pickup end sets_bitmask: {bitmask_summary}")
         for name, mask in self._armour.sets_bitmask.items():
             new_bits = mask & ~self._armour.location_collected_armour.get(name, 0)
             for piece in _PIECE_ORDER:
@@ -220,7 +222,7 @@ class PlanetState(BaseState):
         del _name, _piece
 
     def on_menu_preload(self) -> None:
-        logger.info(f"[RAC] [{self.name}] Vendor preload started.")
+        self._log(f"[RAC] [{self.name}] Vendor preload started.")
         if self._vendor is not None:
             self._vendor.start_menu_preload()
         if self._weapons is not None:
@@ -229,7 +231,7 @@ class PlanetState(BaseState):
     def on_menu_preload_exit(self) -> None:
         from .vendor import VendorSessionState
         session = self._vendor.session if self._vendor is not None else VendorSessionState.CLOSED
-        logger.info(f"[RAC] [{self.name}] Vendor preload exit — session={session.name}.")
+        self._log(f"[RAC] [{self.name}] Vendor preload exit — session={session.name}.")
         if session != VendorSessionState.PRELOADING:
             return
         if self._vendor is not None:
@@ -238,7 +240,7 @@ class PlanetState(BaseState):
             self._reapply_inv()
 
     def on_menu_open(self) -> None:
-        logger.info(f"[RAC] [{self.name}] Vendor menu open.")
+        self._log(f"[RAC] [{self.name}] Vendor menu open.")
         if self._weapons is not None:
             self._weapons.apply_vendor_locations()
             self._weapons.on_weapon_acquired = lambda name: self.on_vendor_weapon_purchased(name)
@@ -246,7 +248,7 @@ class PlanetState(BaseState):
             self._weapons.on_mod_acquired    = lambda weapon, slot: self.on_vendor_mod_purchased(weapon, slot)
 
     def on_menu_close(self) -> None:
-        logger.info(f"[RAC] [{self.name}] Vendor menu closed — restoring AP inventory.")
+        self._log(f"[RAC] [{self.name}] Vendor menu closed — restoring AP inventory.")
         if self._weapons is not None:
             self._weapons.on_weapon_acquired = lambda _: None
             self._weapons.on_gadget_acquired = lambda _: None

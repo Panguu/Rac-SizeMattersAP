@@ -16,17 +16,20 @@ CONTROLLER_PAUSE_SELECT_ADDRESS = 0x20F7F414
 CONTROLLER_BUTTONS_ADDRESS = 0x20F7F415
 CHALLENGE_MODE_ADDRESS = 0x21F4C778 # 1 - 255 when challange mode is active, 0 otherwise
 PLANET_UNLOCK_ADDRESSES: dict[str, int] = { # each value must be 3 in order to unlock next planet
-    "POKITARU": 0x21F4C661,
-    "RYLLUS": 0x21F4C662,
-    "KALIDON": 0x21F4C663,
-    "METALIS": 0x21F4C664,
-    "DREAMTIME": 0x21F4C665,
-    "OUTPOST_OMEGA": 0x21F4C666,
-    "CHALLAX": 0x21F4C667,
-    "DAYNI_MOON": 0x21F4C668,
+    "POKITARU":     0x21F4C661,
+    "RYLLUS":       0x21F4C662,
+    "KALIDON":      0x21F4C663,
+    "METALIS":      0x21F4C664,
+    "DREAMTIME":    0x21F4C665,
+    "OUTPOST_OMEGA":0x21F4C666,
+    "CHALLAX":      0x21F4C667,
+    "DAYNI_MOON":   0x21F4C668,
     "INSIDE_CLANK": 0x21F4C669,
-    "QUODRONA": 0x21F4C66A,
+    "QUODRONA":     0x21F4C66A,
 }
+# Each planet has a parallel "state" byte at unlock_address + PLANET_STATE_OFFSET.
+# e.g. OUTPOST_OMEGA state = 0x21F4C677; gates Outpost Omega 2 (0x17) access.
+PLANET_STATE_OFFSET: int = 0x11
 # Per-planet player state/health addresses
 PLAYER_ADDRS: dict[int, tuple[int, int]] = {
     0x01: (0x20F805C0, 0x20F80E2C),  # pokitaru
@@ -35,6 +38,7 @@ PLAYER_ADDRS: dict[int, tuple[int, int]] = {
     0x04: (0x20F7EDD0, 0x20F7F63C),  # metalis
     0x05: (0x20F762C0, 0x20F76B2C),  # dreamtime
     0x06: (0x20F81B40, 0x20F823AC),  # outpost omega
+    0x17: (0x20F82A40, 0x20F823AC),  # outpost omega 2
     0x07: (0x20F806C0, 0x20F80F2C),  # challax
     0x08: (0x20F79850, 0x20F7A0BC),  # dayni moon
     0x09: (0x20F82540, 0x20F82DAC),  # inside clank
@@ -127,6 +131,23 @@ DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
     "The Thin Bouncy Line": 0x1F4B3FE,
     "The Ultimate Showdown": 0x1F4B3FF,
 }
+# each address is 4 bytes
+QUICK_SELECT_ADDRESSES: dict[str, int] = {
+    "right": 0x21F4B364,
+    "top-right": 0x21F4B368,
+    "top-middle": 0x21F4B36C,
+    "top-left": 0x21F4B370,
+    "left": 0x21F4B374,
+    "bottom-left": 0x21F4B378,
+    "bottom-middle": 0x21F4B37C,
+    "bottom-right": 0x21F4B380,
+}
+
+CURRENT_WEAPON_IN_VENDOR = 0x21F4AB8C
+# This address designates what appears in vendor, i.e how many options there are in the menu.
+WEAPON_VENDOR_SLOTS = 0x21F4ABE4
+# each item is 4 bytes: 02 00 00 00 is lacerator
+WEAPON_VENDOR_ITEMS = 0x21F4AB80
 # Metalis challenge unlock addresses — layout per byte is undocumented.
 # 0x1F4B3DB = unknown challenge type 1 unlock
 # 0x1F4B3DC = unknown challenge type 2 unlock

@@ -24,7 +24,7 @@ TITANIUM_BOLTS: dict[str, TitaniumBolt] = {
     "Dreamtime Jump Across three moving parasols (TB)": TitaniumBolt(0x05, 16, "Dreamtime"),
     "Dreamtime To the left of Ratchets Garage (TB)":   TitaniumBolt(0x05, 17, "Dreamtime"),
     "Dreamtime Apparition of the Scuttle Crab (TB)":   TitaniumBolt(0x05, 18, "Dreamtime"),
-    "Outpost Omega Near the Entrance to DreamTime (TB)":TitaniumBolt(0x06, 20, "Outpost Omega"),
+    "Outpost Omega Near the Entrance to DreamTime (TB)":TitaniumBolt(0x17, 20, "Outpost Omega"),
     "Challax Beside The Ultra Mech Pad (TB)":           TitaniumBolt(0x07, 24, "Challax"),
     "Challax Hidden Room (TB)":                         TitaniumBolt(0x07, 25, "Challax"),
     "Challax Mimic Plant Lob (TB)":                     TitaniumBolt(0x07, 26, "Challax"),

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 from NetUtils import ClientStatus
 
 

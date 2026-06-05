@@ -50,7 +50,7 @@ def build_planet_address_map(planet_id: int) -> AddressMap:
     tb = _TEXTBOX_BY_PLANET.get(planet_id)
     if tb is not None:
         address_map.register(make_countdown_cls(planet_name, tb.countdown_timer))
-        address_map.register(make_vendor_visibility_cls(planet_name, tb.is_visible))
+        address_map.register(make_vendor_visibility_cls(planet_name, tb.message_str_pointer))
 
     if planet_id in WEAPON_ARRAY_BASE_BY_PLANET:
         array_base = WEAPON_ARRAY_BASE_BY_PLANET[planet_id]

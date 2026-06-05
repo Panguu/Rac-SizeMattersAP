@@ -11,6 +11,7 @@ from ..structs.cutscenes import (
 )
 from ..structs.game_status import ControllerStruct, GameStatusStruct
 from ..structs.planet_progress import PlanetProgressStruct
+from ..structs.quick_select import QuickSelectStruct
 from ..structs.skill_points import SkillPointsStruct
 from ..structs.titanium_bolts import TitaniumBoltStruct
 
@@ -18,6 +19,7 @@ from ..structs.titanium_bolts import TitaniumBoltStruct
 def build_global_address_map() -> AddressMap:
     address_map = AddressMap(interface_id="global")
     address_map.register(
+        QuickSelectStruct,
         ArmourStruct,
         ArmourSetCollectedStruct,
         TitaniumBoltStruct,

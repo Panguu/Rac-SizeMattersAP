@@ -34,7 +34,7 @@ SKILL_POINTS: dict[str, SkillPoint] = {
     "Ultimate Gladiator (SP)":            SkillPoint(0x04, 14, "Metalis"),
     "Friends Dont Hurt Friends (SP)":     SkillPoint(0x05, 16, "Dreamtime"),
     "Night Terrors (SP)":                 SkillPoint(0x05, 17, "Dreamtime"),
-    "Be An Awesome Skyboarder (SC)":      SkillPoint(0x06, 20, "Outpost Omega"),
+    "Be An Awesome Skyboarder (SC)":      SkillPoint(0x17, 20, "Outpost Omega"),
     "High Tech Weapons Master (SP)":      SkillPoint(0x07, 25, "Challax"),
     "No More Varmints (SP)":              SkillPoint(0x07, 26, "Challax"),
     "Ultimate Gladiator Dayni Moon (SP)": SkillPoint(0x08, 28, "Dayni Moon"),
