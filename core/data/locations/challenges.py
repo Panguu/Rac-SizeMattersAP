@@ -8,12 +8,30 @@ from __future__ import annotations
 from enum import IntFlag
 from typing import NamedTuple
 
-from .addresses import (
+from ..addresses import (
     DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR,
+    DAYNI_MOON_CLANK_CHALLENGES_UNLOCK_ADDR,
+    DAYNI_MOON_DERBY_CHALLENGES_UNLOCK_ADDR,
+    DAYNI_MOON_DERBY_B_CHALLENGES_UNLOCK_ADDR,
+    DAYNI_MOON_GADGETBOT_CHALLENGES_UNLOCK_ADDR,
     KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR,
     METALIS_CLANK_CHALLENGES_COMPLETED_ADDR,
+    METALIS_CLANK_CHALLENGES_UNLOCK_ADDR,
     OUTPOST_OMEGA_SKYBOARD_CHALLENGES_COMPLETED_ADDR,
 )
+
+# Metalis: challenge type layout per byte is undocumented; written as one 3-byte block.
+METALIS_CLANK_UNLOCK_ADDR:  int   = METALIS_CLANK_CHALLENGES_UNLOCK_ADDR
+METALIS_CLANK_UNLOCK_BYTES: bytes = bytes([0x0F, 0x0F, 0x0F])
+
+# Dayni Moon: three consecutive unlock bytes, one per challenge type.
+# Written as one 3-byte block starting at the Derby unlock address.
+DAYNI_CLANK_DERBY_UNLOCK_ADDR:     int = DAYNI_MOON_DERBY_CHALLENGES_UNLOCK_ADDR
+DAYNI_CLANK_DERBY_B_UNLOCK_ADDR:   int = DAYNI_MOON_DERBY_B_CHALLENGES_UNLOCK_ADDR
+DAYNI_CLANK_GADGETBOT_UNLOCK_ADDR: int = DAYNI_MOON_GADGETBOT_CHALLENGES_UNLOCK_ADDR
+DAYNI_CLANK_UNLOCK_ADDR:           int = DAYNI_MOON_CLANK_CHALLENGES_UNLOCK_ADDR  # = Derby addr
+DAYNI_CLANK_UNLOCK_BYTES:        bytes = bytes([0x0F, 0x0F, 0x0F])
+
 
 
 class ChallengePickup(NamedTuple):
@@ -37,18 +55,26 @@ class SkyboardBit(IntFlag):
     RACE_4 = 0x40
 
 
+# Maps Metalis challenge name → reward item name for challenges that grant a reward.
+# Used to build combined "Challenge - Reward (CC)" location names.
+METALIS_CHALLENGE_REWARD: dict[str, str] = {
+    "Buzzsaw Blitz":       "Polarizer",
+    "Smasherbot's Revenge": "Crystallix Helmet",
+    "The Uber Finals":     "Crystallix Gloves",
+    "Nigh Impossible":     "Sludge Mk9 Gloves",
+}
+
 # ── Reward locations (item_challenges + all_challenges) ───────────────────────
 CHALLENGE_PICKUPS: list[ChallengePickup] = [
-    # Metalis — each address is the completion flag for the named challenge
-    ChallengePickup(0x1F4B3DE, "Metalis Polarizer (CC)",            "Metalis"),   # Buzzsaw Blitz
-    ChallengePickup(0x1F4B3E2, "Metalis Crystallix Helmet (CC)",    "Metalis"),   # Smasherbot's Revenge
-    ChallengePickup(0x1F4B3E7, "Metalis Crystallix Gloves (CC)",    "Metalis"),   # The Uber Finals
-    ChallengePickup(0x1F4B3EC, "Metalis Sludge Mk9 Helmet (CC)",    "Metalis"),   # Nigh Impossible
+    # Metalis — combined "Challenge - Reward" names so item_challenges and
+    # all_challenges modes use the same location name for reward-granting challenges.
+    ChallengePickup(0x1F4B3DE, "Metalis Buzzsaw Blitz - Polarizer (CC)",              "Metalis"),
+    ChallengePickup(0x1F4B3E2, "Metalis Smasherbot's Revenge - Crystallix Helmet (CC)", "Metalis"),
+    ChallengePickup(0x1F4B3E7, "Metalis The Uber Finals - Crystallix Gloves (CC)",    "Metalis"),
+    ChallengePickup(0x1F4B3EC, "Metalis Nigh Impossible - Sludge Mk9 Gloves (CC)",    "Metalis"),
     # Dayni Moon
-    ChallengePickup(0x1F4B3FF, "Dayni Moon Mega Bomb Gloves (CC)",  "Dayni Moon"),  # The Ultimate Showdown
-    ChallengePickup(0x1F4B404, "Dayni Moon Mega Bomb Boots (CC)",   "Dayni Moon"),  # Infinite Improbability
-    # Outpost Omega — detected via SkyboardPoller (Vertigo completion)
-    # ChallengePickup(0x00, "Outpost Omega Electroshock Boots (CC)", "Outpost Omega"),
+    ChallengePickup(0x1F4B3FF, "Dayni Moon The Ultimate Showdown - Mega Bomb Gloves (CC)", "Dayni Moon"),
+    ChallengePickup(0x1F4B404, "Dayni Moon Infinite Improbability - Mega Bomb Boots (CC)", "Dayni Moon"),
 ]
 
 # Reward address map (used by item_challenges and for _append_location lookup)
@@ -59,15 +85,34 @@ CHALLENGE_ADDRESS_MAP: dict[int, str] = {
 }
 
 # ── Individual completion locations (all_challenges only) ─────────────────────
+def _metalis_pickup_name(name: str) -> str:
+    reward = METALIS_CHALLENGE_REWARD.get(name)
+    return f"Metalis {name} - {reward} (CC)" if reward else f"Metalis {name} (CC)"
+
 METALIS_CLANK_PICKUPS: list[ChallengePickup] = [
-    ChallengePickup(addr, f"Metalis {name} (CC)", "Metalis")
+    ChallengePickup(addr, _metalis_pickup_name(name), "Metalis")
     for name, addr in METALIS_CLANK_CHALLENGES_COMPLETED_ADDR.items()
 ]
 
+DAYNI_MOON_CHALLENGE_REWARD: dict[str, str] = {
+    "The Ultimate Showdown": "Mega Bomb Gloves",
+    "Infinite Improbability": "Mega Bomb Boots",
+}
+
+def _dayni_pickup_name(name: str) -> str:
+    reward = DAYNI_MOON_CHALLENGE_REWARD.get(name)
+    return f"Dayni Moon {name} - {reward} (CC)" if reward else f"Dayni Moon {name} (CC)"
+
 DAYNI_MOON_CLANK_PICKUPS: list[ChallengePickup] = [
-    ChallengePickup(addr, f"Dayni Moon {name} (CC)", "Dayni Moon")
+    ChallengePickup(addr, _dayni_pickup_name(name), "Dayni Moon")
     for name, addr in DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR.items()
 ]
+
+# Addresses that use count-increase detection (unlock via single bitmask write).
+COUNT_BASED_CHALLENGE_ADDRS: frozenset[int] = (
+    frozenset(METALIS_CLANK_CHALLENGES_COMPLETED_ADDR.values())
+    | frozenset(DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR.values())
+)
 
 # All individual + reward addresses — used for initialization and all_challenges polling
 ALL_CLANK_ADDRESS_MAP: dict[int, str] = {
@@ -82,12 +127,12 @@ KALIDON_SKYBOARD_PICKUPS: list[SkyboardPickup] = [
     for name, (unlock_addr, completed_addr, mask) in KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR.items()
 ]
 
-# Vertigo (last race) is the condition for Outpost Omega Electroshock Boots
+# Vertigo (last race) grants Electroshock Boots — combined race-reward name.
 _OO_SKYBOARD_NAMES: dict[str, str] = {
     "Interior Decorating": "Outpost Omega Interior Decorating (SC)",
     "Danger, High Voltage": "Outpost Omega Danger, High Voltage (SC)",
     "The Vortex":           "Outpost Omega The Vortex (SC)",
-    "Vertigo":              "Outpost Omega Electroshock Boots (CC)",
+    "Vertigo":              "Outpost Omega Vertigo - Electroshock Boots (SC)",
 }
 
 OUTPOST_OMEGA_SKYBOARD_PICKUPS: list[SkyboardPickup] = [
@@ -115,7 +160,7 @@ for _sp in ALL_SKYBOARD_PICKUPS:
 # ── Challenge-only AP items ───────────────────────────────────────────────────
 CHALLENGE_ONLY_ITEMS: frozenset[str] = frozenset({
     "Polarizer",
-    "Sludge Mk9 Helmet",
+    "Sludge Mk9 Gloves",
     "Crystallix Helmet",
     "Crystallix Gloves",
     "Mega Bomb Gloves",

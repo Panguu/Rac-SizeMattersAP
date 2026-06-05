@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Region
 
-from .core.data.skill_points import CHALLENGE_SKILL_POINTS
+from .core.data.locations.skill_points import CHALLENGE_SKILL_POINTS
 from .locations import (
     ALL_CLANK_LOCATIONS,
     ARMOUR_PICKUP_LOCATIONS,
@@ -60,7 +60,8 @@ def create_regions(world: RACSizeMatterWorld) -> None:
     ]
     if world.options.vendor_mods_randomized:
         location_tables.append(WEAPON_MOD_VENDOR_LOCATIONS)
-    location_tables.append(CHALLENGE_LOCATIONS)
+    if world.options.clank_challenges.value >= 1:
+        location_tables.append(CHALLENGE_LOCATIONS)
     if world.options.clank_challenges.value >= 2:
         location_tables.append(ALL_CLANK_LOCATIONS)
     if world.options.skyboard_challenges.value >= 1:

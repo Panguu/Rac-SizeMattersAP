@@ -1,21 +1,15 @@
 from __future__ import annotations
 
-from CommonClient import logger
-
-from ...pypine.pypine.pine import Pine
-from ..data import (
+from ...data import (
     ARMOUR_BASE,
     TITANIUM_BOLT_BASE,
     WEAPON_ARRAY_BASE_BY_PLANET,
-    WEAPON_MIN_CONSECUTIVE,
-    WEAPON_STRUCT_SIZE,
     ArmourAddresses,
     ArmourPiece,
     GadgetAddresses,
     TitaniumBoltAddresses,
     WeaponAddresses,
     build_weapons,
-    is_ps2_weapon_candidate,
 )
 
 WEAPONS: dict[str, WeaponAddresses] = {}
@@ -38,36 +32,12 @@ _ARMOUR_SET_ORDER = ["wildfire", "sludge", "crystallix", "electroshock", "mega_b
 
 
 def load_weapons_for_planet(planet_id: int) -> bool:
+    WEAPONS.clear()
+    GADGETS.clear()
     array_base = WEAPON_ARRAY_BASE_BY_PLANET.get(planet_id)
     if array_base is None:
         return False
     weapons, gadgets = build_weapons(array_base)
-    WEAPONS.clear()
-    GADGETS.clear()
     WEAPONS.update(weapons)
     GADGETS.update(gadgets)
     return True
-
-
-def sync_weapons(ipc: Pine) -> None:
-    SCAN_START  = 0x20F00000
-    SCAN_LENGTH = 0x100000
-
-    data  = ipc.read_bytes(SCAN_START, SCAN_LENGTH)
-    limit = SCAN_LENGTH - WEAPON_STRUCT_SIZE * WEAPON_MIN_CONSECUTIVE
-    for i in range(limit):
-        if (SCAN_START + i) % 4 != 3:
-            continue
-        if not is_ps2_weapon_candidate(data, i):
-            continue
-        count = 1
-        while count < WEAPON_MIN_CONSECUTIVE and is_ps2_weapon_candidate(data, i + count * WEAPON_STRUCT_SIZE):
-            count += 1
-        if count >= WEAPON_MIN_CONSECUTIVE:
-            array_base = SCAN_START + i
-            weapons, gadgets = build_weapons(array_base)
-            WEAPONS.update(weapons)
-            GADGETS.update(gadgets)
-            logger.info(f"Weapon array at 0x{array_base:08X}")
-            return
-    logger.warning("Weapon scan: no consecutive structs found.")

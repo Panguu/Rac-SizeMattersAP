@@ -15,18 +15,19 @@ except ImportError:
 from CommonClient import logger
 
 from ..core.challenge import ChallengePoller
-from ..core.data import PLANET_STATE_ADDRESSES, PLAYER_STATE, SKILL_POINT_ADDRESS
+from ..core.data import PLANET_STATE_ADDRESSES, SKILL_POINT_ADDRESS
 from ..core.data.controller import ButtonState
-from ..core.memory import (
+from ..core.game_wiring import GameWiring
+from ..core.skyboard import SkyboardPoller
+from ..core.states.game_state import GameState
+from ..core.states.memory import (
     ARMOUR_ADDRESSES,
     BOLTS,
     PLAYER_ARMOUR_SLOTS,
     Int64State,
     MemoryItemState,
 )
-from ..core.skyboard import SkyboardPoller
-from ..core.state import GameState
-from ..core.vendor import VendorPoller, VendorSession
+from ..core.states.vendor_session import VendorPoller, VendorSession
 from ..locations import ALL_LOCATIONS
 from ..pypine.pypine.pine import Pine
 from .constants import GAME_NAME
@@ -134,13 +135,6 @@ class RACContext(
             debug_log=self._log,
         )
         self._prev_planet = 0
-        self._prev_player_state = 0
-        self._prev_goal_cutscene = 0
-        self._prev_ryllus_enter: int | None = None
-        self._prev_before_sprout_cutscene: int | None = None
-        self._prev_sprout_cutscene: int | None = None
-        self._prev_electroshock_cutscene: int | None = None
-        self._state_addr = PLAYER_STATE
 
         self._armour_pickup_state = MemoryItemState(
             ARMOUR_ADDRESSES,
@@ -200,6 +194,21 @@ class RACContext(
         self._debug_messages = False
         self._challenge_defaults_written = False
 
+        self._wiring = GameWiring(self.pine)
+
+    def _checked_location_names(self) -> set[str]:
+        id_to_name = {v: k for k, v in self._location_name_to_id.items()}
+        return {
+            id_to_name[lid]
+            for lid in (self.checked_locations | self._locally_checked_locations)
+            if lid in id_to_name
+        }
+
+    def _suppress_sprout_gadget(self) -> None:
+        from ..core.states.memory import GADGETS
+        if GADGETS and not self._player_gadget_state.get("sprout_o_matic"):
+            self.pine.write_int8(GADGETS["sprout_o_matic"].unlocked, 0)
+
     def _log(self, msg: str, level: str = "info") -> None:
         if not self._debug_messages:
             return
@@ -225,11 +234,25 @@ class RACContext(
             self._gs.vendor_session.mods_randomized = bool(self.slot_data.get("vendor_mods_randomized", True))
             if self._death_link_enabled:
                 asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": ["DeathLink"]}]))
+            self._wiring.wire(
+                send_location         = self._append_location_by_name,
+                send_deathlink        = self._send_death_link_from_sync,
+                kill_player           = self._kill_player_sync,
+                reapply_inv           = self._apply_player_inventory_sync,
+                death_amnesty         = lambda: int(self.slot_data.get("death_amnesty", 1)),
+                on_goal               = lambda: asyncio.create_task(self._send_goal_status()),
+                on_vendor_close       = self._on_menu_close_for_armour_sets,
+                on_sprout_suppress    = self._suppress_sprout_gadget,
+            )
+            checked = self._checked_location_names()
+            asyncio.create_task(self._wiring.on_ap_connected(self.slot_data, checked))
             self._pending_item_apply = True
             asyncio.create_task(self._apply_received_items())
             return
 
         if cmd == "ReceivedItems":
+            checked = self._checked_location_names()
+            asyncio.create_task(self._wiring.on_ap_received_items(checked))
             self._pending_item_apply = True
             asyncio.create_task(self._apply_received_items())
             return

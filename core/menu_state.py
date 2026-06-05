@@ -4,7 +4,6 @@ from enum import IntEnum
 
 from ..pypine.pypine.pine import Pine
 from .data import BY_ID
-from .data.addresses import PRELOAD_MENU_ADDR_BY_PLANET_ID
 
 
 class MenuStateValue(IntEnum):
@@ -17,25 +16,21 @@ class MenuStateValue(IntEnum):
 
 
 class MenuState:
-    """Single-read snapshot of the current menu and preload state for a planet."""
+    """Single-read snapshot of the current menu state for a planet."""
 
-    def __init__(self, value: int, preload: int, menu_addr: int | None, preload_addr: int | None) -> None:
-        self._value       = value
-        self._preload     = preload
-        self._menu_addr   = menu_addr
-        self._preload_addr = preload_addr
+    def __init__(self, value: int, menu_addr: int | None) -> None:
+        self._value     = value
+        self._menu_addr = menu_addr
 
     @classmethod
     def read(cls, ipc: Pine, planet_id: int) -> MenuState:
-        planet_obj   = BY_ID.get(planet_id)
-        menu_addr    = planet_obj.menu_addr if planet_obj else None
-        preload_addr = PRELOAD_MENU_ADDR_BY_PLANET_ID.get(planet_id)
-        value   = ipc.read_int8(menu_addr)    if menu_addr    else 0
-        preload = ipc.read_int8(preload_addr) if preload_addr else 0
-        return cls(value, preload, menu_addr, preload_addr)
+        planet_obj = BY_ID.get(planet_id)
+        menu_addr  = planet_obj.menu_addr if planet_obj else None
+        value      = ipc.read_int8(menu_addr) if menu_addr else 0
+        return cls(value, menu_addr)
 
     def write(self, ipc: Pine, state: MenuStateValue) -> bool:
-        """Write state to the preload address then the menu address."""
+        """Write state to the menu address."""
         if not self._menu_addr:
             return False
         ipc.write_int8(self._menu_addr, state)
@@ -46,13 +41,6 @@ class MenuState:
     @property
     def raw(self) -> int:
         return self._value
-
-    # ── preload ───────────────────────────────────────────────────────────────
-
-    @property
-    def is_ready(self) -> bool:
-        """True when the vendor area is preloaded and interactable."""
-        return self._preload == MenuStateValue.PRELOAD_READY
 
     # ── named states ─────────────────────────────────────────────────────────
 
@@ -87,5 +75,4 @@ class MenuState:
             name = MenuStateValue(self._value).name
         except ValueError:
             name = f"UNKNOWN({self._value:#04x})"
-        ready = " ready" if self.is_ready else ""
-        return f"MenuState({name}{ready})"
+        return f"MenuState({name})"

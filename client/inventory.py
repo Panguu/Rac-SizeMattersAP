@@ -60,13 +60,13 @@ _LOCATION_TO_ARMOUR: dict[str, tuple[str, int]] = {
 }
 
 from ..core.data import ArmourPiece
-from ..core.memory import (
+from ..core.states.memory import (
     ARMOUR_ADDRESSES,
     GADGETS,
     PLAYER_ARMOUR_SLOTS,
     WEAPONS,
 )
-from ..core.memory.singletons import _ARMOUR_PIECES, _ARMOUR_SET_ORDER, _PIECE_TO_SLOTS
+from ..core.states.memory.singletons import _ARMOUR_PIECES, _ARMOUR_SET_ORDER, _PIECE_TO_SLOTS
 
 _MOD_SLOT_ATTRS = ("mod_slot_one", "mod_slot_two", "mod_slot_three")
 
@@ -87,22 +87,36 @@ def _build_gadget_addresses() -> dict[str, int]:
 
 
 class InventoryMixin:
+    async def _apply_inventory_after_pickup(self) -> None:
+        """Deferred inventory flush called after pickup ends.
+
+        GameWiring's on_pickup_end reads armour from memory after a 0.3 s sleep.
+        We wait 0.5 s so that detection window has closed before we write AP items,
+        preventing false armour-pickup location checks.
+        """
+        await asyncio.sleep(0.5)
+        if not self._pending_item_apply or self._wiring.is_picking_up:
+            return
+        loop = asyncio.get_event_loop()
+        async with self._pine_lock:
+            await loop.run_in_executor(None, self._apply_world_states_sync)
+            await loop.run_in_executor(None, self._apply_player_inventory_sync)
+        self._pending_item_apply = False
+
     async def _apply_received_items(self) -> None:
         if not self.pine_connected:
             self._pending_item_apply = True
             return
+        if not self.items_received:
+            return
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
+            if self._wiring.is_picking_up:
+                self._pending_item_apply = True
+                return
             await loop.run_in_executor(None, self._apply_player_inventory_sync)
+            await loop.run_in_executor(None, self._apply_world_states_sync)
             self._grant_new_bolt_items()
-        armour_pieces = sum(v.bit_count() for v in self._player_armour_state.values.values())
-        weapon_count  = sum(1 for k, v in self._player_weapon_state.values.items()
-                            if "_mod_" not in k and v)
-        gadget_count  = sum(1 for v in self._player_gadget_state.values.values() if v)
-        self._log(
-            f"[RAC] Applied AP inventory: {weapon_count} weapons, "
-            f"{gadget_count} gadgets, {armour_pieces} armour pieces."
-        )
         self._pending_item_apply = False
 
     # ── Rebuild from received AP items ────────────────────────────────────────
@@ -121,6 +135,7 @@ class InventoryMixin:
         gadget_unlocked:    dict[str, int] = {}
         weapon_mods:        dict[str, int] = {}  # internal_name → max mods count
 
+        infobot_planets: set[str] = set()
         for network_item in self.items_received:
             item_name = self.item_names[self.game].get(network_item.item, "")
 
@@ -134,7 +149,11 @@ class InventoryMixin:
                 continue
 
             if item_name in INFOBOT_ITEM_TO_PLANET:
-                self._planet_state.add(INFOBOT_ITEM_TO_PLANET[item_name], INFOBOT_UNLOCK_VALUE)
+                planet_key = INFOBOT_ITEM_TO_PLANET[item_name]
+                self._planet_state.add(planet_key, INFOBOT_UNLOCK_VALUE)
+                if planet_key == "outpost_omega":
+                    self._planet_state.add("outpost_omega_oo2", INFOBOT_UNLOCK_VALUE)
+                infobot_planets.add(planet_key.upper())
             elif item_name in WEAPON_DISPLAY_TO_INTERNAL:
                 weapon_unlocked[WEAPON_DISPLAY_TO_INTERNAL[item_name]] = 1
             elif item_name in GADGET_DISPLAY_TO_INTERNAL:
@@ -145,6 +164,8 @@ class InventoryMixin:
                     set_key,
                     self._player_armour_state.get(set_key) | int(piece),
                 )
+
+        self._wiring.planet_unlock.set_unlocked_planets(infobot_planets)
 
         # Progressive armour
         for display, count in armour_prog_counts.items():
@@ -201,7 +222,7 @@ class InventoryMixin:
         self._seed_armour_pickup_state()
 
         self._gs.tracked_armour = {
-            key: self._player_armour_state.get(key)
+            key: self._player_armour_state.get(key) | self._armour_pickup_state.get(key)
             for key in ARMOUR_ADDRESSES
         }
 
@@ -282,29 +303,26 @@ class InventoryMixin:
         # _rebuild_player_inventory already called _sync_game_state_inventory;
         # re-run it here to pick up the freshly updated weapon/gadget addresses.
         self._sync_game_state_inventory()
-        if self._gs.is_picking_up:
+        if self._wiring.is_picking_up:
+            return
+        if self._wiring.writes_blocked:
+            self._log("[RAC] _apply_player_inventory_sync: all writes blocked — planet transition or travel menu open")
             return
         self._planet_state.give(self.pine)
-        self._player_armour_state.remove(self.pine)
-        self._player_armour_state.give(self.pine)
-        self._sync_armour_slot_state()
-        self._armour_slot_state.give(self.pine)
+        for key, addr in ARMOUR_ADDRESSES.items():
+            ap_val = self._player_armour_state.get(key)
+            existing = self.pine.read_int8(addr)
+            self.pine.write_int8(addr, existing | ap_val)
         # Never write weapons or gadgets while vendor owns the weapon state.
-        if self._gs.is_preloaded or self._gs.is_in_menu:
+        if self._gs.is_preloaded or self._gs.is_in_menu or self._wiring.vendor_active:
+            self._log(f"[RAC] _apply_player_inventory_sync: weapon write blocked — "
+                      f"is_preloaded={self._gs.is_preloaded}, is_in_menu={self._gs.is_in_menu}, "
+                      f"vendor_active={self._wiring.vendor_active}")
             return
+        unlocked = [k for k, v in self._player_weapon_state.values.items() if v and "_mod_" not in k]
+        self._log(f"[RAC] _apply_player_inventory_sync: writing {len(unlocked)} AP weapons: {unlocked}")
         if WEAPONS:
-            # Snapshot ammo/level/exp before writing unlocked flags — the game
-            # resets those fields when unlocked changes, so we restore them after.
-            snap = {n: (self.pine.read_int32(w.ammo),
-                        self.pine.read_int32(w.level),
-                        self.pine.read_int32(w.experience))
-                    for n, w in WEAPONS.items()}
             self._player_weapon_state.give(self.pine)
-            for n, w in WEAPONS.items():
-                ammo, lvl, exp = snap[n]
-                self.pine.write_int32(w.ammo, ammo)
-                self.pine.write_int32(w.level, lvl)
-                self.pine.write_int32(w.experience, exp)
         if GADGETS:
             self._player_gadget_state.give(self.pine)
 
@@ -366,6 +384,8 @@ class InventoryMixin:
         self._prev_bolt_pickup = new_bolt & BOLT_PICKUP_MASK
         new_sp   = self._skill_point_state.apply_or(self.pine)
         self._prev_skill_points = new_sp
+        # Write infobot-unlocked planet states (populated by _rebuild_player_inventory).
+        self._planet_state.give(self.pine)
         # Force-unlock planets that have no collectible infobot in the AP world.
         for address in AUTO_UNLOCK_ADDRESSES:
             self.pine.write_int8(address, INFOBOT_UNLOCK_VALUE)

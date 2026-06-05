@@ -17,9 +17,9 @@ __all__ = [
     # planets
     "Planet", "Planets", "BY_ID",
     # cutscenes
-    "Cutscene", "arm_cutscenes",
+    "Cutscene", "arm_cutscenes", "suppress_disabled_cutscenes",
     "ENTER_CUTSCENES", "CUTSCENE_BEFORE_SPROUT_O_MATIC", "SPROUT_O_MATIC_CUTSCENE",
-    "ELECTROSHOCK_GLOVES_CUTSCENE", "CUTSCENES",
+    "ELECTROSHOCK_GLOVES_CUTSCENE", "POKITARU_RYLLUS_ALT_TRIGGER", "CUTSCENES",
     # skill points
     "SkillPoint", "SKILL_POINT_ADDRESS", "SKILL_POINTS", "LOCATION_SKILL_POINTS", "SKILL_POINT_BY_PLANET_AND_MASK",
     "CHALLENGE_SKILL_POINTS",
@@ -59,14 +59,30 @@ from .addresses import (
 )
 from .armour import ArmourAddresses, ArmourPiece, PlayerArmour
 
+# ── Cutscenes ─────────────────────────────────────────────────────────────────
+from .cutscenes import (
+    CUTSCENE_BEFORE_SPROUT_O_MATIC,
+    CUTSCENES,
+    ELECTROSHOCK_GLOVES_CUTSCENE,
+    ENTER_CUTSCENES,
+    POKITARU_RYLLUS_ALT_TRIGGER,
+    SPROUT_O_MATIC_CUTSCENE,
+    Cutscene,
+    arm_cutscenes,
+    suppress_disabled_cutscenes,
+)
+
+# ── Infobots ──────────────────────────────────────────────────────────────────
+from .infobots import AUTO_UNLOCK_ADDRESSES, INFOBOT_ITEM_TO_PLANET, INFOBOT_UNLOCK_VALUE, PLANET_STATE_ADDRESSES
+
 # ── Armour pickups ────────────────────────────────────────────────────────────
-from .armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPickup
+from .locations.armour_pickups import ARMOUR_FLAG_TO_LOCATION, ARMOUR_PICKUPS, ArmourPickup
 
 # ── Armour set checks ─────────────────────────────────────────────────────────
-from .armour_set_checks import ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
+from .locations.armour_set_checks import ARMOUR_SET_CHECK_MASKS, ARMOUR_SET_CHECKS, ArmourSetCheck, ArmourSets
 
 # ── Challenges ────────────────────────────────────────────────────────────────
-from .challenges import (
+from .locations.challenges import (
     ALL_CLANK_ADDRESS_MAP,
     CHALLENGE_ADDRESS_MAP,
     CHALLENGE_ONLY_ITEMS,
@@ -76,31 +92,8 @@ from .challenges import (
     ChallengePickup,
 )
 
-# ── Cutscenes ─────────────────────────────────────────────────────────────────
-from .cutscenes import (
-    CUTSCENE_BEFORE_SPROUT_O_MATIC,
-    CUTSCENES,
-    ELECTROSHOCK_GLOVES_CUTSCENE,
-    ENTER_CUTSCENES,
-    SPROUT_O_MATIC_CUTSCENE,
-    Cutscene,
-    arm_cutscenes,
-)
-
-# ── Infobots ──────────────────────────────────────────────────────────────────
-from .infobots import AUTO_UNLOCK_ADDRESSES, INFOBOT_ITEM_TO_PLANET, INFOBOT_UNLOCK_VALUE, PLANET_STATE_ADDRESSES
-
-# ── Pickup address resolvers ───────────────────────────────────────────────────
-from .pickups import TitaniumBoltAddresses
-
-# ── Planets ────────────────────────────────────────────────────────────────────
-from .planets import BY_ID, Planet, Planets
-
-# ── Player states ──────────────────────────────────────────────────────────────
-from .player_states import PlayerState
-
 # ── Skill points ──────────────────────────────────────────────────────────────
-from .skill_points import (
+from .locations.skill_points import (
     CHALLENGE_SKILL_POINTS,
     LOCATION_SKILL_POINTS,
     SKILL_POINT_ADDRESS,
@@ -110,7 +103,16 @@ from .skill_points import (
 )
 
 # ── Titanium bolts ────────────────────────────────────────────────────────────
-from .titanium_bolts import BOLT_BY_PLANET_AND_DELTA, TITANIUM_BOLTS, TitaniumBolt
+from .locations.titanium_bolts import BOLT_BY_PLANET_AND_DELTA, TITANIUM_BOLTS, TitaniumBolt
+
+# ── Pickup address resolvers ───────────────────────────────────────────────────
+from .pickups import TitaniumBoltAddresses
+
+# ── Planets ────────────────────────────────────────────────────────────────────
+from .planets import BY_ID, Planet, Planets
+
+# ── Player states ──────────────────────────────────────────────────────────────
+from .player_states import PlayerState
 
 # ── Weapon/gadget address resolvers ───────────────────────────────────────────
 from .weapons import (

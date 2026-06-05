@@ -46,7 +46,7 @@ class VendorHandlerMixin:
                 self._pending_vendor_checks.append(loc_name)
 
     def _on_vendor_close_sync(self) -> None:
-        """Called when the vendor session ends.  Purchases are already queued
-        by _on_vendor_purchase during detection, so this is a no-op safety net
-        for any edge-case items not caught by the immediate callback."""
-        pass
+        """Called when the vendor menu closes. Flushes pending purchase checks."""
+        for loc_name in self._pending_vendor_checks:
+            self._append_location_by_name(loc_name)
+        self._pending_vendor_checks.clear()

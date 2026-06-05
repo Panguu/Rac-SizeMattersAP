@@ -5,7 +5,7 @@ from collections.abc import Callable
 from CommonClient import logger
 
 from ..pypine.pypine.pine import Pine
-from .data.challenges import SKYBOARD_ADDRESS_MASK_MAP, SKYBOARD_UNLOCK_MASK
+from .states.challenges import SKYBOARD_ADDRESS_MASK_MAP, SKYBOARD_UNLOCK_MASK
 
 
 class SkyboardPoller:

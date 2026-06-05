@@ -1,9 +1,9 @@
 from typing import NamedTuple
 
-from .core.data.armour_pickups import ARMOUR_PICKUPS
-from .core.data.challenges import CHALLENGE_PICKUPS, DAYNI_MOON_CLANK_PICKUPS, METALIS_CLANK_PICKUPS
-from .core.data.skill_points import SKILL_POINTS
-from .core.data.titanium_bolts import TITANIUM_BOLTS
+from .core.data.locations.armour_pickups import ARMOUR_PICKUPS
+from .core.data.locations.challenges import CHALLENGE_PICKUPS, DAYNI_MOON_CLANK_PICKUPS, METALIS_CLANK_PICKUPS
+from .core.data.locations.skill_points import SKILL_POINTS
+from .core.data.locations.titanium_bolts import TITANIUM_BOLTS
 
 BASE_ID = 77_700_000
 
@@ -42,14 +42,15 @@ VENDOR_WEAPON_PLANET: dict[str, str] = {
     "Suck Cannon":     "Dreamtime",
     "Bee Mine Glove":  "Outpost Omega",
     "Sniper Mine":     "Challax",
-    "Mootator":        "Dayni Moon",
     "Shock Rocket":    "Dayni Moon",
     "Static Barrier":  "Inside Clank",
     "Laser Tracer":    "Quodrona",
 }
 
 VENDOR_GADGET_PLANET: dict[str, str] = {
-    "Hypershot": "Pokitaru",
+    "Hypershot":   "Pokitaru",
+    "PDA":         "Challax",
+    "Map-O-Matic": "Dayni Moon",
 }
 
 WEAPON_VENDOR_LOCATIONS: dict[str, RACLocationData] = {
@@ -73,7 +74,7 @@ VENDOR_WEAPON_MOD_PLANET: dict[tuple, str | None] = {
     ("Concussion Gun",  "Lock On Mod"):       "Challax",
     ("Concussion Gun",  "Charge Up Mod"):     "Challax",
     ("Agents of Doom",  None):                None,    # mod slot 1 inaccessible at vendor
-    ("Agents of Doom",  "Launcher Mod"):      "Kalidon",
+    ("Agents of Doom",  "Launcher Mod"):      "Quodrona",
     ("Scorcher",        "Spitfire Mod"):      "Quodrona",
     ("Bee Mine Glove",  "Worker Mod"):        "Challax",
     ("Sniper Mine",     "Split Beam Mod"):    "Quodrona",
@@ -87,7 +88,7 @@ WEAPON_MOD_VENDOR_LOCATIONS: dict[str, RACLocationData] = {
     if mod is not None
 }
 
-from .core.data.armour_set_checks import ARMOUR_SET_CHECKS
+from .core.data.locations.armour_set_checks import ARMOUR_SET_CHECKS
 
 ARMOUR_SET_CHECK_LOCATIONS: dict[str, RACLocationData] = {
     name: RACLocationData(BASE_ID + 1500 + idx, "Pokitaru")
@@ -100,18 +101,18 @@ GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
 }
 
 # ── Skyboard challenge locations ──────────────────────────────────────────────
-# item_checks (1): race reward pickups only.
+# item_checks (1): races that award a randomised item only.
 SKYBOARD_ITEM_LOCATIONS: dict[str, RACLocationData] = {
-    "Kalidon Learner's Permit (SC)":         RACLocationData(BASE_ID + 1402, "Kalidon"),
-    "Kalidon Speeding Ticket (SC)":          RACLocationData(BASE_ID + 1403, "Kalidon"),
-    "Kalidon Tricky Air (SC)":               RACLocationData(BASE_ID + 1404, "Kalidon"),
-    "Kalidon Master's Challenge (SC)":       RACLocationData(BASE_ID + 1405, "Kalidon"),
-    "Outpost Omega Electroshock Boots (CC)": RACLocationData(BASE_ID + 1800, "Outpost Omega"),
+    "Kalidon Learner's Permit (SC)":                   RACLocationData(BASE_ID + 1402, "Kalidon"),
+    "Kalidon Master's Challenge (SC)":                 RACLocationData(BASE_ID + 1405, "Kalidon"),
+    "Outpost Omega Vertigo - Electroshock Boots (SC)": RACLocationData(BASE_ID + 1800, "Outpost Omega"),
+    "Outpost Omega Interior Decorating (SC)":          RACLocationData(BASE_ID + 1801, "Outpost Omega"),
 }
 
-# all_challenges (2): every individual race completion is also a check.
+# all_challenges (2): non-item races added on top of item_checks.
 EXTRA_SKYBOARD_LOCATIONS: dict[str, RACLocationData] = {
-    "Outpost Omega Interior Decorating (SC)":  RACLocationData(BASE_ID + 1801, "Outpost Omega"),
+    "Kalidon Speeding Ticket (SC)":            RACLocationData(BASE_ID + 1403, "Kalidon"),
+    "Kalidon Tricky Air (SC)":                 RACLocationData(BASE_ID + 1404, "Kalidon"),
     "Outpost Omega Danger, High Voltage (SC)": RACLocationData(BASE_ID + 1802, "Outpost Omega"),
     "Outpost Omega The Vortex (SC)":           RACLocationData(BASE_ID + 1803, "Outpost Omega"),
 }
@@ -125,6 +126,7 @@ _ALL_CLANK_PICKUPS = METALIS_CLANK_PICKUPS + DAYNI_MOON_CLANK_PICKUPS
 ALL_CLANK_LOCATIONS: dict[str, RACLocationData] = {
     cp.name: RACLocationData(BASE_ID + 1700 + idx, cp.planet)
     for idx, cp in enumerate(_ALL_CLANK_PICKUPS, start=1)
+    if cp.name not in CHALLENGE_LOCATIONS  # combined reward-challenge names live in CHALLENGE_LOCATIONS
 }
 
 ALL_LOCATIONS: dict[str, RACLocationData] = {
