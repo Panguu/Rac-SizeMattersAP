@@ -3,7 +3,7 @@ __all__ = [
     "ArmourAddresses", "ArmourPiece", "PlayerArmour",
     # weapon/gadget address resolvers + data
     "WeaponAddresses", "GadgetAddresses",
-    "WEAPON_MOD_COUNTS", "WEAPON_STRUCT_SIZE", "WEAPON_MIN_CONSECUTIVE",
+    "WEAPON_MOD_COUNTS", "WEAPON_MAX_LEVELS", "WEAPON_STRUCT_SIZE", "WEAPON_MIN_CONSECUTIVE",
     "is_weapon_candidate", "is_ps2_weapon_candidate",
     "WEAPON_ORDER", "GADGET_ORDER", "build_weapons",
     # pickup address resolvers
@@ -54,9 +54,8 @@ from .addresses import (
     PRELOAD_MENU_ADDR_BY_PLANET_ID,
     TITANIUM_BOLT_BASE,
     WEAPON_ARRAY_BASE_BY_PLANET,
-    DisplayedTextBox,
-    TextBoxDisplayAddrs,
 )
+from .display_text_box import DisplayedTextBox, TextBoxDisplayAddrs
 from .armour import ArmourAddresses, ArmourPiece, PlayerArmour
 
 # ── Cutscenes ─────────────────────────────────────────────────────────────────
@@ -117,6 +116,7 @@ from .player_states import PlayerState
 # ── Weapon/gadget address resolvers ───────────────────────────────────────────
 from .weapons import (
     GADGET_ORDER,
+    WEAPON_MAX_LEVELS,
     WEAPON_MIN_CONSECUTIVE,
     WEAPON_MOD_COUNTS,
     WEAPON_ORDER,

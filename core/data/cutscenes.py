@@ -28,6 +28,11 @@ def suppress_disabled_cutscenes(ipc: Pine, planet_id: int) -> None:
 
 @dataclass(frozen=True)
 class Cutscene:
+    """
+    Data record for a cutscene in game.
+    This is used for preventing and tracking cutscenes that are relevant to the randomizer.
+    Cutscenes can only be monitored once the planet is loaded in memory.
+    """
     name:      str
     planet_id: int   # planet the cutscene belongs to
     address:   int   # memory address to monitor; goes to 0 when cutscene has played

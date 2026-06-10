@@ -11,11 +11,6 @@ from ..structs.armour import ArmourSetCollectedStruct
 
 
 class ArmourSetCollectedState(BaseState):
-    """Polls the single-byte armour-set-collected bitmask.
-
-    Fires on_location_check for every armour set check whose required bitmask
-    is fully satisfied by the current value, firing only once per check.
-    """
 
     def __init__(
         self,
@@ -27,9 +22,6 @@ class ArmourSetCollectedState(BaseState):
         self._prev:      int       = 0
         self._completed: set[str]  = set()
         self.on_location_check: Callable[[str], None] = lambda _: None
-
-    def on_enter(self) -> None:
-        pass
 
     def on_exit(self) -> None:
         self.on_location_check = lambda _: None

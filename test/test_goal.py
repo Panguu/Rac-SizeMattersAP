@@ -9,7 +9,7 @@ from .bases import (
     RACSizeMatterTestBase,
 )
 
-_BASE = {"starting_weapons": 0, "starting_gadgets": 0, "skill_points_as_checks": 0}
+_BASE = {"starting_weapons": 0, "starting_gadgets": 0}
 
 
 class TestGoal(RACSizeMatterTestBase):
@@ -45,7 +45,7 @@ class TestGoal(RACSizeMatterTestBase):
 
 class TestLocationRules(RACSizeMatterTestBase):
     run_default_tests = False
-    options = {"starting_weapons": 0, "starting_gadgets": 0, "skill_points_as_checks": 1}
+    options = {"starting_weapons": 0, "starting_gadgets": 0}
 
     def test_polarized_door_bolt_needs_polarizer_and_hypershot(self) -> None:
         self.collect_by_name(METALIS_ITEMS)

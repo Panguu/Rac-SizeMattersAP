@@ -1,21 +1,13 @@
-"""Physical armour pickups found in the game world, keyed for both AP location
-creation and client-side detection via armour set bitmask monitoring.
-
-set_key   — matches ArmourAddresses._SET_OFFSETS keys in armour.py
-piece     — ArmourPiece flag (CHESTPLATE/HELMET/GLOVES/BOOTS)
-name      — canonical AP location name
-planet    — AP region name
-
-Challenge-exclusive pickups (Sludge Mk9 Gloves, Sludge Mk9 Helmet,
-Crystallix Helmet, Crystallix Gloves, Mega Bomb Gloves, Mega Bomb Boots,
-Electroshock Boots) are defined in challenges.py, not here.
-"""
 from typing import NamedTuple
 
 from ..armour import ArmourPiece
 
 
 class ArmourPickup(NamedTuple):
+    """
+    Data record for an armour pickup's information.
+    This is used for monitoring and modifying armour pickups in the game.
+    """
     set_key: str
     piece: ArmourPiece
     name: str
@@ -49,15 +41,11 @@ ARMOUR_PICKUPS: list[ArmourPickup] = [
     #              "Inside Clank"),  # cutscene address not yet found
 ]
 
-# (set_key, piece_bitmask) → location name — used by the client to map a
-# detected bitmask change to an AP location check.
 ARMOUR_FLAG_TO_LOCATION: dict[tuple[str, ArmourPiece], str] = {
     (ap.set_key, ap.piece): ap.name
     for ap in ARMOUR_PICKUPS
 }
 
-# Challenge reward locations that grant armour: location name → (set_key, piece).
-# Used by ArmourState.sync_from_ap() to restore location_collected_armour on connect.
 CHALLENGE_LOCATION_TO_ARMOUR_FLAG: dict[str, tuple[str, ArmourPiece]] = {
     "Metalis Smasherbot's Revenge - Crystallix Helmet (CC)":          ("crystallix",   ArmourPiece.HELMET),
     "Metalis The Uber Finals - Crystallix Gloves (CC)":               ("crystallix",   ArmourPiece.GLOVES),

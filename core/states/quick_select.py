@@ -30,9 +30,6 @@ class QuickSelectState(BaseState):
         self._polling = False
         self._write_time: float = 0.0
 
-    def on_enter(self) -> None:
-        pass
-
     def on_exit(self) -> None:
         self._stop_polling()
 

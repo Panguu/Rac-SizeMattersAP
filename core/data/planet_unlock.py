@@ -5,6 +5,11 @@ from .addresses import PLANET_STATE_OFFSET, PLANET_UNLOCK_ADDRESSES
 
 @dataclass(frozen=True)
 class PlanetUnlock:
+    """
+    Data record for a planet's unlock information.
+    This is used for monitoring and modifying planet unlock states in the game.
+    """
+
     unlock_addr:   int
     state_addr:    int
     default_state: int = 0  # minimum value always written to state_addr

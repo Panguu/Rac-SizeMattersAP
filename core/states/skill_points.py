@@ -1,71 +1,31 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from CommonClient import logger
 
 from ...interface_orchestrator.memory.accessor import MemoryAccessor
 from ...interface_orchestrator.state.base_state import BaseState
 from ...interface_orchestrator.storage.local import LocalStorage
 from ...interface_orchestrator.structs.address_map import AddressMap
+from ..data.locations.skill_points import (
+    CHALLENGE_SKILL_POINTS,
+    LOCATION_SKILL_POINTS,
+    SKILL_POINT_ADDRESS,
+    SKILL_POINT_BY_PLANET_AND_MASK,
+    SKILL_POINTS,
+    SkillPoint,
+)
 from ..structs.skill_points import SkillPointsStruct
 
+__all__ = [
+    "SkillPoint",
+    "SKILL_POINTS",
+    "CHALLENGE_SKILL_POINTS",
+    "SKILL_POINT_BY_PLANET_AND_MASK",
+    "LOCATION_SKILL_POINTS",
+    "SKILL_POINT_ADDRESS",
+    "SkillPointState",
+]
 
-@dataclass(frozen=True)
-class SkillPoint:
-    planet_id: int
-    bit:       int
-    region:    str
-
-    @property
-    def mask(self) -> int:
-        return 1 << self.bit
-
-SKILL_POINTS: dict[str, SkillPoint] = {
-    "Train Faster (SP)":                  SkillPoint(0x01,  0, "Pokitaru"),
-    "Dont Rock The Boat (SP)":            SkillPoint(0x01,  1, "Pokitaru"),
-    "Do Cows Get Crabby (SP)":            SkillPoint(0x01,  2, "Pokitaru"),
-    "Bury The Pygmies (SP)":              SkillPoint(0x02,  4, "Ryllus"),
-    "Lights Camera Action (SP)":          SkillPoint(0x02,  5, "Ryllus"),
-    "Ship It (SP)":                       SkillPoint(0x02,  6, "Ryllus"),
-    "Explosive Ordnance Disposal (SP)":   SkillPoint(0x03,  8, "Kalidon"),
-    "Super Lombax (SP)":                  SkillPoint(0x03,  9, "Kalidon"),
-    "Be A Cool Skyboarder (SP)":          SkillPoint(0x03, 10, "Kalidon"),
-    "Shutout (SP)":                       SkillPoint(0x04, 12, "Metalis"),
-    "Terror of the Skies (SP)":           SkillPoint(0x04, 13, "Metalis"),
-    "Ultimate Gladiator (SP)":            SkillPoint(0x04, 14, "Metalis"),
-    "Friends Dont Hurt Friends (SP)":     SkillPoint(0x05, 16, "Dreamtime"),
-    "Night Terrors (SP)":                 SkillPoint(0x05, 17, "Dreamtime"),
-    "Be An Awesome Skyboarder (SC)":      SkillPoint(0x17, 20, "Outpost Omega"),
-    "High Tech Weapons Master (SP)":      SkillPoint(0x07, 25, "Challax"),
-    "No More Varmints (SP)":              SkillPoint(0x07, 26, "Challax"),
-    "Ultimate Gladiator Dayni Moon (SP)": SkillPoint(0x08, 28, "Dayni Moon"),
-    "Wool Protest (SP)":                  SkillPoint(0x08, 29, "Dayni Moon"),
-    "Bouncy Bouncy Bouncy (SP)":          SkillPoint(0x08, 30, "Dayni Moon"),
-    "Not The Shock of Me Now (SP)":       SkillPoint(0x09, 32, "Inside Clank"),
-    "Ratchet Just Ratchet (SP)":          SkillPoint(0x09, 33, "Inside Clank"),
-    "Elite Annihilation (SP)":            SkillPoint(0x0A, 36, "Quodrona"),
-    "Storm The Front (SP)":               SkillPoint(0x0A, 37, "Quodrona"),
-}
-
-CHALLENGE_SKILL_POINTS: frozenset[str] = frozenset({
-    "Be A Cool Skyboarder (SP)",
-    "Shutout (SP)",
-    "Terror of the Skies (SP)",
-    "Ultimate Gladiator (SP)",
-    "Ultimate Gladiator Dayni Moon (SP)",
-    "Be An Awesome Skyboarder (SC)",
-    "No More Varmints (SP)",
-})
-
-SKILL_POINT_BY_PLANET_AND_MASK: dict[tuple[int, int], str] = {
-    (sp.planet_id, sp.mask): name
-    for name, sp in SKILL_POINTS.items()
-}
-
-LOCATION_SKILL_POINTS: dict[str, int] = {
-    name: sp.mask for name, sp in SKILL_POINTS.items()
-}
-
-SKILL_POINT_ADDRESS = SkillPointsStruct.BASE_ADDRESS
 
 class SkillPointState(BaseState):
 
@@ -76,35 +36,66 @@ class SkillPointState(BaseState):
         storage: LocalStorage,
     ) -> None:
         super().__init__(accessor, addresses, storage)
-        self._bits:        int = 0
-        self._synced_mask: int = 0
+        self._bits:          int  = 0
+        self._synced_mask:   int  = 0
+        self._planet_loaded: bool = False
+        self._enabled:       bool = False
 
-    def on_enter(self) -> None:
-        pass
+    def set_enabled(self, enabled: bool, planet_loaded: bool = False) -> None:
+        was_enabled = self._enabled
+        self._enabled = enabled
+        if enabled:
+            # Always remove then re-add to avoid duplicates on reconnect.
+            self.accessor.remove_struct_handler(SkillPointsStruct, self._on_struct_change)
+            self.accessor.on_struct_change(SkillPointsStruct, self._on_struct_change)
+            self._read_bits()
+            if planet_loaded:
+                self._planet_loaded = True
+        elif was_enabled:
+            self.accessor.remove_struct_handler(SkillPointsStruct, self._on_struct_change)
 
-    def on_exit(self) -> None:
-        pass
+    def mark_planet_loaded(self) -> None:
+        self._planet_loaded = True
 
     def _register_handlers(self) -> None:
-        self.accessor.on_struct_change(SkillPointsStruct, self._on_struct_change)
+        # Re-register after interface swap if already enabled.
+        if self._enabled:
+            self.accessor.on_struct_change(SkillPointsStruct, self._on_struct_change)
 
     def _unregister_handlers(self) -> None:
         self.accessor.remove_struct_handler(SkillPointsStruct, self._on_struct_change)
 
     def _on_struct_change(self, address: int, new_bytes: bytes) -> None:
         del address
-        instance = SkillPointsStruct.from_bytes(new_bytes)
-        current  = instance.bitmask
+        instance  = SkillPointsStruct.from_bytes(new_bytes)
+        current   = instance.bitmask
         newly_set = current & ~self._bits
+        prev      = self._bits
         self._bits = current
+        if not self._planet_loaded:
+            return
         if newly_set:
+            logger.info(
+                f"[RAC] Skill point bits: {prev:#010x} -> {current:#010x}  (earned: {newly_set:#010x})"
+            )
             for name, sp in SKILL_POINTS.items():
                 if newly_set & sp.mask:
+                    logger.info(f"[RAC] Skill point earned: {name}")
                     self.on_skill_point_earned(name)
 
+    def _read_bits(self) -> None:
+        try:
+            instance = self.accessor.read_struct(SkillPointsStruct)
+            self._bits = instance.bitmask
+        except Exception:
+            pass
+
     def sync(self) -> None:
+        if not self._enabled:
+            return
         instance = self.accessor.read_struct(SkillPointsStruct)
         self._bits = instance.bitmask
+        self.mark_planet_loaded()
         new_val = instance.bitmask | self._synced_mask
         if new_val != instance.bitmask:
             instance.bitmask = new_val

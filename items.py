@@ -2,7 +2,7 @@ from typing import NamedTuple
 
 from BaseClasses import ItemClassification
 
-from .core.data import WEAPON_MOD_COUNTS
+from .core.data import WEAPON_MAX_LEVELS, WEAPON_MOD_COUNTS
 from .core.data.infobots import INFOBOT_ITEM_TO_PLANET
 
 BASE_ID = 77_700_000
@@ -90,9 +90,25 @@ WEAPON_ITEM_TABLE: dict[str, RACItemData] = {
     for idx, name in enumerate(WEAPON_DISPLAY_TO_INTERNAL, start=1)
 }
 
-WEAPON_PROGRESSIVE_STEPS: dict[str, int] = {
+WEAPON_PROGRESSIVE_STEPS_MODS: dict[str, int] = {
     display: 1 + WEAPON_MOD_COUNTS.get(internal, 0)
     for display, internal in WEAPON_DISPLAY_TO_INTERNAL.items()
+}
+
+WEAPON_PROGRESSIVE_STEPS_LEVELS: dict[str, int] = {
+    display: 1 + max(0, WEAPON_MAX_LEVELS.get(internal, 1) - 1)
+    for display, internal in WEAPON_DISPLAY_TO_INTERNAL.items()
+}
+
+WEAPON_PROGRESSIVE_STEPS: dict[str, int] = {
+    display: 1 + WEAPON_MOD_COUNTS.get(internal, 0) + max(0, WEAPON_MAX_LEVELS.get(internal, 1) - 1)
+    for display, internal in WEAPON_DISPLAY_TO_INTERNAL.items()
+}
+
+WEAPON_PROGRESSIVE_STEPS_BY_MODE: dict[int, dict[str, int]] = {
+    1: WEAPON_PROGRESSIVE_STEPS_MODS,
+    2: WEAPON_PROGRESSIVE_STEPS_LEVELS,
+    3: WEAPON_PROGRESSIVE_STEPS,
 }
 
 WEAPON_PROGRESSIVE_ITEM_TABLE: dict[str, RACItemData] = {

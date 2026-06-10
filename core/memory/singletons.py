@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ...data import (
+from ..data import (
     ARMOUR_BASE,
     TITANIUM_BOLT_BASE,
     WEAPON_ARRAY_BASE_BY_PLANET,

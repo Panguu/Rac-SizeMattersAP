@@ -6,8 +6,8 @@ from ..data.addresses import (
     PLAYER_ADDRS,
     PRELOAD_MENU_ADDR_BY_PLANET_ID,
     WEAPON_ARRAY_BASE_BY_PLANET,
-    TextBoxDisplayAddrs,
 )
+from ..data.display_text_box import TextBoxDisplayAddrs
 from ..data.weapons import (
     build_weapons,
 )

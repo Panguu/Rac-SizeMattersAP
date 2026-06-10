@@ -23,6 +23,13 @@ _AUTO_UNLOCK_NAMES: frozenset[str] = frozenset({
     "INSIDE_CLANK",
 })
 
+# Planets auto-unlocked in memory but gated behind different AP progress.
+# Maps auto-unlock planet → the planet whose AP status we check for vendor access.
+_VENDOR_PLANET_GATE: dict[str, str] = {
+    "DREAMTIME":    "OUTPOST_OMEGA",  # reachable only once Outpost Omega infobot received
+    "INSIDE_CLANK": "DAYNI_MOON",    # reachable only once Dayni Moon infobot received
+}
+
 _COUNT = len(PLANET_UNLOCK_ORDER)
 
 class PlanetUnlockState(BaseState):
@@ -40,12 +47,6 @@ class PlanetUnlockState(BaseState):
         self._enforce_active: bool     = True
         self._ryllus_released: bool    = False
         self._infobot_planets: set[str] = set()
-
-    def on_enter(self) -> None:
-        pass
-
-    def on_exit(self) -> None:
-        pass
 
     def _register_handlers(self) -> None:
         self.accessor.on_struct_change(PlanetProgressStruct, self._on_struct_change)
@@ -119,6 +120,10 @@ class PlanetUnlockState(BaseState):
 
     def is_unlocked(self, planet: str) -> bool:
         return self._desired.get(planet, False)
+
+    def is_vendor_accessible(self, planet: str) -> bool:
+        gate = _VENDOR_PLANET_GATE.get(planet, planet)
+        return self._desired.get(gate, False)
 
     def on_planet_unlocked(self, _planet: str) -> None:
         del _planet

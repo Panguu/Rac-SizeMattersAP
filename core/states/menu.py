@@ -56,9 +56,6 @@ class MenuState(BaseState):
         self._vendor = None
         self._planet = None
 
-    def on_enter(self) -> None:
-        pass
-
     def on_exit(self) -> None:
         if self._vendor and self.is_vendor:
             self._vendor.on_menu_close()
@@ -152,9 +149,6 @@ class MenuState(BaseState):
             self._vendor.deactivate()
             if self._planet is not None:
                 self._planet.on_menu_close()
-
-    def sync(self) -> None:
-        pass
 
     @property
     def is_vendor(self) -> bool:

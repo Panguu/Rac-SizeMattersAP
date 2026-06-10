@@ -1,17 +1,3 @@
-"""Armour slot check definitions for Ratchet & Clank: Size Matters.
-
-Each armour slot (chestplate, helmet, gloves_left, gloves_right, boots_left, boots_right)
-holds a uint8 value encoding which piece is currently equipped:
-
-    slot_value = set_index + 1   (wildfire=1, sludge=2, crystallix=3, …)
-
-    The slot address itself identifies the piece (chestplate/helmet/gloves/boots);
-    the value only encodes which set is equipped in that slot. 0 means empty.
-
-ArmourSetCheck describes the expected slot values for a location check.
-None means "don't care" — that slot is not required by this check.
-Gloves / boots are symmetric: both left and right must match the expected value.
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -19,6 +5,10 @@ from enum import IntEnum
 
 
 class ArmourSets(IntEnum):
+    """
+    Enum representing different armour sets in the game.
+    This is the value which is set in armour slots to represent what armour is currently equiped.
+    """
     Wildfire     = 1
     Sludge       = 2
     Crystallix   = 3
@@ -30,27 +20,18 @@ class ArmourSets(IntEnum):
 
 @dataclass(frozen=True)
 class ArmourSetCheck:
-    """Expected slot values for a single armour-equip location check.
-
-    Only the slots set to a non-None value are tested.  This allows both full-set
-    checks and single-piece checks (e.g. just helmet).
-
-    Gloves and boots are symmetric — both left/right slots must match the value.
-    """
     chestplate: int | None = None
     helmet:     int | None = None
     gloves:     int | None = None
     boots:      int | None = None
 
     def required_mask(self) -> int:
-        """Bitmask of all armour sets needed for this check (bit N = ArmourSets(N+1))."""
         mask = 0
         for val in {self.chestplate, self.helmet, self.gloves, self.boots} - {None}:
             mask |= 1 << (val - 1)
         return mask
 
     def matches(self, slot_values: dict[str, int]) -> bool:
-        """Return True when the current slot values satisfy every non-None field."""
         if self.chestplate is not None:
             if slot_values.get("chestplate", 0) != self.chestplate:
                 return False
@@ -85,8 +66,6 @@ ARMOUR_SET_CHECKS: dict[str, ArmourSetCheck] = {
     "Equip Stalker Armour Set":       ArmourSetCheck(chestplate=ArmourSets.Chameleon,    helmet=ArmourSets.Wildfire,     gloves=ArmourSets.Sludge,       boots=ArmourSets.Chameleon),
 }
 
-# Hybrid sets have dedicated bits in byte 1 (0x21F4B443).
-# Shifted left by 8 so they occupy bits 8-15 of the combined 16-bit value.
 _HYBRID_BYTE1_BITS: dict[str, int] = {
     "Equip Shock Crystal Armour Set": 0x01,
     "Equip Wildburst Armour Set":     0x02,
@@ -95,9 +74,6 @@ _HYBRID_BYTE1_BITS: dict[str, int] = {
     "Equip Stalker Armour Set":       0x10,
 }
 
-# Pre-computed required bitmask per check — used by ArmourSetCollectedState.
-# Hybrid sets use the dedicated byte-1 bit (shifted to bits 8-15).
-# All other sets use the component mask from byte 0 (bits 0-7).
 ARMOUR_SET_CHECK_MASKS: dict[str, int] = {
     name: (_HYBRID_BYTE1_BITS[name] << 8) if name in _HYBRID_BYTE1_BITS
           else check.required_mask()

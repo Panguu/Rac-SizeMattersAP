@@ -5,22 +5,12 @@ from enum import IntFlag
 
 
 class ArmourAddresses:
-    """Resolves all armour field addresses from a single base address.
-
-    Layout (identical on PSP and PS2):
-      +0x00  chestplate slot
-      +0x01  helmet slot
-      +0x02  gloves_left slot
-      +0x03  gloves_right slot
-      +0x04  boots_left slot
-      +0x05  boots_right slot
-      +0x06  wildfire set
-      +0x07  sludge set
-      +0x08  crystallix set
-      +0x09  electroshock set
-      +0x0A  mega_bomb set
-      +0x0B  hyperborean set
-      +0x0C  chameleon set
+    """
+    Armour Address Struct
+    This is the layout of Armour in Static Memory
+    Slot Offsets are the currently equiped armour pieces
+    Set Offsets are the unlock addresses for the Armour
+    We only need one read and one write to handle these addresses as they are next to eachother in memory
     """
 
     _SLOT_OFFSETS: dict[str, int] = {
@@ -57,16 +47,27 @@ class ArmourAddresses:
 
 
 class ArmourPiece(IntFlag):
+    """
+    Armour pieces are represented as bits in a byte, with the following mapping:
+    - Bit 0 (0x01): Chestplate
+    - Bit 1 (0x02): Helmet
+    - Bit 2 (0x04): Gloves
+    - Bit 4 (0x10): Boots (any value with bit 4 set is considered to have boots equipped)
+    """
     NONE       = 0
     CHESTPLATE = 0x01
     HELMET     = 0x02
     GLOVES     = 0x04
-    BOOTS      = 0x10
+    BOOTS      = 0x10 # Boots changes it is any value with bit 4 set, this is because the game treats left and right boots as one piece, so any value with bit 4 set is considered to have boots equipped
     ALL        = 0x17
 
 
 @dataclass(frozen=True)
 class PlayerArmour:
+    """
+    Wrapper for armour piece bitmask.
+    This sets up named boolean properties for each piece and helper methods for working with the bitmask.
+    """
     pieces: ArmourPiece
 
     @classmethod

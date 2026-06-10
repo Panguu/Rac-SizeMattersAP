@@ -25,7 +25,4 @@ class PlanetProgressStruct(MemoryStruct):
         "pokitaru", "ryllus", "kalidon", "metalis", "dreamtime",
         "outpost_omega", "challax", "dayni_moon", "inside_clank", "quodrona",
     )
-    PLANET_NAME_ORDER: tuple[str, ...] = (
-        "POKITARU", "RYLLUS", "KALIDON", "METALIS", "DREAMTIME",
-        "OUTPOST_OMEGA", "CHALLAX", "DAYNI_MOON", "INSIDE_CLANK", "QUODRONA",
-    )
+    PLANET_NAME_ORDER: tuple[str, ...] = tuple(n.upper() for n in PLANET_ORDER)

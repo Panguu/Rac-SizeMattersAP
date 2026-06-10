@@ -1,6 +1,6 @@
 """Tests for armour-related options: progressive armour and armour set checks."""
 from ..items import ARMOUR_ITEM_TABLE, ARMOUR_PROGRESSIVE_ITEM_TABLE
-from ..locations import ARMOUR_SET_CHECK_LOCATIONS, SKILL_POINT_LOCATIONS
+from ..locations import ARMOUR_SET_CHECK_LOCATIONS
 from .bases import RACSizeMatterTestBase
 
 
@@ -86,13 +86,11 @@ class TestArmourSetChecksDisabled(RACSizeMatterTestBase):
 
 
 class TestAllOptionalChecksEnabled(RACSizeMatterTestBase):
-    options = {"armour_set_checks": 1, "skill_points_as_checks": 1}
+    options = {"armour_set_checks": 1}
 
     def test_all_optional_locations_present(self) -> None:
         names = {loc.name for loc in self.multiworld.get_locations(self.player)}
         for name in ARMOUR_SET_CHECK_LOCATIONS:
-            self.assertIn(name, names)
-        for name in SKILL_POINT_LOCATIONS:
             self.assertIn(name, names)
 
     def test_item_count_matches_location_count(self) -> None:

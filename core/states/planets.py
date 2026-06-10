@@ -2,37 +2,29 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from ...interface_orchestrator.memory.accessor import MemoryAccessor
 from ...interface_orchestrator.state.base_state import BaseState
 from ...interface_orchestrator.storage.local import LocalStorage
 from ...interface_orchestrator.structs.address_map import AddressMap
-from ..data.addresses import MENU_ADDR_BY_PLANET_ID
 from ..data.armour import ArmourPiece
-from ..data.cutscenes import arm_cutscenes, suppress_disabled_cutscenes
 from ..structs.game_status import GameStatusStruct
 
 if TYPE_CHECKING:
-    from ..data.addresses import DisplayedTextBox
+    from ..data.display_text_box import DisplayedTextBox
     from .armour import ArmourState
     from .display_text_box import DisplayedTextBoxState, DisplayTextBoxState
     from .menu import MenuState
     from .player import PlayerState
     from .vendor import VendorState
+    from .vendor_unlock import VendorUnlockState
     from .weapon import WeaponState
 
 logger = logging.getLogger("CommonClient")
 
 _PIECE_ORDER = [ArmourPiece.CHESTPLATE, ArmourPiece.HELMET, ArmourPiece.GLOVES, ArmourPiece.BOOTS]
 
-
-@dataclass(frozen=True)
-class Planet:
-    name:      str
-    planet_id: int
-    menu_addr: int | None = None
 
 
 class PlanetState(BaseState):
@@ -57,6 +49,7 @@ class PlanetState(BaseState):
         self._player:             PlayerState | None           = None
         self._menu:               MenuState | None             = None
         self._vendor:             VendorState | None           = None
+        self._vendor_unlock:      VendorUnlockState | None     = None
         self._display_text:       DisplayTextBoxState | None   = None
         self._displayed_text_box: DisplayedTextBoxState | None = None
         self._display_text_cfg:   DisplayedTextBox | None     = None
@@ -79,6 +72,9 @@ class PlanetState(BaseState):
     def set_menu_state(self, menu: MenuState, vendor: VendorState) -> None:
         self._menu   = menu
         self._vendor = vendor
+
+    def set_vendor_unlock(self, vendor_unlock: VendorUnlockState) -> None:
+        self._vendor_unlock = vendor_unlock
 
     def set_display_text_box(
         self,
@@ -105,12 +101,6 @@ class PlanetState(BaseState):
     def add_exit_callback(self, fn: Callable[[], None]) -> None:
         self._on_exit_callbacks.append(fn)
 
-    def on_enter(self) -> None:
-        pass
-
-    def on_exit(self) -> None:
-        pass
-
     def _register_handlers(self) -> None:
         self.accessor.on_struct_change(GameStatusStruct, self._on_game_status_change)
 
@@ -131,12 +121,8 @@ class PlanetState(BaseState):
         elif was_active and not now_active:
             self.planet_exit()
 
-    def sync(self) -> None:
-        pass
-
     def planet_enter(self) -> None:
         self._log(f"[RAC] [{self.name}] planet_enter")
-        arm_cutscenes(self._pine_proxy(), self.planet_id, "armed")
         for cb in self._on_enter_callbacks:
             cb()
         if self._player is not None:
@@ -197,26 +183,23 @@ class PlanetState(BaseState):
         return _Proxy()
 
     def on_pickup_start(self) -> None:
-        suppress_disabled_cutscenes(self._pine_proxy(), self.planet_id)
-        self._log(f"[RAC] [{self.name}] Pickup start — applying collected armour")
+        self._log(f"[RAC] [{self.name}] Pickup start — zeroing armour for clean pickup read")
         if self._armour is not None:
             self._armour.sync_slots()
-            self._armour.apply_location_armour()
+            self._armour.clear_all_memory()
 
     def on_pickup_end(self) -> None:
-        suppress_disabled_cutscenes(self._pine_proxy(), self.planet_id)
         self._log(f"[RAC] [{self.name}] Pickup end — reading armour state")
         if self._armour is None:
             return
-        self._armour.sync()
+        self._armour.sync_bitmasks()
         bitmask_summary = {k: hex(v) for k, v in self._armour.sets_bitmask.items() if v}
         self._log(f"[RAC] [{self.name}] Pickup end sets_bitmask: {bitmask_summary}")
         for name, mask in self._armour.sets_bitmask.items():
-            new_bits = mask & ~self._armour.location_collected_armour.get(name, 0)
+            new_bits = mask & ~self._armour.world_collected_armour.get(name, 0)
             for piece in _PIECE_ORDER:
                 if new_bits & int(piece):
                     self.on_armour_acquired(name, piece)
-        self._armour.apply_item_pickup_armour()
 
     def on_armour_acquired(self, _name: str, _piece: ArmourPiece) -> None:
         del _name, _piece
@@ -226,7 +209,12 @@ class PlanetState(BaseState):
         if self._vendor is not None:
             self._vendor.start_menu_preload()
         if self._weapons is not None:
-            self._weapons.apply_vendor_locations()
+            allowed = (
+                self._vendor_unlock.allowed_weapons_for_inventory()
+                if self._vendor_unlock is not None else frozenset()
+            )
+            self._weapons.apply_vendor_locations(allowed)
+            self._weapons.apply_mod_vendor_locations()
 
     def on_menu_preload_exit(self) -> None:
         from .vendor import VendorSessionState
@@ -240,12 +228,23 @@ class PlanetState(BaseState):
             self._reapply_inv()
 
     def on_menu_open(self) -> None:
+        from .menu import MenuStateValue
         self._log(f"[RAC] [{self.name}] Vendor menu open.")
         if self._weapons is not None:
-            self._weapons.apply_vendor_locations()
+            allowed = (
+                self._vendor_unlock.allowed_weapons_for_inventory()
+                if self._vendor_unlock is not None else frozenset()
+            )
+            self._weapons.apply_vendor_locations(allowed)
             self._weapons.on_weapon_acquired = lambda name: self.on_vendor_weapon_purchased(name)
             self._weapons.on_gadget_acquired = lambda name: self.on_vendor_gadget_purchased(name)
             self._weapons.on_mod_acquired    = lambda weapon, slot: self.on_vendor_mod_purchased(weapon, slot)
+        is_weapon_vendor = (
+            self._vendor is not None
+            and self._vendor.vendor_type == MenuStateValue.WEAPONS_VENDOR
+        )
+        if is_weapon_vendor and self._vendor_unlock is not None:
+            self._vendor_unlock.apply(self.accessor)
 
     def on_menu_close(self) -> None:
         self._log(f"[RAC] [{self.name}] Vendor menu closed — restoring AP inventory.")
@@ -279,21 +278,3 @@ class PlanetState(BaseState):
         return f"PlanetState(name={self.name!r}, planet_id={self.planet_id:#04x})"
 
 
-class Planets:
-    POKITARU        = Planet("Pokitaru",        0x01, menu_addr=MENU_ADDR_BY_PLANET_ID[0x01])
-    RYLLUS          = Planet("Ryllus",          0x02, menu_addr=MENU_ADDR_BY_PLANET_ID[0x02])
-    KALIDON         = Planet("Kalidon",         0x03, menu_addr=MENU_ADDR_BY_PLANET_ID[0x03])
-    METALIS         = Planet("Metalis",         0x04, menu_addr=MENU_ADDR_BY_PLANET_ID[0x04])
-    DREAMTIME       = Planet("Dreamtime",       0x05, menu_addr=MENU_ADDR_BY_PLANET_ID[0x05])
-    CHALLAX         = Planet("Challax",         0x07, menu_addr=MENU_ADDR_BY_PLANET_ID[0x07])
-    DAYNI_MOON      = Planet("Dayni Moon",      0x08, menu_addr=MENU_ADDR_BY_PLANET_ID[0x08])
-    INSIDE_CLANK    = Planet("Inside Clank",    0x09)
-    QUODRONA        = Planet("Quodrona",        0x0A, menu_addr=MENU_ADDR_BY_PLANET_ID[0x0A])
-    OUTPOST_OMEGA_2 = Planet("Outpost Omega 2", 0x17, menu_addr=MENU_ADDR_BY_PLANET_ID[0x17])
-
-
-BY_ID: dict[int, Planet] = {
-    p.planet_id: p
-    for p in vars(Planets).values()
-    if isinstance(p, Planet)
-}

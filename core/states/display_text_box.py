@@ -10,7 +10,7 @@ from ...interface_orchestrator.structs.address_map import AddressMap
 from ..structs.display_text import CountdownTimerStruct, VendorVisibilityStruct
 
 if TYPE_CHECKING:
-    from ..data.addresses import DisplayedTextBox
+    from ..data.display_text_box import DisplayedTextBox
 
 class DisplayedTextBoxState(BaseState):
 
@@ -30,9 +30,6 @@ class DisplayedTextBoxState(BaseState):
     def deactivate(self) -> None:
         self._active_config = None
         self.is_displayed = False
-
-    def on_enter(self) -> None:
-        pass
 
     def on_exit(self) -> None:
         self.is_displayed = False
@@ -106,9 +103,6 @@ class DisplayTextBoxState(BaseState):
     def deactivate(self) -> None:
         self._active_config = None
         self.is_vendor_prompt = False
-
-    def on_enter(self) -> None:
-        pass
 
     def on_exit(self) -> None:
         self.is_vendor_prompt = False

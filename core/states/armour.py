@@ -27,14 +27,8 @@ class ArmourState(BaseState):
         self._stable_slots: dict[str, int] = dict.fromkeys(ArmourStruct.SLOT_FIELDS, 0)
         self.sets_unlocked: dict[str, bool]    = dict.fromkeys(ArmourStruct.SET_FIELDS, False)
         self.sets_bitmask: dict[str, int]      = dict.fromkeys(ArmourStruct.SET_FIELDS, 0)
-        self.location_collected_armour: dict[str, int] = dict.fromkeys(ArmourStruct.SET_FIELDS, 0)
-        self.item_pickup_armour: dict[str, int]        = dict.fromkeys(ArmourStruct.SET_FIELDS, 0)
-
-    def on_enter(self) -> None:
-        pass
-
-    def on_exit(self) -> None:
-        pass
+        self.world_collected_armour: dict[str, int] = dict.fromkeys(ArmourStruct.SET_FIELDS, 0)
+        self.ap_armour: dict[str, int]                 = dict.fromkeys(ArmourStruct.SET_FIELDS, 0)
 
     def _register_handlers(self) -> None:
         self.accessor.on_struct_change(ArmourStruct, self._on_armour_change)
@@ -62,6 +56,18 @@ class ArmourState(BaseState):
             self.sets_bitmask[name]  = raw
             self.sets_unlocked[name] = bool(raw)
 
+    def sync_bitmasks(self) -> None:
+        """Read only the set bitmasks from memory without touching _stable_slots.
+
+        Used in on_pickup_end so that the slot snapshot taken at pickup_start is
+        preserved for restore_equipped_slots() after the detection window closes.
+        """
+        instance = self.accessor.read_struct(ArmourStruct)
+        for name in ArmourStruct.SET_FIELDS:
+            raw = getattr(instance, name)
+            self.sets_bitmask[name]  = raw
+            self.sets_unlocked[name] = bool(raw)
+
     def sync_slots(self) -> None:
         raw = self.accessor.read_raw(ArmourStruct.BASE_ADDRESS, len(ArmourStruct.SLOT_FIELDS))
         for i, name in enumerate(ArmourStruct.SLOT_FIELDS):
@@ -82,36 +88,36 @@ class ArmourState(BaseState):
         slot_bytes = bytes(self._stable_slots[name] for name in ArmourStruct.SLOT_FIELDS)
         self.accessor.write_raw(ArmourStruct.BASE_ADDRESS, slot_bytes)
 
-    def apply_location_armour(self) -> None:
+    def apply_world_armour(self) -> None:
         data = bytearray(ArmourStruct.size())
         for name in ArmourStruct.SLOT_FIELDS:
             offset = ArmourStruct.field_offset(name)
             data[offset] = self._stable_slots[name]
         for name in ArmourStruct.SET_FIELDS:
             offset = ArmourStruct.field_offset(name)
-            data[offset] = self.location_collected_armour.get(name, 0)
+            data[offset] = self.world_collected_armour.get(name, 0)
         self.accessor.write_raw(ArmourStruct.BASE_ADDRESS, bytes(data))
 
-    def apply_item_pickup_armour(self) -> None:
+    def apply_ap_armour(self) -> None:
         data = bytearray(ArmourStruct.size())
         for name in ArmourStruct.SLOT_FIELDS:
             offset = ArmourStruct.field_offset(name)
             data[offset] = self._stable_slots[name]
         for name in ArmourStruct.SET_FIELDS:
             offset = ArmourStruct.field_offset(name)
-            data[offset] = self.item_pickup_armour.get(name, 0)
+            data[offset] = self.ap_armour.get(name, 0)
         self.accessor.write_raw(ArmourStruct.BASE_ADDRESS, bytes(data))
 
     def clear_all_memory(self) -> None:
         self.accessor.write_raw(ArmourStruct.BASE_ADDRESS, bytes(ArmourStruct.size()))
 
-    def add_location_piece(self, set_name: str, piece: ArmourPiece) -> None:
-        if set_name in self.location_collected_armour:
-            self.location_collected_armour[set_name] |= int(piece)
+    def add_world_armour_piece(self, set_name: str, piece: ArmourPiece) -> None:
+        if set_name in self.world_collected_armour:
+            self.world_collected_armour[set_name] |= int(piece)
 
-    def add_item_pickup_piece(self, set_name: str, piece: ArmourPiece) -> None:
-        if set_name in self.item_pickup_armour:
-            self.item_pickup_armour[set_name] |= int(piece)
+    def add_ap_armour_piece(self, set_name: str, piece: ArmourPiece) -> None:
+        if set_name in self.ap_armour:
+            self.ap_armour[set_name] |= int(piece)
 
     def sync_from_ap(
         self,
@@ -122,17 +128,17 @@ class ArmourState(BaseState):
             v: k for k, v in ARMOUR_FLAG_TO_LOCATION.items()
         }
         for key in ArmourStruct.SET_FIELDS:
-            self.location_collected_armour[key] = 0
-            self.item_pickup_armour[key] = 0
+            self.world_collected_armour[key] = 0
+            self.ap_armour[key] = 0
         for loc_name in checked_locations:
             flag = _loc_to_flag.get(loc_name) or CHALLENGE_LOCATION_TO_ARMOUR_FLAG.get(loc_name)
             if flag:
                 set_key, piece = flag
-                self.location_collected_armour[set_key] |= int(piece)
+                self.world_collected_armour[set_key] |= int(piece)
         for flag in armour_item_pickups:
             if ARMOUR_FLAG_TO_LOCATION.get(flag):
                 set_key, piece = flag
-                self.item_pickup_armour[set_key] |= int(piece)
+                self.ap_armour[set_key] |= int(piece)
 
     def __repr__(self) -> str:
         unlocked  = [n for n, v in self.sets_unlocked.items() if v]
