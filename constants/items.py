@@ -2,8 +2,6 @@
 
 class RACSMITEM:
     """String constants for each item"""
-
-
     LACERATOR = "Lacerator"
     CONCUSSION_GUN = "Concussion Gun"
     ACID_BOMB_GLOVE = "Acid Bomb Glove"

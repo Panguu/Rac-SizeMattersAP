@@ -1,6 +1,5 @@
 """This module contains string constants for skillpoint locations"""
 
-
 class RACSMSKILLPOINT:
     """String constants for skillpoint locations"""
     POKITARU_TRAIN = "Pokitaru: Skill Point: Train Faster"
@@ -28,5 +27,3 @@ class RACSMSKILLPOINT:
     INSIDE_CLANK_RATCHET = "Inside Clank: Skill Point: Ratchet... Just Ratchet"
     QUODRONA_ELITE = "Quodrona: Skill Point: Elite Annihilation"
     QUODRONA_STORM = "Quodrona: Skill Point: Storm the Front"
-
-

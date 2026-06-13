@@ -12,6 +12,6 @@ class RACSMTARMORSET:
     SHOCK_CRYSTAL = "Armor Set: Equip Shock Crystal Armor Set"
     SLUDGE_MK9 = "Armor Set: Equip Sludge Mk9 Armor Set"
     STALKER = "Armor Set: Equip Stalker Armor Set"
-    TRIPLE_Wave = "Armor Set: Equip Triple Wave Armor Set"
+    TRIPLE_WAVE = "Armor Set: Equip Triple Wave Armor Set"
     WILDBURST = "Armor Set: Equip Wildburst Armor Set"
     WILDFIRE = "Armor Set: Equip Wildfire Armor Set"
