@@ -32,7 +32,3 @@ class RACSMVENDORLOCATION:
     QUODRONA_SNIPER_SPLIT = "Quodrona: Slim Cognito: Sniper Mine Split Beam Mod - 25,000"
     QUODRONA_SHOCK_LOCK = "Quodrona: Slim Cognito: Shock Rocket Lock On Mod - 5,000"
     QUODRONA_SHOCK_AFTER = "Quodrona: Slim Cognito: Shock Rocket After Shock Mod - 25,000"
-
-
-
-
