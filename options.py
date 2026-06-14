@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from Options import Choice, DeathLink, DefaultOnToggle, PerGameCommonOptions, Range, Toggle
+from Options import (Choice, DeathLink, DefaultOnToggle, PerGameCommonOptions, Range, Toggle,
+                     Accessibility, ProgressionBalancing, OptionGroup)
 
 
 class ProgressiveWeapons(Choice):
@@ -114,3 +115,28 @@ class RACSizeMatterOptions(PerGameCommonOptions):
     starting_gadgets: StartingGadgets
     starting_bolts: StartingBolts
     starting_skin: StartingSkin
+
+racsm_option_groups = [
+    OptionGroup("Generic Options", [
+        ProgressionBalancing,
+        Accessibility,
+        DeathLink,
+        DeathAmnesty,
+    ]),
+    OptionGroup("RACSM Item Options", [
+        StartingWeapons,
+        StartingGadgets,
+        StartingBolts,
+        ProgressiveWeapons,
+        ProgressiveArmour,
+    ]),
+    OptionGroup("RACSM Location Options", [
+        ClankChallenges,
+        SkyboardChallenges,
+        SkillPoints,
+        ArmourSetChecks,
+    ]),
+    OptionGroup("RACSM Cosmetic Options", [
+        StartingSkin,
+    ])
+]
