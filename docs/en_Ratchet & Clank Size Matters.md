@@ -1,17 +1,21 @@
 # Ratchet & Clank: Size Matters
 
+An Archipelago implementation for Ratchet & Clank: Size Matters
+
 ## Where is the settings page?
 
 The [player settings page for this game](../player-settings) contains all the options for configuring your randomizer experience.
 
 ## What does randomization do to this game?
 
-All weapons, gadgets, and armour pieces are shuffled across the following location types:
+All weapons, gadgets, and armour pieces and infobots are shuffled across the following location types:
 
-- **Titanium Bolt pickups** (20) — bolts found throughout each planet
-- **Armour pickups** (20) — armour pieces found in the game world
-- **Defeat Otto Destruct** (1) — defeating the final boss on Quodrona
-- **Skill Points** (25, optional) — in-game skill point challenges
+- Clank Challanges
+- Armour & Titanium Bolt pickups
+- Skyboard Challanges
+- Weapon Vendors
+- Skill Points (untested in full)
+- Armour Sets
 
 ## What is the goal?
 
@@ -21,18 +25,13 @@ Defeat **Otto Destruct** on Quodrona. The client detects the end-boss cutscene c
 
 Any weapon, gadget, or armour piece. When progressive modes are enabled, you receive `Progressive Weapon`, `Progressive Gadget`, or `Progressive Armour` items that unlock each in a fixed order.
 
-## Options
+## When the player receives an item, what happens?
 
-| Option | Description |
-|--------|-------------|
-| Progressive Weapons | Unlock weapons in a fixed order (Progressive Weapon items) |
-| Progressive Armour | Unlock armour in a fixed order (Progressive Armour items) |
-| Progressive Gadgets | Unlock gadgets in a fixed order (Progressive Gadget items) |
-| Death Link | Dying sends a death to all Death Link players and vice versa |
-| Randomize Vendor | Randomize which weapons/gadgets appear in vendor shops |
-| Skill Points as Checks | Treat skill point unlocks as location checks (adds 25 locations) |
-| Starting Bolts | Number of bolts the player starts with |
+You will be able to visit the planets with whatever infobot you receive, receiving Infobot: Kalidon will unlock Kalidon
+for travel within Ratchet's Ship. Upon receiving a weapon it unlocks in ratchet's inventory, which will let you equip it
+and use to fire on enemy troops. Progressive upgrades will upgrade your weapons increasing their
+firepower.
 
 ## Setup guide
 
-See [setup_en.md](setup_en.md) for full instructions on connecting PCSX2 to Archipelago.
+See [the Setup Guide](setup_en.md) for full instructions on connecting PCSX2 to Archipelago.
