@@ -18,7 +18,7 @@ from .items import (
     WEAPON_PROGRESSIVE_STEPS_BY_MODE,
 )
 from .locations import ALL_LOCATIONS
-from .options import RACSizeMatterOptions
+from .options import RACSizeMatterOptions, racsm_option_groups
 from .regions import create_regions
 from .rules import set_rules
 from .universal_tracker import setup_options_from_slot_data, tracker_world
@@ -44,6 +44,7 @@ class RACWeb(WebWorld):
             ["Archipelago Community"],
         )
     ]
+    option_groups = racsm_option_groups
 
 
 class RACSizeMatterWorld(World):
