@@ -11,24 +11,12 @@ from ..items import (
     WEAPON_DISPLAY_TO_INTERNAL,
 )
 from ..locations import (
-    VENDOR_GADGET_PLANET,
+    VENDOR_GADGET_LOC,
+    VENDOR_WEAPON_LOC,
     VENDOR_WEAPON_MOD_PLANET,
-    VENDOR_WEAPON_PLANET,
 )
 
-# ── Vendor location → internal name lookups ───────────────────────────────────
-
-_VENDOR_WEAPON_LOC: dict[str, str] = {
-    f"Purchase {display}": WEAPON_DISPLAY_TO_INTERNAL[display]
-    for display in VENDOR_WEAPON_PLANET
-    if display in WEAPON_DISPLAY_TO_INTERNAL
-}
-
-_VENDOR_GADGET_LOC: dict[str, str] = {
-    f"Purchase {display}": GADGET_DISPLAY_TO_INTERNAL[display]
-    for display in VENDOR_GADGET_PLANET
-    if display in GADGET_DISPLAY_TO_INTERNAL
-}
+# ── Vendor mod location → (internal weapon, slot index name) ──────────────────
 
 _SLOTS = ("one", "two", "three")
 _by_weapon: dict[str, list[str | None]] = defaultdict(list)
@@ -51,6 +39,7 @@ from ..core.data import (
     PLAYER_BOLT_COUNT,
     SKILL_POINTS,
     TITANIUM_BOLTS,
+    WEAPON_MAX_LEVELS,
     WEAPON_MOD_COUNTS,
 )
 
@@ -60,13 +49,13 @@ _LOCATION_TO_ARMOUR: dict[str, tuple[str, int]] = {
 }
 
 from ..core.data import ArmourPiece
-from ..core.states.memory import (
+from ..core.memory import (
     ARMOUR_ADDRESSES,
     GADGETS,
     PLAYER_ARMOUR_SLOTS,
     WEAPONS,
 )
-from ..core.states.memory.singletons import _ARMOUR_PIECES, _ARMOUR_SET_ORDER, _PIECE_TO_SLOTS
+from ..core.memory.singletons import _ARMOUR_PIECES, _ARMOUR_SET_ORDER, _PIECE_TO_SLOTS
 
 _MOD_SLOT_ATTRS = ("mod_slot_one", "mod_slot_two", "mod_slot_three")
 
@@ -111,10 +100,14 @@ class InventoryMixin:
             return
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
+            # Always rebuild internal inventory state (weapons/armour/gadgets)
+            # so it is up-to-date even during a pickup animation.
+            # _apply_player_inventory_sync guards game-memory writes internally
+            # when is_picking_up is True, so only the state rebuild runs.
+            await loop.run_in_executor(None, self._apply_player_inventory_sync)
             if self._wiring.is_picking_up:
                 self._pending_item_apply = True
                 return
-            await loop.run_in_executor(None, self._apply_player_inventory_sync)
             await loop.run_in_executor(None, self._apply_world_states_sync)
             self._grant_new_bolt_items()
         self._pending_item_apply = False
@@ -179,13 +172,26 @@ class InventoryMixin:
             self._player_armour_state.add(internal, bitmask)
 
         # Progressive weapons
+        prog_mode = int(self.slot_data.get("progressive_weapons", 0))
+        weapon_levels: dict[str, int] = {}
         for display, count in weapon_prog_counts.items():
             internal = WEAPON_DISPLAY_TO_INTERNAL.get(display)
             if not internal:
                 continue
             if count >= 1:
                 weapon_unlocked[internal] = 1
-            weapon_mods[internal] = min(count - 1, WEAPON_MOD_COUNTS.get(internal, 0))
+            n_mods = WEAPON_MOD_COUNTS.get(internal, 0)
+            if prog_mode == 1:  # progressive_mods: unlock then mods, no levels
+                weapon_mods[internal] = min(count - 1, n_mods)
+                weapon_levels[internal] = 0
+            elif prog_mode == 2:  # progressive_levels: unlock then levels, no mods
+                weapon_mods[internal] = 0
+                weapon_levels[internal] = min(max(0, count - 1), WEAPON_MAX_LEVELS.get(internal, 1) - 1)
+            else:  # all_progressive (3): unlock, mods, then levels
+                weapon_mods[internal] = min(count - 1, n_mods)
+                level_steps = max(0, count - 1 - n_mods)
+                weapon_levels[internal] = min(level_steps, WEAPON_MAX_LEVELS.get(internal, 1) - 1)
+        self._gs.tracked_weapon_levels = weapon_levels
 
         # Populate weapon/gadget player states (updates addresses if weapons are loaded)
         if WEAPONS:
@@ -249,11 +255,11 @@ class InventoryMixin:
         vendor_weapons: dict[str, int] = {}
         vendor_gadgets: dict[str, int] = {}
         vendor_mods: dict[str, set[str]] = {}
-        for loc_name, internal in _VENDOR_WEAPON_LOC.items():
+        for loc_name, internal in VENDOR_WEAPON_LOC.items():
             loc_id = self._location_name_to_id.get(loc_name)
             if loc_id and loc_id in checked:
                 vendor_weapons[internal] = 1
-        for loc_name, internal in _VENDOR_GADGET_LOC.items():
+        for loc_name, internal in VENDOR_GADGET_LOC.items():
             loc_id = self._location_name_to_id.get(loc_name)
             if loc_id and loc_id in checked:
                 vendor_gadgets[internal] = 1
@@ -323,6 +329,9 @@ class InventoryMixin:
         self._log(f"[RAC] _apply_player_inventory_sync: writing {len(unlocked)} AP weapons: {unlocked}")
         if WEAPONS:
             self._player_weapon_state.give(self.pine)
+            for name, level in self._gs.tracked_weapon_levels.items():
+                if name in WEAPONS:
+                    self.pine.write_int32(WEAPONS[name].level, level)
         if GADGETS:
             self._player_gadget_state.give(self.pine)
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -8,7 +7,7 @@ if TYPE_CHECKING:
     from ..storage.local import LocalStorage
     from ..structs.address_map import AddressMap
 
-class BaseState(ABC):
+class BaseState:
 
     def __init__(
         self,
@@ -38,25 +37,20 @@ class BaseState(ABC):
         self._unregister_handlers()
         self.on_exit()
 
-    @abstractmethod
     def on_enter(self) -> None:
-        ...
+        pass
 
-    @abstractmethod
     def on_exit(self) -> None:
-        ...
+        pass
 
-    @abstractmethod
     def _register_handlers(self) -> None:
-        ...
+        pass
 
-    @abstractmethod
     def _unregister_handlers(self) -> None:
-        ...
+        pass
 
-    @abstractmethod
     def sync(self) -> None:
-        ...
+        pass
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(active={self._active})"

@@ -39,9 +39,6 @@ class PlayerState(BaseState):
         self._health_addr: int | None = None
         self._current_planet: int | None = None
 
-    def on_enter(self) -> None:
-        pass
-
     def on_exit(self) -> None:
         self.movement_state = PlayerMovementState.Alive
         self.health = 0

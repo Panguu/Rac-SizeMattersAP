@@ -29,21 +29,6 @@ class VendorState(BaseState):
         self.vendor_type: MenuStateValue | None = None
         self.vendor_locations: dict[str, bool]  = {}
 
-    def on_enter(self) -> None:
-        pass
-
-    def on_exit(self) -> None:
-        pass
-
-    def _register_handlers(self) -> None:
-        pass
-
-    def _unregister_handlers(self) -> None:
-        pass
-
-    def sync(self) -> None:
-        pass
-
     def activate(self, vendor_type: MenuStateValue) -> None:
         self.vendor_type = vendor_type
         self.session = VendorSessionState.OPEN

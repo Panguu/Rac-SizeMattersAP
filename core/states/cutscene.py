@@ -46,9 +46,6 @@ class CutsceneState(BaseState):
         self._prev_before_sprout = _read_i32(self.accessor, BeforeSproutCutsceneStruct.BASE_ADDRESS)
         self._prev_sprout        = _read_i32(self.accessor, SproutCutsceneStruct.BASE_ADDRESS)
 
-    def on_exit(self) -> None:
-        pass
-
     def _register_handlers(self) -> None:
         self.accessor.on_struct_change(GoalCutsceneStruct,         self._on_goal_change)
         self.accessor.on_struct_change(ElectroshockCutsceneStruct, self._on_electroshock_change)

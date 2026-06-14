@@ -28,11 +28,6 @@ BOSS_LOCATIONS: dict[str, RACLocationData] = {
     "Defeat Otto Destruct": RACLocationData(BASE_ID + 1200, "Quodrona"),
 }
 
-SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
-    name: RACLocationData(BASE_ID + 1300 + idx, sp.region)
-    for idx, (name, sp) in enumerate(SKILL_POINTS.items(), start=1)
-}
-
 VENDOR_WEAPON_PLANET: dict[str, str] = {
     "Lacerator":       "Pokitaru",
     "Acid Bomb Glove": "Pokitaru",
@@ -66,8 +61,8 @@ GADGET_VENDOR_LOCATIONS: dict[str, RACLocationData] = {
 # None sentinel = mod slot exists in the weapon struct but is not sold at any vendor.
 # It is counted for slot-index purposes so subsequent mods land on the correct address.
 VENDOR_WEAPON_MOD_PLANET: dict[tuple, str | None] = {
-    ("Lacerator",       "Lock On Mod"):       "Kalidon",
     ("Lacerator",       "Double Barrel Mod"): "Challax",
+    ("Lacerator",       "Lock On Mod"):      "Kalidon",
     ("Acid Bomb Glove", "Acid Burn Mod"):     "Challax",
     ("Acid Bomb Glove", "Epoxy Mod"):         "Challax",
     ("Concussion Gun",  "Split Barrel Mod"):  "Kalidon",
@@ -95,13 +90,18 @@ ARMOUR_SET_CHECK_LOCATIONS: dict[str, RACLocationData] = {
     for idx, name in enumerate(ARMOUR_SET_CHECKS, start=1)
 }
 
+SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
+    name: RACLocationData(BASE_ID + 4000 + idx, sp.region)
+    for idx, (name, sp) in enumerate(SKILL_POINTS.items(), start=1)
+}
+
 GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
-    "Ryllus Sprout-O-Matic":            RACLocationData(BASE_ID + 1401, "Ryllus"),
-    "Metalis Electroshock Gloves":      RACLocationData(BASE_ID + 1406, "Metalis"),
+    "Ryllus Sprout-O-Matic":       RACLocationData(BASE_ID + 1401, "Ryllus"),
+    "Kalidon Shrink Ray":          RACLocationData(BASE_ID + 1407, "Kalidon"),
+    "Metalis Electroshock Gloves": RACLocationData(BASE_ID + 1406, "Metalis"),
 }
 
 # ── Skyboard challenge locations ──────────────────────────────────────────────
-# item_checks (1): races that award a randomised item only.
 SKYBOARD_ITEM_LOCATIONS: dict[str, RACLocationData] = {
     "Kalidon Learner's Permit (SC)":                   RACLocationData(BASE_ID + 1402, "Kalidon"),
     "Kalidon Master's Challenge (SC)":                 RACLocationData(BASE_ID + 1405, "Kalidon"),
@@ -109,7 +109,6 @@ SKYBOARD_ITEM_LOCATIONS: dict[str, RACLocationData] = {
     "Outpost Omega Interior Decorating (SC)":          RACLocationData(BASE_ID + 1801, "Outpost Omega"),
 }
 
-# all_challenges (2): non-item races added on top of item_checks.
 EXTRA_SKYBOARD_LOCATIONS: dict[str, RACLocationData] = {
     "Kalidon Speeding Ticket (SC)":            RACLocationData(BASE_ID + 1403, "Kalidon"),
     "Kalidon Tricky Air (SC)":                 RACLocationData(BASE_ID + 1404, "Kalidon"),
@@ -129,12 +128,55 @@ ALL_CLANK_LOCATIONS: dict[str, RACLocationData] = {
     if cp.name not in CHALLENGE_LOCATIONS  # combined reward-challenge names live in CHALLENGE_LOCATIONS
 }
 
+_MISSION_ENTRIES: list[tuple[str, str]] = [
+    # Pokitaru
+    ("Fight some robots",          "Pokitaru"),
+    # Ryllus
+    ("Buzzing Cameras",            "Ryllus"),
+    ("Investigate the artifact",   "Ryllus"),
+    ("Unlock the temple",          "Ryllus"),
+    # Kalidon
+    ("Explore the planet",         "Kalidon"),
+    ("Win the skyboard race",      "Kalidon"),
+    # Metalis
+    ("Survive Robot War III",      "Metalis"),
+    ("Escape the planet",          "Metalis"),
+    # Dreamtime
+    ("??????????",                 "Dreamtime"),
+    # Outpost Omega
+    ("Escape from facility pt 1",  "Outpost Omega"),
+    ("Escape the medical facility","Outpost Omega"),
+    ("Rematch - Skyboard racers",  "Outpost Omega"),
+    # Challax
+    ("Start giant clank",          "Challax"),
+    ("Destroy the space fortress", "Challax"),
+    # Dayni Moon
+    ("Catch Luna",                 "Dayni Moon"),
+    ("Luna fight pt 1",            "Dayni Moon"),
+    ("Luna fight pt 2",            "Dayni Moon"),
+    ("'Disable' Luna",             "Dayni Moon"),
+    ("Escape from clank",          "Dayni Moon"),
+    # Inside Clank
+    ("Defeat all technomites",     "Inside Clank"),
+    # Quodrona
+    ("Clone Wars",                 "Quodrona"),
+    ("Runnnn from Otto",           "Quodrona"),
+    ("Defeat mecha Otto",          "Quodrona"),
+    ("Find Otto Destruct",         "Quodrona"),
+]
+
+MISSION_LOCATIONS: dict[str, RACLocationData] = {
+    name: RACLocationData(BASE_ID + 3000 + idx, region)
+    for idx, (name, region) in enumerate(_MISSION_ENTRIES, start=1)
+}
+
 ALL_LOCATIONS: dict[str, RACLocationData] = {
     **TITANIUM_BOLT_LOCATIONS,
     **ARMOUR_PICKUP_LOCATIONS,
     **BOSS_LOCATIONS,
-    **SKILL_POINT_LOCATIONS,
     **GADGET_PICKUP_LOCATIONS,
+    **SKILL_POINT_LOCATIONS,
+    **MISSION_LOCATIONS,
     **WEAPON_VENDOR_LOCATIONS,
     **GADGET_VENDOR_LOCATIONS,
     **WEAPON_MOD_VENDOR_LOCATIONS,
@@ -146,3 +188,23 @@ ALL_LOCATIONS: dict[str, RACLocationData] = {
 }
 
 LOCATION_ID_TO_NAME: dict[int, str] = {data.code: name for name, data in ALL_LOCATIONS.items()}
+
+# ── Vendor location ↔ internal-name lookup tables ─────────────────────────────
+# Derived here so both the game-state layer and the client can share one source.
+
+from .items import GADGET_DISPLAY_TO_INTERNAL, WEAPON_DISPLAY_TO_INTERNAL  # noqa: E402
+
+VENDOR_WEAPON_LOC: dict[str, str] = {
+    f"Purchase {display}": WEAPON_DISPLAY_TO_INTERNAL[display]
+    for display in VENDOR_WEAPON_PLANET
+    if display in WEAPON_DISPLAY_TO_INTERNAL
+}
+
+VENDOR_GADGET_LOC: dict[str, str] = {
+    f"Purchase {display}": GADGET_DISPLAY_TO_INTERNAL[display]
+    for display in VENDOR_GADGET_PLANET
+    if display in GADGET_DISPLAY_TO_INTERNAL
+}
+
+WEAPON_INTERNAL_TO_LOCATION: dict[str, str] = {v: k for k, v in VENDOR_WEAPON_LOC.items()}
+GADGET_INTERNAL_TO_LOCATION: dict[str, str] = {v: k for k, v in VENDOR_GADGET_LOC.items()}

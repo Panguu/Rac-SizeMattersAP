@@ -6,23 +6,17 @@ from ...interface_orchestrator.memory.accessor import MemoryAccessor
 from ...interface_orchestrator.state.base_state import BaseState
 from ...interface_orchestrator.storage.local import LocalStorage
 from ...interface_orchestrator.structs.address_map import AddressMap
-from ...items import GADGET_DISPLAY_TO_INTERNAL, WEAPON_DISPLAY_TO_INTERNAL
-from ...locations import VENDOR_GADGET_PLANET, VENDOR_WEAPON_MOD_PLANET, VENDOR_WEAPON_PLANET
+from ...items import WEAPON_DISPLAY_TO_INTERNAL
+from ...locations import (
+    VENDOR_WEAPON_LOC,
+    VENDOR_GADGET_LOC,
+    VENDOR_WEAPON_MOD_PLANET,
+    WEAPON_INTERNAL_TO_LOCATION,
+    GADGET_INTERNAL_TO_LOCATION,
+)
 from ..structs.weapon import GadgetStruct, WeaponStruct
 
 _MOD_SLOTS = ("mod_slot_one", "mod_slot_two", "mod_slot_three")
-
-_WEAPON_LOC: dict[str, str] = {
-    f"Purchase {display}": WEAPON_DISPLAY_TO_INTERNAL[display]
-    for display in VENDOR_WEAPON_PLANET
-    if display in WEAPON_DISPLAY_TO_INTERNAL
-}
-
-_GADGET_LOC: dict[str, str] = {
-    f"Purchase {display}": GADGET_DISPLAY_TO_INTERNAL[display]
-    for display in VENDOR_GADGET_PLANET
-    if display in GADGET_DISPLAY_TO_INTERNAL
-}
 
 _by_weapon: dict[str, list[str | None]] = defaultdict(list)
 for _wd, _mn in VENDOR_WEAPON_MOD_PLANET:
@@ -36,9 +30,7 @@ for _wd, _mns in _by_weapon.items():
             if _i < len(_MOD_SLOTS) and _mn is not None:
                 _MOD_LOC[f"Purchase {_wd} {_mn}"] = (_int, _MOD_SLOTS[_i])
 
-WEAPON_INTERNAL_TO_LOCATION: dict[str, str]            = {v: k for k, v in _WEAPON_LOC.items()}
-GADGET_INTERNAL_TO_LOCATION: dict[str, str]            = {v: k for k, v in _GADGET_LOC.items()}
-MOD_INTERNAL_TO_LOCATION: dict[tuple[str, str], str]  = {v: k for k, v in _MOD_LOC.items()}
+MOD_INTERNAL_TO_LOCATION: dict[tuple[str, str], str] = {v: k for k, v in _MOD_LOC.items()}
 
 class WeaponState(BaseState):
 
@@ -53,11 +45,8 @@ class WeaponState(BaseState):
         self.gadgets: dict[str, bool]           = {}
         self.mods: dict[str, dict[str, bool]]   = {}
         self.vendor_locations: dict[str, bool]  = dict.fromkeys(
-            (*_WEAPON_LOC, *_GADGET_LOC, *_MOD_LOC), False
+            (*VENDOR_WEAPON_LOC, *VENDOR_GADGET_LOC, *_MOD_LOC), False
         )
-
-    def on_enter(self) -> None:
-        pass
 
     def on_exit(self) -> None:
         self.weapons.clear()
@@ -156,7 +145,13 @@ class WeaponState(BaseState):
                 inst.unlocked = int(self.gadgets.get(name, False))
                 self.accessor.write_field(cls, "unlocked", inst.unlocked)
 
-    def apply_vendor_locations(self) -> None:
+    def apply_vendor_locations(self, allowed_extra: frozenset[str] = frozenset()) -> None:
+        """Zero all weapon/gadget memory then restore what the player may keep.
+
+        Restored if purchased from vendor (and still owned) OR if name is in
+        allowed_extra (owned weapon whose vendor planet is unlocked).
+        Mods are always restored when purchased regardless of allowed_extra.
+        """
         for cls in self.addresses.structs():
             if issubclass(cls, WeaponStruct) and cls is not WeaponStruct:
                 self.accessor.write_field(cls, "unlocked", 0)
@@ -169,30 +164,58 @@ class WeaponState(BaseState):
         for loc_name, purchased in self.vendor_locations.items():
             if not purchased:
                 continue
-            if loc_name in _WEAPON_LOC:
-                name = _WEAPON_LOC[loc_name]
-                cls  = self.addresses.get(f"WeaponStruct_{name}")
-                if cls:
-                    self.accessor.write_field(cls, "unlocked", 1)
-            elif loc_name in _GADGET_LOC:
-                name = _GADGET_LOC[loc_name]
-                cls  = self.addresses.get(f"GadgetStruct_{name}")
-                if cls:
-                    self.accessor.write_field(cls, "unlocked", 1)
+            if loc_name in VENDOR_WEAPON_LOC:
+                name = VENDOR_WEAPON_LOC[loc_name]
+                # Guard: only restore if player actually owns it (edge-case safety).
+                if self.weapons.get(name, False):
+                    cls = self.addresses.get(f"WeaponStruct_{name}")
+                    if cls:
+                        self.accessor.write_field(cls, "unlocked", 1)
+            elif loc_name in VENDOR_GADGET_LOC:
+                name = VENDOR_GADGET_LOC[loc_name]
+                if self.gadgets.get(name, False):
+                    cls = self.addresses.get(f"GadgetStruct_{name}")
+                    if cls:
+                        self.accessor.write_field(cls, "unlocked", 1)
             elif loc_name in _MOD_LOC:
                 weapon, slot = _MOD_LOC[loc_name]
                 cls = self.addresses.get(f"WeaponStruct_{weapon}")
                 if cls:
                     self.accessor.write_field(cls, slot, 1)
 
+        # Restore weapons/gadgets owned via AP items whose vendor planet is unlocked.
+        for name in allowed_extra:
+            cls = self.addresses.get(f"WeaponStruct_{name}")
+            if cls:
+                self.accessor.write_field(cls, "unlocked", 1)
+            cls = self.addresses.get(f"GadgetStruct_{name}")
+            if cls:
+                self.accessor.write_field(cls, "unlocked", 1)
+
+    def apply_mod_vendor_locations(self) -> None:
+        """Zero all mod slots then restore only purchased mods."""
+        for cls in self.addresses.structs():
+            if issubclass(cls, WeaponStruct) and cls is not WeaponStruct:
+                self.accessor.write_field(cls, "mod_slot_one",   0)
+                self.accessor.write_field(cls, "mod_slot_two",   0)
+                self.accessor.write_field(cls, "mod_slot_three", 0)
+
+        for loc_name, purchased in self.vendor_locations.items():
+            if not purchased or loc_name not in _MOD_LOC:
+                continue
+            weapon, slot = _MOD_LOC[loc_name]
+            cls = self.addresses.get(f"WeaponStruct_{weapon}")
+            if cls:
+                self.accessor.write_field(cls, slot, 1)
+
     def sync_from_ap(self, checked_locations: set[str]) -> None:
         for loc in checked_locations:
             if loc in self.vendor_locations:
                 self.vendor_locations[loc] = True
-            if loc in _WEAPON_LOC:
-                self.weapons[_WEAPON_LOC[loc]] = True
-            elif loc in _GADGET_LOC:
-                self.gadgets[_GADGET_LOC[loc]] = True
+            if loc in VENDOR_WEAPON_LOC:
+                self.weapons[VENDOR_WEAPON_LOC[loc]] = True
+            elif loc in VENDOR_GADGET_LOC:
+                self.gadgets[VENDOR_GADGET_LOC[loc]] = True
             elif loc in _MOD_LOC:
                 weapon, slot = _MOD_LOC[loc]
                 self.mods.setdefault(weapon, dict.fromkeys(_MOD_SLOTS, False))

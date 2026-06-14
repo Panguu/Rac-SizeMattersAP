@@ -66,6 +66,11 @@
             "name": "Do Cows Get Crabby (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Fight some robots",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -123,6 +128,21 @@
             "name": "Ship It (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Buzzing Cameras",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Investigate the artifact",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Unlock the temple",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -177,6 +197,11 @@
             "icon": "icons/Crate.png"
           },
           {
+            "name": "Kalidon Shrink Ray",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
             "name": "Explosive Ordnance Disposal (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
@@ -190,6 +215,16 @@
             "name": "Be A Cool Skyboarder (SP)",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Explore the planet",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Win the skyboard race",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           },
           {
             "name": "Kalidon Learner's Permit (SC)",
@@ -267,6 +302,16 @@
             "name": "Ultimate Gladiator (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Survive Robot War III",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Escape the planet",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -281,7 +326,7 @@
         ],
         "sections": [
           {
-            "name": "Dreamtime Jump Across three moving parasols (TB)",
+            "name": "Dreamtime Atop the floating hat (TB)",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
@@ -312,6 +357,11 @@
           },
           {
             "name": "Night Terrors (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "??????????",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -351,6 +401,21 @@
             "name": "Be An Awesome Skyboarder (SC)",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Escape from facility pt 1",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Escape the medical facility",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Rematch - Skyboard racers",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -438,6 +503,16 @@
             "name": "No More Varmints (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Start giant clank",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Destroy the space fortress",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -500,6 +575,31 @@
             "name": "Bouncy Bouncy Bouncy (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Catch Luna",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Luna fight pt 1",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Luna fight pt 2",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "'Disable' Luna",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Escape from clank",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       },
@@ -540,6 +640,11 @@
           },
           {
             "name": "Ratchet Just Ratchet (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Defeat all technomites",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -602,6 +707,26 @@
           },
           {
             "name": "Storm The Front (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Clone Wars",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Runnnn from Otto",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Defeat mecha Otto",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Find Otto Destruct",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -724,6 +849,11 @@
             "name": "Do Cows Get Crabby (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Fight some robots",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -832,6 +962,21 @@
           },
           {
             "name": "Ship It (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Buzzing Cameras",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Investigate the artifact",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Unlock the temple",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -997,6 +1142,11 @@
         ],
         "sections": [
           {
+            "name": "Kalidon Shrink Ray",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
             "name": "Explosive Ordnance Disposal (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
@@ -1010,6 +1160,16 @@
             "name": "Be A Cool Skyboarder (SP)",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Explore the planet",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Win the skyboard race",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1096,6 +1256,16 @@
             "name": "Ultimate Gladiator (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Survive Robot War III",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Escape the planet",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1115,7 +1285,7 @@
         ],
         "sections": [
           {
-            "name": "Dreamtime Jump Across three moving parasols (TB)",
+            "name": "Dreamtime Atop the floating hat (TB)",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
@@ -1146,6 +1316,11 @@
           },
           {
             "name": "Night Terrors (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "??????????",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1190,6 +1365,21 @@
             "name": "Be An Awesome Skyboarder (SC)",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
+          },
+          {
+            "name": "Escape from facility pt 1",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Escape the medical facility",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Rematch - Skyboard racers",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1318,6 +1508,16 @@
             "name": "No More Varmints (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Start giant clank",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Destroy the space fortress",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1421,6 +1621,31 @@
             "name": "Bouncy Bouncy Bouncy (SP)",
             "item_count": 1,
             "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Catch Luna",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Luna fight pt 1",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Luna fight pt 2",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "'Disable' Luna",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Escape from clank",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
           }
         ]
       }
@@ -1490,6 +1715,11 @@
           },
           {
             "name": "Ratchet Just Ratchet (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Defeat all technomites",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1569,6 +1799,26 @@
           },
           {
             "name": "Storm The Front (SP)",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Clone Wars",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Runnnn from Otto",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Defeat mecha Otto",
+            "item_count": 1,
+            "icon": "icons/Crate.png"
+          },
+          {
+            "name": "Find Otto Destruct",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }

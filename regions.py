@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Region
 
-from .core.data.locations.skill_points import CHALLENGE_SKILL_POINTS
 from .locations import (
     ALL_CLANK_LOCATIONS,
     ARMOUR_PICKUP_LOCATIONS,
@@ -14,6 +13,7 @@ from .locations import (
     EXTRA_SKYBOARD_LOCATIONS,
     GADGET_PICKUP_LOCATIONS,
     GADGET_VENDOR_LOCATIONS,
+    MISSION_LOCATIONS,
     SKILL_POINT_LOCATIONS,
     SKYBOARD_ITEM_LOCATIONS,
     TITANIUM_BOLT_LOCATIONS,
@@ -57,25 +57,18 @@ def create_regions(world: RACSizeMatterWorld) -> None:
         GADGET_PICKUP_LOCATIONS,
         WEAPON_VENDOR_LOCATIONS,
         GADGET_VENDOR_LOCATIONS,
+        MISSION_LOCATIONS,
     ]
-    if world.options.vendor_mods_randomized:
-        location_tables.append(WEAPON_MOD_VENDOR_LOCATIONS)
+    if world.options.skill_points:
+        location_tables.append(SKILL_POINT_LOCATIONS)
+    location_tables.append(WEAPON_MOD_VENDOR_LOCATIONS)
     if world.options.clank_challenges.value >= 1:
         location_tables.append(CHALLENGE_LOCATIONS)
     if world.options.clank_challenges.value >= 2:
         location_tables.append(ALL_CLANK_LOCATIONS)
     if world.options.skyboard_challenges.value >= 1:
         location_tables.append(SKYBOARD_ITEM_LOCATIONS)
-    if world.options.skyboard_challenges.value >= 2:
         location_tables.append(EXTRA_SKYBOARD_LOCATIONS)
-    sp_opt = world.options.skill_points_as_checks.value
-    if sp_opt == 1:
-        location_tables.append({
-            name: data for name, data in SKILL_POINT_LOCATIONS.items()
-            if name not in CHALLENGE_SKILL_POINTS
-        })
-    elif sp_opt == 2:
-        location_tables.append(SKILL_POINT_LOCATIONS)
     if world.options.armour_set_checks:
         location_tables.append(ARMOUR_SET_CHECK_LOCATIONS)
 

@@ -15,10 +15,10 @@ from .items import (
     INFOBOT_ITEM_TABLE,
     WEAPON_ITEM_TABLE,
     WEAPON_PROGRESSIVE_ITEM_TABLE,
-    WEAPON_PROGRESSIVE_STEPS,
+    WEAPON_PROGRESSIVE_STEPS_BY_MODE,
 )
 from .locations import ALL_LOCATIONS
-from .options import RACSizeMatterOptions
+from .options import RACSizeMatterOptions, racsm_option_groups
 from .regions import create_regions
 from .rules import set_rules
 from .universal_tracker import setup_options_from_slot_data, tracker_world
@@ -44,6 +44,7 @@ class RACWeb(WebWorld):
             ["Archipelago Community"],
         )
     ]
+    option_groups = racsm_option_groups
 
 
 class RACSizeMatterWorld(World):
@@ -91,8 +92,9 @@ class RACSizeMatterWorld(World):
 
     def create_items(self) -> None:
         pool: list[str] = []
-        if self.options.progressive_weapons:
-            for display, steps in WEAPON_PROGRESSIVE_STEPS.items():
+        prog_mode = self.options.progressive_weapons.value
+        if prog_mode > 0:
+            for display, steps in WEAPON_PROGRESSIVE_STEPS_BY_MODE[prog_mode].items():
                 pool += [f"{display} Progressive Weapon"] * steps
         else:
             pool += list(WEAPON_ITEM_TABLE)
@@ -106,7 +108,7 @@ class RACSizeMatterWorld(World):
         else:
             pool += list(ARMOUR_ITEM_TABLE)
 
-        # Fill any remaining slots (e.g. when skill_points_as_checks adds locations)
+        # Fill any remaining slots
         unfilled = len(self.multiworld.get_unfilled_locations(self.player))
         filler_needed = max(0, unfilled - len(pool))
         pool += ["Bolts"] * filler_needed
@@ -133,7 +135,7 @@ class RACSizeMatterWorld(World):
 
         weapon_count = self.options.starting_weapons.value
         if weapon_count > 0:
-            if self.options.progressive_weapons:
+            if self.options.progressive_weapons.value > 0:
                 pool = list(WEAPON_PROGRESSIVE_ITEM_TABLE.keys())
             else:
                 pool = list(WEAPON_ITEM_TABLE.keys())
@@ -151,8 +153,8 @@ class RACSizeMatterWorld(World):
             "death_link": bool(self.options.death_link.value),
             "clank_challenges": self.options.clank_challenges.value,
             "skyboard_challenges": self.options.skyboard_challenges.value,
-            "vendor_mods_randomized": bool(self.options.vendor_mods_randomized.value),
-            "skill_points_as_checks": self.options.skill_points_as_checks.value,
+
+            "skill_points": bool(self.options.skill_points.value),
             "armour_set_checks": bool(self.options.armour_set_checks.value),
             "starting_bolts": self.options.starting_bolts.value,
             "death_amnesty": self.options.death_amnesty.value,
@@ -160,6 +162,7 @@ class RACSizeMatterWorld(World):
             "progressive_armour": self.options.progressive_armour.value,
             "starting_weapons": self.options.starting_weapons.value,
             "starting_gadgets": self.options.starting_gadgets.value,
+            "starting_skin": self.options.starting_skin.value,
         }
 
     @staticmethod

@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 ARMOUR_BASE                = 0x21F4B354
 ARMOUR_SET_COLLECTED_ADDR  = 0x21F4B442  # byte 0: pure sets (bit N = ArmourSets(N+1) complete)
                                            # byte 1 (0x21F4B443): hybrid sets equipped —
@@ -14,19 +12,21 @@ BOLT_PICKUP_MASK       = 0x000000FFFFFFFFFF
 PLANET_LOAD_ADDRESS    = 0x21F4C770
 CONTROLLER_PAUSE_SELECT_ADDRESS = 0x20F7F414
 CONTROLLER_BUTTONS_ADDRESS = 0x20F7F415
-CHALLENGE_MODE_ADDRESS = 0x21F4C778 # 1 - 255 when challange mode is active, 0 otherwise
 PLANET_UNLOCK_ADDRESSES: dict[str, int] = { # each value must be 3 in order to unlock next planet
-    "POKITARU": 0x21F4C661,
-    "RYLLUS": 0x21F4C662,
-    "KALIDON": 0x21F4C663,
-    "METALIS": 0x21F4C664,
-    "DREAMTIME": 0x21F4C665,
-    "OUTPOST_OMEGA": 0x21F4C666,
-    "CHALLAX": 0x21F4C667,
-    "DAYNI_MOON": 0x21F4C668,
+    "POKITARU":     0x21F4C661,
+    "RYLLUS":       0x21F4C662,
+    "KALIDON":      0x21F4C663,
+    "METALIS":      0x21F4C664,
+    "DREAMTIME":    0x21F4C665,
+    "OUTPOST_OMEGA":0x21F4C666,
+    "CHALLAX":      0x21F4C667,
+    "DAYNI_MOON":   0x21F4C668,
     "INSIDE_CLANK": 0x21F4C669,
-    "QUODRONA": 0x21F4C66A,
+    "QUODRONA":     0x21F4C66A,
 }
+# Each planet has a parallel "state" byte at unlock_address + PLANET_STATE_OFFSET.
+# e.g. OUTPOST_OMEGA state = 0x21F4C677; gates Outpost Omega 2 (0x17) access.
+PLANET_STATE_OFFSET: int = 0x11
 # Per-planet player state/health addresses
 PLAYER_ADDRS: dict[int, tuple[int, int]] = {
     0x01: (0x20F805C0, 0x20F80E2C),  # pokitaru
@@ -35,6 +35,7 @@ PLAYER_ADDRS: dict[int, tuple[int, int]] = {
     0x04: (0x20F7EDD0, 0x20F7F63C),  # metalis
     0x05: (0x20F762C0, 0x20F76B2C),  # dreamtime
     0x06: (0x20F81B40, 0x20F823AC),  # outpost omega
+    0x17: (0x20F82A40, 0x20F823AC),  # outpost omega 2
     0x07: (0x20F806C0, 0x20F80F2C),  # challax
     0x08: (0x20F79850, 0x20F7A0BC),  # dayni moon
     0x09: (0x20F82540, 0x20F82DAC),  # inside clank
@@ -90,88 +91,22 @@ WEAPON_ARRAY_BASE_BY_PLANET: dict[int, int] = {
     for planet, addr in _LACERATOR_UNLOCK.items()
 }
 
-# value 3f37 when vendor text is loaded; value 01 when text is on screen
-@dataclass(frozen=True)
-class DisplayedTextBox:
-    planet_id: int
-    message_str_pointer: int
-    is_visible: int
-    vendor_value: int
-    countdown_timer: int
-TextBoxDisplayAddrs: list[DisplayedTextBox] = [
-    DisplayedTextBox(planet_id=0x01, message_str_pointer=0xF47A10, is_visible=0xF47A08, vendor_value=0xBF48, countdown_timer=0xF479E8), # pokitaru  # noqa: E501
-    DisplayedTextBox(planet_id=0x02, message_str_pointer=0xF441D0, is_visible=0xF441C8, vendor_value=0xBF35, countdown_timer=0xF441A8), # ryllus  # noqa: E501
-    DisplayedTextBox(planet_id=0x03, message_str_pointer=0xF44090, is_visible=0xF44088, vendor_value=0x3F37, countdown_timer=0xF44068), # kalidon  # noqa: E501
-    DisplayedTextBox(planet_id=0x04, message_str_pointer=0xF44ED0, is_visible=0xF44EC8, vendor_value=0x3F30, countdown_timer=0xF44EA8), # metalis  # noqa: E501
-    DisplayedTextBox(planet_id=0x05, message_str_pointer=0xF40D90, is_visible=0xF40D88, vendor_value=0x7FA7, countdown_timer=0xF40D68), # dreamtime  # noqa: E501
-    DisplayedTextBox(planet_id=0x07, message_str_pointer=0xF46510, is_visible=0xF46508, vendor_value=0xBF49, countdown_timer=0xF464E8), # challax  # noqa: E501
-    DisplayedTextBox(planet_id=0x08, message_str_pointer=0xF3A8D0, is_visible=0xF3A8C8, vendor_value=0x3FDB, countdown_timer=0xF3A8A8), # dayni moon  # noqa: E501
-    DisplayedTextBox(planet_id=0x09, message_str_pointer=0xF4C010, is_visible=0xF4C008, vendor_value=0x3F68, countdown_timer=0xF4BFE8), # inside clank  # noqa: E501
-    DisplayedTextBox(planet_id=0x0A, message_str_pointer=0xF47A10, is_visible=0xF47A08, vendor_value=0xBF4C, countdown_timer=0xF479E8), # quodrona  # noqa: E501
-    DisplayedTextBox(planet_id=0x17, message_str_pointer=0xF4FE10, is_visible=0xF4FE08, vendor_value=0x3f37, countdown_timer=0xF4FDE8), # outpost omega 2 unknown vendor  # noqa: E501
-]
-
-DAYNI_MOON_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
-    "Two's A Crowd": 0x1F4B400,
-    "Reverse Into Victory": 0x1F4B401,
-    "Emergency Bridge": 0x1F4B402,
-    "Leap Of Faith": 0x1F4B403,
-    "Infinite Improbability": 0x1F4B404,
-    "Welcome to Dayni": 0x1F4B3F6,
-    "Round Up!": 0x1F4B3F7,
-    "Variety Is Shocking": 0x1F4B3F8,
-    "Tom Sawyer": 0x1F4B3F9,
-    "Smasherbot Returns!": 0x1F4B3FA,
-    "Tri-bomb Tournament": 0x1F4B3FC,
-    "A-rooouund the Bend": 0x1F4B3FD,
-    "The Thin Bouncy Line": 0x1F4B3FE,
-    "The Ultimate Showdown": 0x1F4B3FF,
-}
-# Metalis challenge unlock addresses — layout per byte is undocumented.
-# 0x1F4B3DB = unknown challenge type 1 unlock
-# 0x1F4B3DC = unknown challenge type 2 unlock
-# 0x1F4B3DD = unknown challenge type 3 unlock
-# All three are written as a single 3-byte value (0x0FFFFF).
-METALIS_CLANK_CHALLENGES_UNLOCK_ADDR: int = 0x1F4B3DB
-
-# Dayni Moon challenge unlock addresses — each byte unlocks a specific challenge type.
-DAYNI_MOON_DERBY_CHALLENGES_UNLOCK_ADDR:     int = 0x1F4B3F3  # Derby challenges
-DAYNI_MOON_DERBY_B_CHALLENGES_UNLOCK_ADDR:   int = 0x1F4B3F4  # Derby challenges (second type)
-DAYNI_MOON_GADGETBOT_CHALLENGES_UNLOCK_ADDR: int = 0x1F4B3F5  # Gadgetbot challenges
-DAYNI_MOON_CLANK_CHALLENGES_UNLOCK_ADDR:     int = DAYNI_MOON_DERBY_CHALLENGES_UNLOCK_ADDR
-
-METALIS_CLANK_CHALLENGES_COMPLETED_ADDR: dict[str, int] = {
-    "Buzzsaw Blitz": 0x1F4B3DE,
-    "Take Two For The Team": 0x1F4B3E8,
-    "CHARGE!": 0x1F4B3DF,
-    "Bridge The Gap": 0x1F4B3E9,
-    "Electric Boogaloo": 0x1F4B3E0,
-    "Of Trapeze and Teleporters": 0x1F4B3EA,
-    "Showdown": 0x1F4B3E1,
-    "Brain Trip": 0x1F4B3EB,
-    "Smasherbot's Revenge": 0x1F4B3E2,
-    "Nigh Impossible": 0x1F4B3EC,
-    "Little League": 0x1F4B3E3,
-    "Varsity Bracket": 0x1F4B3E4,
-    "Collegiate Division": 0x1F4B3E5,
-    "Professional Level": 0x1F4B3E6,
-    "The Uber Finals": 0x1F4B3E7,
-}
-
-# Single address per planet, cumulative bitmask per race.
-# Cumulative values: race 1=0x01, race 2=0x05, race 3=0x15, race 4=0x55.
-# Each entry is (address, detection_mask) — the NEW bit set when that race completes.
-KAILDON_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, tuple[int, int, int]] = {
-    "Learner's Permit":   (0x1F4B407, 0x1F4B408, 0x01),
-    "Speeding Ticket":    (0x1F4B407, 0x1F4B408, 0x04),
-    "Tricky Air":         (0x1F4B407, 0x1F4B408, 0x10),
-    "Master's Challenge": (0x1F4B407, 0x1F4B408, 0x40),
-}
+CURRENT_WEAPON_IN_VENDOR = 0x21F4AB8C
+WEAPON_VENDOR_SLOTS      = 0x21F4ABE4
+WEAPON_VENDOR_ITEMS      = 0x21F4AB80
 
 
-OUTPOST_OMEGA_SKYBOARD_CHALLENGES_COMPLETED_ADDR: dict[str, tuple[int, int, int]] = {
-    "Interior Decorating": (0x1F4B409, 0x1F4B40A, 0x01),  # address unknown
-    "Danger, High Voltage": (0x1F4B409, 0x1F4B40A, 0x04),  # address unknown
-    "The Vortex":           (0x1F4B409, 0x1F4B40A, 0x10),  # address unknown
-    "Vertigo":              (0x1F4B409, 0x1F4B40A, 0x40),  # address unknown
+# 2-byte mission progress value per planet, ordered by game progression.
+# Addresses confirmed for first three planets; remainder follow the +0x02 pattern.
+PLANET_MISSION_ADDRESSES: dict[str, int] = {
+    "Pokitaru":        0x21F4B3C4,
+    "Ryllus":          0x21F4B3C6,
+    "Kalidon":         0x21F4B3C8,
+    "Metalis":         0x21F4B3CA,
+    "Dreamtime":       0x21F4B3CC,
+    "Outpost Omega":   0x21F4B3CE,
+    "Challax":         0x21F4B3D0,
+    "Dayni Moon":      0x21F4B3D2,
+    "Inside Clank":    0x21F4B3D4,
+    "Quodrona":        0x21F4B3D6,
 }

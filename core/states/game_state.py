@@ -58,6 +58,7 @@ class GameState:
     tracked_weapons:        dict[str, int]         = field(default_factory=dict)
     tracked_gadgets:        dict[str, int]         = field(default_factory=dict)
     tracked_mods:           dict[str, set[str]]    = field(default_factory=dict)
+    tracked_weapon_levels:  dict[str, int]         = field(default_factory=dict)
     tracked_vendor_weapons: dict[str, int]         = field(default_factory=dict)
     tracked_vendor_gadgets: dict[str, int]         = field(default_factory=dict)
     tracked_vendor_mods:    dict[str, set[str]]    = field(default_factory=dict)

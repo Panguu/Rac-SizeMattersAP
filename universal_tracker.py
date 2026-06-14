@@ -43,8 +43,9 @@ def setup_options_from_slot_data(world: "RACSizeMatterWorld") -> None:
             world.options.progressive_armour.value = world.passthrough["progressive_armour"]
             world.options.death_link.value = world.passthrough["death_link"]
             world.options.clank_challenges.value = world.passthrough.get("clank_challenges", 0)
-            world.options.vendor_mods_randomized.value = world.passthrough.get("vendor_mods_randomized", 1)
-            world.options.skill_points_as_checks.value = world.passthrough["skill_points_as_checks"]
+            world.options.skyboard_challenges.value = world.passthrough.get("skyboard_challenges", 0)
+            world.options.skill_points.value = world.passthrough.get("skill_points", True)
+
             world.options.armour_set_checks.value = world.passthrough["armour_set_checks"]
             world.options.starting_weapons.value = world.passthrough["starting_weapons"]
             world.options.starting_gadgets.value = world.passthrough["starting_gadgets"]

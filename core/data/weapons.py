@@ -19,6 +19,22 @@ WEAPON_MOD_COUNTS: dict[str, int] = {
     "ryno":            0,
 }
 
+WEAPON_MAX_LEVELS: dict[str, int] = {
+    "lacerator":       4,
+    "concussion_gun":  4,
+    "acid_bomb_glove": 4,
+    "agents_of_doom":  4,
+    "bee_mine_glove":  4,
+    "static_barrier":  4,
+    "shock_rocket":    4,
+    "sniper_mine":     4,
+    "scorcher":        4,
+    "laser_tracer":    4,
+    "suck_cannon":     4,
+    "mootator":        1,
+    "ryno":            4,
+}
+
 
 def is_weapon_candidate(data: bytes, i: int) -> bool:
     if i + 0x46 > len(data):
@@ -62,15 +78,8 @@ def is_ps2_weapon_candidate(data: bytes, i: int) -> bool:
 
 
 class WeaponAddresses:
-    """Resolves weapon unlock and mod-slot addresses from a single base (start_object).
-
-      mod_slot_one   = base + 0x3D  (uint8 boolean)
-      mod_slot_two   = base + 0x3E  (uint8 boolean)
-      mod_slot_three = base + 0x3F  (uint8 boolean)
-      unlocked       = base + 0x45  (uint8 boolean)
-    """
-
     _OFFSETS: dict[str, int] = {
+        "level":          0x2D,
         "mod_slot_one":   0x3D,
         "mod_slot_two":   0x3E,
         "mod_slot_three": 0x3F,
@@ -99,13 +108,6 @@ class WeaponAddresses:
 
 
 class GadgetAddresses:
-    """Resolves gadget addresses from a single base (start_object).
-
-    Gadgets share the same struct layout as weapons but only use two fields:
-      icon     = base + 0x1D
-      unlocked = base + 0x45  (uint8 boolean)
-    """
-
     _OFFSETS: dict[str, int] = {
         "icon":     0x1D,
         "unlocked": 0x45,

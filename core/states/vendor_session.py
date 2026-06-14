@@ -8,7 +8,7 @@ from CommonClient import logger
 from ..data import WEAPON_MOD_COUNTS, TextBoxDisplayAddrs
 from ..menu_state import MenuState, MenuStateValue
 from .game_state import GameState
-from .memory import GADGETS, WEAPONS, MemoryItemState, restore_tracked_weapon_state, zero_weapon
+from ..memory import GADGETS, WEAPONS, MemoryItemState, restore_tracked_weapon_state, zero_weapon
 
 _TEXTBOX_BY_PLANET: dict[int, object] = {tb.planet_id: tb for tb in TextBoxDisplayAddrs}
 
@@ -32,13 +32,6 @@ def _build_vendor_gadget_addresses() -> dict[str, int]:
 
 @dataclass
 class VendorSession:
-    """Tracks the state of a vendor interaction.
-
-    on_purchase fires immediately when a weapon, gadget, or mod is detected —
-    args are (kind, internal_name, slot_or_None) where kind is "weapon",
-    "gadget", or "mod".  This lets the client queue the AP location check
-    straight away rather than waiting for the session to close.
-    """
     purchased_weapons:  list[str]                              = field(default_factory=list)
     purchased_gadgets:  list[str]                              = field(default_factory=list)
     purchased_mods:     list[tuple[str, str]]                  = field(default_factory=list)
@@ -56,7 +49,6 @@ class VendorSession:
         tracked_vendor_gadgets: dict[str, int],
         tracked_vendor_mods:    dict[str, set[str]],
     ) -> None:
-        """Rebuild vendor state from already-purchased locations."""
         if WEAPONS:
             self.weapon_state.update_addresses(_build_vendor_weapon_addresses())
             for name in WEAPONS:
@@ -73,10 +65,7 @@ class VendorSession:
         self.purchased_gadgets.clear()
         self.purchased_mods.clear()
 
-    # ── Memory operations ─────────────────────────────────────────────────────
-
     def apply(self, ipc) -> None:
-        """Write vendor state to memory."""
         for w in WEAPONS.values():
             zero_weapon(ipc, w)
         for g in GADGETS.values():
@@ -85,8 +74,6 @@ class VendorSession:
         self.gadget_state.give(ipc)
 
     def detect_purchases(self, ipc, gs: GameState) -> None:
-        """Poll addresses; fire on_purchase immediately for each new detection
-        and update tracked vendor state so re-opened sessions are accurate."""
         for name, w in WEAPONS.items():
             if self.weapon_state.get(name) == 0 and ipc.read_int8(w.unlocked):
                 self._add_weapon(name, gs)
@@ -104,7 +91,6 @@ class VendorSession:
                 self.gadget_state.add(name, 1)
 
     def enforce(self, ipc) -> None:
-        """Re-enforce vendor state (correct drift while menu is open)."""
         for name, w in WEAPONS.items():
             expected_unlocked = self.weapon_state.get(name)
             if ipc.read_int8(w.unlocked) != expected_unlocked:
@@ -126,7 +112,6 @@ class VendorSession:
     def total(self) -> int:
         return len(self.purchased_weapons) + len(self.purchased_gadgets) + len(self.purchased_mods)
 
-    # ── Purchase recording ────────────────────────────────────────────────────
 
     def _add_weapon(self, name: str, gs: GameState) -> None:
         if name not in self.purchased_weapons:
@@ -154,7 +139,6 @@ class VendorSession:
 
 
 class VendorPoller:
-    """Handles all three vendor stages: preload → menu open → menu close."""
 
     def __init__(self, gs: GameState, log: Callable[[str], None] | None = None) -> None:
         self._gs  = gs

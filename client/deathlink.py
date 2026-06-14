@@ -5,6 +5,8 @@ import random
 import time
 from typing import Any
 
+from CommonClient import logger
+
 from ..core.data import BY_ID as PLANETS_BY_ID
 from ..core.data import PLAYER_ADDRS, PLAYER_HEALTH, PLAYER_STATE, PlayerState
 
@@ -71,6 +73,7 @@ class DeathLinkMixin:
         if now - self._last_death_link < 1:
             return
         self._last_death_link = now
+        logger.info("[RAC] DeathLink sent.")
         source = self.auth or "Ratchet"
         planet_name = (
             PLANETS_BY_ID[self._gs.current_planet].name

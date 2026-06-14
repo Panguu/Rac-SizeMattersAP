@@ -50,7 +50,7 @@ SKILL_POINTS: dict[str, SkillPoint] = {
     "Friends Dont Hurt Friends (SP)":     SkillPoint(0x05, 16, "Dreamtime"),
     "Night Terrors (SP)":                 SkillPoint(0x05, 17, "Dreamtime"),
     # Outpost Omega
-    "Be An Awesome Skyboarder (SC)":      SkillPoint(0x06, 20, "Outpost Omega"),
+    "Be An Awesome Skyboarder (SC)":      SkillPoint(0x17, 20, "Outpost Omega"),
     # Challax
     # "Take Them Down A Shock (SP)": SkillPoint(0x07, 24, "Challax")
     # Excluded: only one opportunity to complete this in the whole game (bit 24).

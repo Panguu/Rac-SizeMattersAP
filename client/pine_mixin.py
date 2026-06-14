@@ -5,7 +5,7 @@ import asyncio
 from CommonClient import logger
 
 from ..core.data import CURRENT_PLANET_ADDRESS
-from ..core.states.memory import load_weapons_for_planet
+from ..core.memory import load_weapons_for_planet
 from ..universal_tracker import PLANET_ID_TO_REGION
 from .constants import EXPECTED_GAME_ID, POLL_INTERVAL
 
@@ -156,7 +156,7 @@ class PineMixin:
                            " — was game generated with the current options?")
             return
         checks.append(loc_id)
-        logger.info(f"[RAC] {kind} checked: {name}")
+        self._log(f"[RAC] {kind} checked: {name}")
 
     async def _check_locations(self, locations: list[int]) -> None:
         unique_locations = set(locations) - self._locally_checked_locations

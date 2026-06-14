@@ -3,7 +3,11 @@ from enum import IntFlag
 from ...pypine.pypine.pine import Pine
 from .addresses import CONTROLLER_BUTTONS_ADDRESS, CONTROLLER_PAUSE_SELECT_ADDRESS
 
+"""
+Controller Logic
+This is currently not implemented the idea is to open Planet Menu however these addresses float around in memory so no implementation is planned yet.
 
+"""
 class PauseSelectButtons(IntFlag):
     SELECT = 0x01
     START  = 0x08

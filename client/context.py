@@ -14,13 +14,11 @@ except ImportError:
     from CommonClient import ClientCommandProcessor, CommonContext
 from CommonClient import logger
 
-from ..core.challenge import ChallengePoller
 from ..core.data import PLANET_STATE_ADDRESSES, SKILL_POINT_ADDRESS
 from ..core.data.controller import ButtonState
-from ..core.game_wiring import GameWiring
-from ..core.skyboard import SkyboardPoller
+from ..core.game_orchestrator import GameOrchestrator as GameWiring
 from ..core.states.game_state import GameState
-from ..core.states.memory import (
+from ..core.memory import (
     ARMOUR_ADDRESSES,
     BOLTS,
     PLAYER_ARMOUR_SLOTS,
@@ -75,6 +73,48 @@ class RACCommandProcessor(ClientCommandProcessor):
         logger.info(f"[RAC] Debug messages {state}.")
         return True
 
+    def _cmd_vendor(self) -> bool:
+        """Log current vendor unlock state (owned weapons + planet-unlocked purchasables)."""
+        if not self.ctx.pine_connected:
+            logger.info("[RAC] Not connected to PCSX2.")
+            return False
+        for line in self.ctx._wiring.vendor_unlock.debug_lines():
+            logger.info(line)
+        return True
+
+    def _cmd_mission_change(self) -> bool:
+        """Show the 2-byte mission progress at each planet's address.
+        Run before and after completing a mission to observe value changes."""
+        import struct as _struct
+        from ..core.data.addresses import PLANET_MISSION_ADDRESSES
+
+        ctx = self.ctx
+        if not ctx.pine_connected:
+            logger.info("[RAC] Not connected to PCSX2.")
+            return False
+
+        acc      = ctx._wiring._orchestrator.accessor
+        snapshot: dict[str, int] = getattr(self, "_mission_snapshot", {})
+
+        logger.info("[RAC] ── Mission state (2-byte per planet) ───────────────────")
+        for planet, addr in PLANET_MISSION_ADDRESSES.items():
+            raw = acc.read_raw(addr, 2)
+            if not raw or len(raw) < 2:
+                logger.info(f"[RAC]   {planet:<16}  {addr:#010x}  <read error>")
+                continue
+            value = _struct.unpack_from("<H", raw)[0]
+            prev  = snapshot.get(planet)
+            if prev is not None and value != prev:
+                delta = f"  =>  {prev:#06x} -> {value:#06x}  (XOR {value ^ prev:#06x})"
+            else:
+                delta = ""
+            logger.info(f"[RAC]   {planet:<16}  {addr:#010x}  {value:#06x}{delta}")
+            snapshot[planet] = value
+
+        self._mission_snapshot = snapshot
+        logger.info("[RAC] ─────────────────────────────────────────────────────────")
+        return True
+
     def _cmd_state(self) -> bool:
         """Log all current client states."""
         ctx = self.ctx
@@ -103,6 +143,50 @@ class RACCommandProcessor(ClientCommandProcessor):
         logger.info(f"[RAC] Titanium bolts : {ctx._titanium_bolt_state!r}")
         logger.info(f"[RAC] Skill points   : {ctx._skill_point_state!r}")
         logger.info(f"[RAC] Pending pickup locs : {ctx._pending_armour_pickup_locs or 'none'}")
+        return True
+
+    def _cmd_skill_points(self) -> bool:
+        """Show current skill point bitmask and earned status for each SP.
+        Run again after earning a skill point to see what changed."""
+        import struct as _struct
+        from ..core.states.skill_points import SKILL_POINTS, SKILL_POINT_ADDRESS
+
+        ctx = self.ctx
+        sp  = ctx._wiring.skill_points
+
+        if not ctx.pine_connected:
+            logger.info("[RAC] Not connected to PPSSPP.")
+            return False
+
+        # Fresh read directly from memory — bypasses cached _bits.
+        raw = ctx._wiring._orchestrator.accessor.read_raw(SKILL_POINT_ADDRESS, 8)
+        if not raw or len(raw) < 8:
+            logger.info(f"[RAC] Could not read skill point memory at {SKILL_POINT_ADDRESS:#010x}.")
+            return False
+        live = _struct.unpack_from("<Q", raw)[0]
+
+        prev: int | None = getattr(self, "_sp_snapshot", None)
+        self._sp_snapshot = live
+        changed = live ^ prev if prev is not None else 0
+
+        logger.info(
+            f"[RAC] ── Skill Points  addr={SKILL_POINT_ADDRESS:#010x}"
+            f"  raw={live:#018x}"
+            f"  cached={sp._bits:#018x}"
+            f"  planet_loaded={sp._planet_loaded}"
+            f"  enabled={sp._enabled} ──"
+        )
+        if prev is not None:
+            logger.info(f"[RAC]   prev={prev:#018x}  delta={changed:#018x}  ({bin(changed).count('1')} changed)")
+
+        for name, info in SKILL_POINTS.items():
+            earned  = bool(live & info.mask)
+            marker  = "✓" if earned else " "
+            chg     = "  <-- changed" if (changed & info.mask) else ""
+            logger.info(f"[RAC]  [{marker}] bit {info.bit:2d}  mask={info.mask:#018x}  {name}{chg}")
+
+        total = bin(live).count("1")
+        logger.info(f"[RAC] ── {total}/{len(SKILL_POINTS)} earned ─────────────────────────────────────────")
         return True
 
 
@@ -185,16 +269,14 @@ class RACContext(
             vendor_session=VendorSession(log=self._log, on_purchase=self._on_vendor_purchase),
         )
         self._gs.on_vendor_close = self._on_vendor_close_sync
-        self._vendor_poller   = VendorPoller(self._gs, log=self._log)
-        self._skyboard_poller = SkyboardPoller(log=self._log)
-        self._challenge_poller = ChallengePoller(log=self._log)
+        self._vendor_poller = VendorPoller(self._gs, log=self._log)
 
         self._death_link_enabled = False
         self._last_death_link = 0.0
         self._debug_messages = False
         self._challenge_defaults_written = False
 
-        self._wiring = GameWiring(self.pine)
+        self._wiring = GameWiring(self.pine, log=self._log)
 
     def _checked_location_names(self) -> set[str]:
         id_to_name = {v: k for k, v in self._location_name_to_id.items()}
@@ -203,11 +285,6 @@ class RACContext(
             for lid in (self.checked_locations | self._locally_checked_locations)
             if lid in id_to_name
         }
-
-    def _suppress_sprout_gadget(self) -> None:
-        from ..core.states.memory import GADGETS
-        if GADGETS and not self._player_gadget_state.get("sprout_o_matic"):
-            self.pine.write_int8(GADGETS["sprout_o_matic"].unlocked, 0)
 
     def _log(self, msg: str, level: str = "info") -> None:
         if not self._debug_messages:
@@ -230,19 +307,25 @@ class RACContext(
             self.slot_data = args.get("slot_data", {})
             self._death_link_enabled = bool(self.slot_data.get("death_link", False))
             self._armour_set_checks_enabled = bool(self.slot_data.get("armour_set_checks", False))
-            self._challenge_poller.set_mode(int(self.slot_data.get("clank_challenges", 1)))
-            self._gs.vendor_session.mods_randomized = bool(self.slot_data.get("vendor_mods_randomized", True))
+            self._wiring.clank.set_mode(int(self.slot_data.get("clank_challenges", 1)))
+            self._wiring.skyboard.set_enabled(int(self.slot_data.get("skyboard_challenges", 0)) >= 1)
+            self._wiring.skill_points.set_enabled(
+                bool(self.slot_data.get("skill_points", False)),
+                planet_loaded=self._wiring._initial_load_done,
+            )
+            self._wiring.skin.set_skin_by_option(int(self.slot_data.get("starting_skin", 0)))
+            self._gs.vendor_session.mods_randomized = True
             if self._death_link_enabled:
                 asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": ["DeathLink"]}]))
             self._wiring.wire(
-                send_location         = self._append_location_by_name,
-                send_deathlink        = self._send_death_link_from_sync,
-                kill_player           = self._kill_player_sync,
-                reapply_inv           = self._apply_player_inventory_sync,
-                death_amnesty         = lambda: int(self.slot_data.get("death_amnesty", 1)),
-                on_goal               = lambda: asyncio.create_task(self._send_goal_status()),
-                on_vendor_close       = self._on_menu_close_for_armour_sets,
-                on_sprout_suppress    = self._suppress_sprout_gadget,
+                send_location      = self._append_location_by_name,
+                send_deathlink     = self._send_death_link_from_sync,
+                kill_player        = self._kill_player_sync,
+                reapply_inv        = self._apply_player_inventory_sync,
+                death_amnesty      = lambda: int(self.slot_data.get("death_amnesty", 1)),
+                death_link_enabled = lambda: self._death_link_enabled,
+                on_goal            = lambda: asyncio.create_task(self._send_goal_status()),
+                on_vendor_close    = self._on_menu_close_for_armour_sets,
             )
             checked = self._checked_location_names()
             asyncio.create_task(self._wiring.on_ap_connected(self.slot_data, checked))
