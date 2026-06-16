@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ..constants.armor_sets import RACSMTARMORSET
 from ._helpers import has_armour_piece
 
 if TYPE_CHECKING:
@@ -9,55 +10,55 @@ if TYPE_CHECKING:
 
 
 _ARMOUR_SET_RULES: dict[str, list[tuple[str, str, int]]] = {
-    "Equip Wildfire Armour Set": [
+    RACSMTARMORSET.WILDFIRE: [
         ("Wildfire", "Chestplate", 1), ("Wildfire", "Helmet", 2),
         ("Wildfire", "Gloves", 3), ("Wildfire", "Boots", 4),
     ],
-    "Equip Wildburst Armour Set": [
+    RACSMTARMORSET.WILDBURST: [
         ("Wildfire", "Chestplate", 1), ("Sludge Mk9", "Helmet", 2),
         ("Wildfire", "Gloves", 3), ("Wildfire", "Boots", 4),
     ],
-    "Equip Sludge Mk9 Armour Set": [
+    RACSMTARMORSET.SLUDGE_MK9: [
         ("Sludge Mk9", "Chestplate", 1), ("Sludge Mk9", "Helmet", 2),
         ("Sludge Mk9", "Gloves", 3), ("Sludge Mk9", "Boots", 4),
     ],
-    "Equip Crystallix Armour Set": [
+    RACSMTARMORSET.CRYSTALLIX: [
         ("Crystallix", "Chestplate", 1), ("Crystallix", "Helmet", 2),
         ("Crystallix", "Gloves", 3), ("Crystallix", "Boots", 4),
     ],
-    "Equip Triple Wave Armour Set": [
+    RACSMTARMORSET.TRIPLE_WAVE: [
         ("Wildfire", "Helmet", 2), ("Electroshock", "Chestplate", 1),
         ("Sludge Mk9", "Gloves", 3), ("Electroshock", "Boots", 4),
     ],
-    "Equip Shock Crystal Armour Set": [
+    RACSMTARMORSET.SHOCK_CRYSTAL: [
         ("Electroshock", "Helmet", 2), ("Crystallix", "Chestplate", 1),
         ("Crystallix", "Gloves", 3), ("Electroshock", "Boots", 4),
     ],
-    "Equip Electroshock Armour Set": [
+    RACSMTARMORSET.ELECTROSHOCK: [
         ("Electroshock", "Chestplate", 1), ("Electroshock", "Helmet", 2),
         ("Electroshock", "Gloves", 3), ("Electroshock", "Boots", 4),
     ],
-    "Equip Mega Bomb Armour Set": [
+    RACSMTARMORSET.MEGA_BOMB: [
         ("Mega Bomb", "Chestplate", 1), ("Mega Bomb", "Helmet", 2),
         ("Mega Bomb", "Gloves", 3), ("Mega Bomb", "Boots", 4),
     ],
-    "Equip Fire-Bomb Armour Set": [
+    RACSMTARMORSET.FIRE_BOMB: [
         ("Mega Bomb", "Chestplate", 1), ("Mega Bomb", "Helmet", 2),
         ("Wildfire", "Gloves", 3), ("Mega Bomb", "Boots", 4),
     ],
-    "Equip Hyperborean Armour Set": [
+    RACSMTARMORSET.HYPERBOREAN: [
         ("Hyperborean", "Chestplate", 1), ("Hyperborean", "Helmet", 2),
         ("Hyperborean", "Gloves", 3), ("Hyperborean", "Boots", 4),
     ],
-    "Equip Ice II Armour Set": [
+    RACSMTARMORSET.ICE_II: [
         ("Hyperborean", "Chestplate", 1), ("Crystallix", "Helmet", 2),
         ("Hyperborean", "Gloves", 3), ("Hyperborean", "Boots", 4),
     ],
-    "Equip Chameleon Armour Set": [
+    RACSMTARMORSET.CHAMELEON: [
         ("Chameleon", "Chestplate", 1), ("Chameleon", "Helmet", 2),
         ("Chameleon", "Gloves", 3), ("Chameleon", "Boots", 4),
     ],
-    "Equip Stalker Armour Set": [
+    RACSMTARMORSET.STALKER: [
         ("Wildfire", "Helmet", 2), ("Chameleon", "Chestplate", 1),
         ("Sludge Mk9", "Gloves", 3), ("Chameleon", "Boots", 4),
     ],

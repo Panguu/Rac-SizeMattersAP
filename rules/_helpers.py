@@ -18,8 +18,8 @@ def has_armour_piece(state, player: int, set_display: str, piece_name: str, piec
             state.count(f"{set_display} Progressive Pickup", player) >= piece_idx)
 
 
-def infobot(planet: str, player: int):
-    return lambda state: state.has(f"{planet} Infobot", player)
+def infobot(item_name: str, player: int):
+    return lambda state: state.has(item_name, player)
 
 
 def has_weapon(state, player: int, weapon: str) -> bool:

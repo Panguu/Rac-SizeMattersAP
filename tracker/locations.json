@@ -13,62 +13,62 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Above Zipline (TB)",
+            "name": "Pokitaru: T-Bolt: Above Zipline",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Pokitaru Behind Hut (TB)",
+            "name": "Pokitaru: T-Bolt: Behind Hut",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Pokitaru Wildfire Chestplate",
+            "name": "Pokitaru: Wildfire Chestplate on bridge",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Pokitaru Wildfire Gloves",
+            "name": "Pokitaru: Wildfire Gloves in the skuttle crab cave",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Lacerator",
+            "name": "Pokitaru: Gadgetron Vendor: Lacerator - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Acid Bomb Glove",
+            "name": "Pokitaru: Gadgetron Vendor: Acid Bomb Glove - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun",
+            "name": "Pokitaru: Gadgetron Vendor: Concussion Gun - 10,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Hypershot",
+            "name": "Pokitaru: Gadgetron Vendor: Hypershot - 10,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Train Faster (SP)",
+            "name": "Pokitaru: Skill Point: Train Faster",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Dont Rock The Boat (SP)",
+            "name": "Pokitaru: Skill Point: Don't Rock the Boat",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Do Cows Get Crabby (SP)",
+            "name": "Pokitaru: Skill Point: Do Cows Get Crabby?",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Fight some robots",
+            "name": "Pokitaru: Fight some robots (Complete Luna's photoshoot)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -85,62 +85,62 @@
         ],
         "sections": [
           {
-            "name": "Ryllus Down The Cliff (TB)",
+            "name": "Ryllus: T-Bolt: Down The Cliff",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Ryllus After the Wall (TB)",
+            "name": "Ryllus: T-Bolt: After the Wall",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Ryllus Sludge Mk9 Boots",
+            "name": "Ryllus: Sludge Mk9 Boots behind breakable rock",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ryllus Wildfire Helmet",
+            "name": "Ryllus: Wildfire Helmet before temple entrance",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ryllus Sprout-O-Matic",
+            "name": "Ryllus: Receive Spout-O-Matic",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Agents of Doom",
+            "name": "Ryllus: Gadgetron Vendor: Agents of Doom - 25,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Bury The Pygmies (SP)",
+            "name": "Ryllus: Skill Point: Bury the Pygmies",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Lights Camera Action (SP)",
+            "name": "Ryllus: Skill Point: Lights, Camera, Action!",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ship It (SP)",
+            "name": "Ryllus: Skill Point: Ship It",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Buzzing Cameras",
+            "name": "Ryllus: Buzzing Cameras",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Investigate the artifact",
+            "name": "Ryllus: Investigate the artifact (Reach the temple)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Unlock the temple",
+            "name": "Ryllus: Unlock the temple",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -157,92 +157,92 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Behind The Ship (TB)",
+            "name": "Kalidon: T-Bolt: Behind Ship",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Kalidon Side of Mechanoid Factory (TB)",
+            "name": "Kalidon: T-Bolt: Side of Mechanoid Factory",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Kalidon Grav-Ramps (TB)",
+            "name": "Kalidon: T-Bolt: Grav-Ramps",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Kalidon Sludge Mk9 Chestplate",
+            "name": "Kalidon: Sludge Mk9 Chestplate from Master's Challenge",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Kalidon Wildfire Boots",
+            "name": "Kalidon: Wildfire Boots inside factory",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Scorcher",
+            "name": "Kalidon: Gadgetron Vendor: Scorcher - 20,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Lacerator Lock On Mod",
+            "name": "Kalidon: Slim Cognito: Lacerator Lock On Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun Split Barrel Mod",
+            "name": "Kalidon: Slim Cognito: Concussion Gun Split Barrel Mod - 15,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Kalidon Shrink Ray",
+            "name": "Kalidon: Receive Shrink Ray",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Explosive Ordnance Disposal (SP)",
+            "name": "Kalidon: Skill Point: Explosive Ordnance Disposal",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Super Lombax (SP)",
+            "name": "Kalidon: Skill Point: Super Lombax",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Be A Cool Skyboarder (SP)",
+            "name": "Kalidon: Skill Point: Be A Cool Skyboarder",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Explore the planet",
+            "name": "Kalidon: Explore the planet",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Win the skyboard race",
+            "name": "Kalidon: Win the skyboard race (Complete Learner's Permit)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Kalidon Learner's Permit (SC)",
+            "name": "Kalidon: Skyboard Challenge: Learner's Challenge",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Kalidon Speeding Ticket (SC)",
+            "name": "Kalidon: Skyboard Challenge: Speeding Ticket",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Kalidon Tricky Air (SC)",
+            "name": "Kalidon: Skyboard Challenge: Tricky Air",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Kalidon Master's Challenge (SC)",
+            "name": "Kalidon: Skyboard Challenge: Master's Challenge",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           }
@@ -259,57 +259,57 @@
         ],
         "sections": [
           {
-            "name": "Metalis Behind the Polarized Door (TB)",
+            "name": "Metalis: T-Bolt: Behind the Polarized Door",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Metalis Sludge Mk9 Helmet (CC)",
+            "name": "Metalis: Clank Challenge: Buzzsaw Blitz",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Crystallix Helmet (CC)",
+            "name": "Metalis: Clank Challenge: Smasherbot's Revenge",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Crystallix Gloves (CC)",
+            "name": "Metalis: Clank Challenge: The Uber Finals",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Polarizer (CC)",
+            "name": "Metalis: Clank Challenge: Night Impossible",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Electroshock Gloves",
+            "name": "Metalis: Electroshock Gloves from Giant Clank",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Shutout (SP)",
+            "name": "Metalis: Skill Point: Shutout",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Terror of the Skies (SP)",
+            "name": "Metalis: Skill Point: Terror of the Skies",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ultimate Gladiator (SP)",
+            "name": "Metalis: Skill Point: Ultimate Gladiator",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Survive Robot War III",
+            "name": "Metalis: Survive Robot War III (Complete Buzzsaw Blitz)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Escape the planet",
+            "name": "Metalis: Escape the planet (Giant Clank)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -326,42 +326,42 @@
         ],
         "sections": [
           {
-            "name": "Dreamtime Atop the floating hat (TB)",
+            "name": "Dreamtime: T-Bolt: Atop the floating hat",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime To the left of Ratchets Garage (TB)",
+            "name": "Dreamtime: T-Bolt: To the left of Ratchet's Garage",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Apparition of the Scuttle Crab (TB)",
+            "name": "Dreamtime: T-Bolt: Apparition of the Scuttle Crab",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Crystallix Chestplate",
+            "name": "Dreamtime: Crystallix Chestplate after Giant Clank chase",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Suck Cannon",
+            "name": "Dreamtime: Gadgetron Vendor: Suck Cannon - 30,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Friends Dont Hurt Friends (SP)",
+            "name": "Dreamtime: Skill Point: Friends Don't Hurt Friends",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Night Terrors (SP)",
+            "name": "Dreamtime: Skill Point: Night Terrors",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "??????????",
+            "name": "Dreamtime: Complete Dreamtime",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -378,42 +378,42 @@
         ],
         "sections": [
           {
-            "name": "Outpost Omega Near the Entrance to DreamTime (TB)",
+            "name": "Outpost Omega: T-Bolt: Near the Entrance to DreamTime",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Outpost Omega Electroshock Boots (CC)",
+            "name": "Outpost Omega: Skyboard Challenge: Vertigo",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Outpost Omega Crystallix Boots",
+            "name": "Outpost Omega: Crystallix Boots during escape",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Bee Mine Glove",
+            "name": "Outpost Omega: Gadgetron Vendor: Bee Mine Glove - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Be An Awesome Skyboarder (SC)",
+            "name": "Outpost Omega: Skill Point: Be An Awesome Skyboarder",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Escape from facility pt 1",
+            "name": "Outpost Omega: Escape from facility pt 1",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Escape the medical facility",
+            "name": "Outpost Omega: Escape the medical facility",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Rematch - Skyboard racers",
+            "name": "Outpost Omega: Rematch - Skyboard racers (Complete Interior Decorating)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -430,87 +430,87 @@
         ],
         "sections": [
           {
-            "name": "Challax Beside The Ultra Mech Pad (TB)",
+            "name": "Challax: T-Bolt: Beside The Ultra Mech Pad",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Challax Hidden Room (TB)",
+            "name": "Challax: T-Bolt: Hidden Room",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Challax Mimic Plant Lob (TB)",
+            "name": "Challax: T-Bolt: Mimic Plant Lob",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Challax Electroshock Chestplate",
+            "name": "Challax: Electroshock Helmet after Dropship fight",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Challax Electroshock Helmet",
+            "name": "Challax: Gadgetron Vendor: Sniper Mine - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Sniper Mine",
+            "name": "Challax: Gadgetron Vendor: PDA - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Lacerator Double Barrel Mod",
+            "name": "Challax: Gadgetron Vendor: Bolt Grabber - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Acid Bomb Glove Acid Burn Mod",
+            "name": "Challax: Slim Cognito: Lacerator Double Barrel Mod - 30,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Acid Bomb Glove Epoxy Mod",
+            "name": "Challax: Slim Cognito: Acid Bomb Acid Burn Mod - 30,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun Lock On Mod",
+            "name": "Challax: Slim Cognito: Acid Bomb Epoxy Mod - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun Charge Up Mod",
+            "name": "Challax: Slim Cognito: Concussion Gun Lock On Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Bee Mine Glove Worker Mod",
+            "name": "Challax: Slim Cognito: Concussion Gun Charge Up Mod - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Take Them Down A Shock",
+            "name": "Challax: Slim Cognito: Bee Mine Glove Worker Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "High Tech Weapons Master (SP)",
+            "name": "Challax: Skill Point: High Tech Weapons Master",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "No More Varmints (SP)",
+            "name": "Challax: Skill Point: No More Varmints!",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Start giant clank",
+            "name": "Metalis: Start Giant Clank",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Destroy the space fortress",
+            "name": "Challax: Destroy the space fortress (Giant Clank)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -527,77 +527,72 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Planting at the Barnyard (TB)",
+            "name": "Dayni Moon: T-Bolt: Planting at the Barnyard",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dayni Moon Bounce on the Blue mimic (TB)",
+            "name": "Dayni Moon: T-Bolt: Bounce on the Blue mimic",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dayni Moon Mega Bomb Boots (CC)",
+            "name": "Dayni Moon: Clank Challenge: The Ultimate Showdown",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Dayni Moon Mega Bomb Gloves (CC)",
+            "name": "Dayni Moon: Clank Challenge: Infinite Improbability",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Dayni Moon Mega Bomb Helmet",
+            "name": "Dayni Moon: Mega Bomb Helmet before Luna fight",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Mootator",
+            "name": "Dayni Moon: Gadgetron Vendor: Shock Rocket - 55,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Shock Rocket",
+            "name": "Dayni Moon: Gadgetron Vendor: Map-O-Matic - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ultimate Gladiator Dayni Moon (SP)",
+            "name": "Dayni Moon: Skill Point: Ultimate Gladiator",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Wool Protest (SP)",
+            "name": "Dayni Moon: Skill Point: Wool Protest",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Bouncy Bouncy Bouncy (SP)",
+            "name": "Dayni Moon: Skill Point: Bouncy, Bouncy, Bouncy",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Catch Luna",
+            "name": "Dayni Moon: Catch Luna",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Luna fight pt 1",
+            "name": "Dayni Moon: Luna fight pt 1",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Luna fight pt 2",
+            "name": "Dayni Moon: Luna fight pt 2",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "'Disable' Luna",
-            "item_count": 1,
-            "icon": "icons/Crate.png"
-          },
-          {
-            "name": "Escape from clank",
+            "name": "Dayni Moon: Defeat Luna",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -614,37 +609,37 @@
         ],
         "sections": [
           {
-            "name": "Inside Clank Walk behind the ladder (TB)",
+            "name": "Inside Clank: T-Bolt: Walk behind the ladder",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Inside Clank Wall jumping Technomite (TB)",
+            "name": "Inside Clank: T-Bolt: Wall jumping Technomite",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Inside Clank Mega Bomb Chestplate",
+            "name": "Inside Clank: Gadgetron Vendor: Static Barrier - 65,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Static Barrier",
+            "name": "Inside Clank: Skill Point: Not the Shock of Me Now",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Not The Shock of Me Now (SP)",
+            "name": "Inside Clank: Skill Point: Ratchet... Just Ratchet",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ratchet Just Ratchet (SP)",
+            "name": "Inside Clank: Escape from Clank",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Defeat all technomites",
+            "name": "Inside Clank: Defeat all Technomites",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -661,72 +656,72 @@
         ],
         "sections": [
           {
-            "name": "Quodrona Ratchet Clones and Dummies (TB)",
+            "name": "Quodrona: T-Bolt: Ratchet Clones and Dummies",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Defeat Otto Destruct",
+            "name": "Quodrona: Defeat Otto Destruct",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Laser Tracer",
+            "name": "Quodrona: Gadgetron Vendor: Laser Tracer - 85,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Agents of Doom Launcher Mod",
+            "name": "Quodrona: Slim Cognito: Agents of Doom Launcher Mod - 20,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Scorcher Spitfire Mod",
+            "name": "Quodrona: Slim Cognito: Scorcher Spitfire Mod - 15,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Sniper Mine Split Beam Mod",
+            "name": "Quodrona: Slim Cognito: Sniper Mine Split Beam Mod - 25,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Shock Rocket Lock On Mod",
+            "name": "Quodrona: Slim Cognito: Shock Rocket Lock On Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Shock Rocket After Shock Mod",
+            "name": "Quodrona: Slim Cognito: Shock Rocket After Shock Mod - 25,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Elite Annihilation (SP)",
+            "name": "Quodrona: Skill Point: Elite Annihilation",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Storm The Front (SP)",
+            "name": "Quodrona: Skill Point: Storm the Front",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Clone Wars",
+            "name": "Quodrona: Clone Wars (Fight the Ratchet Clones)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Runnnn from Otto",
+            "name": "Quodrona: Runnnn from Otto",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Defeat mecha Otto",
+            "name": "Quodrona: Defeat Mecha Otto",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Find Otto Destruct",
+            "name": "Quodrona: Find Otto Destruct",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -738,7 +733,7 @@
     "name": "1",
     "children": [
       {
-        "name": "Pokitaru Wildfire Chestplate",
+        "name": "Pokitaru: Wildfire Chestplate on bridge",
         "map_locations": [
           {
             "map": "Pokitaru",
@@ -748,14 +743,14 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Wildfire Chestplate",
+            "name": "Pokitaru: Wildfire Chestplate on bridge",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
         ]
       },
       {
-        "name": "Pokitaru Above Zipline (TB)",
+        "name": "Pokitaru: T-Bolt: Above Zipline",
         "map_locations": [
           {
             "map": "Pokitaru",
@@ -765,14 +760,14 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Above Zipline (TB)",
+            "name": "Pokitaru: T-Bolt: Above Zipline",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Pokitaru Wildfire Gloves",
+        "name": "Pokitaru: Wildfire Gloves in the skuttle crab cave",
         "map_locations": [
           {
             "map": "Pokitaru",
@@ -782,14 +777,14 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Wildfire Gloves",
+            "name": "Pokitaru: Wildfire Gloves in the skuttle crab cave",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
         ]
       },
       {
-        "name": "Pokitaru Behind Hut (TB)",
+        "name": "Pokitaru: T-Bolt: Behind Hut",
         "map_locations": [
           {
             "map": "Pokitaru",
@@ -799,7 +794,7 @@
         ],
         "sections": [
           {
-            "name": "Pokitaru Behind Hut (TB)",
+            "name": "Pokitaru: T-Bolt: Behind Hut",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
@@ -816,42 +811,42 @@
         ],
         "sections": [
           {
-            "name": "Purchase Lacerator",
+            "name": "Pokitaru: Gadgetron Vendor: Lacerator - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Acid Bomb Glove",
+            "name": "Pokitaru: Gadgetron Vendor: Acid Bomb Glove - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun",
+            "name": "Pokitaru: Gadgetron Vendor: Concussion Gun - 10,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Hypershot",
+            "name": "Pokitaru: Gadgetron Vendor: Hypershot - 10,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Train Faster (SP)",
+            "name": "Pokitaru: Skill Point: Train Faster",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Dont Rock The Boat (SP)",
+            "name": "Pokitaru: Skill Point: Don't Rock the Boat",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Do Cows Get Crabby (SP)",
+            "name": "Pokitaru: Skill Point: Do Cows Get Crabby?",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Fight some robots",
+            "name": "Pokitaru: Fight some robots (Complete Luna's photoshoot)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -863,7 +858,7 @@
     "name": "2",
     "children": [
       {
-        "name": "Ryllus Down The Cliff (TB)",
+        "name": "Ryllus: T-Bolt: Down The Cliff",
         "map_locations": [
           {
             "map": "Ryllus",
@@ -873,14 +868,14 @@
         ],
         "sections": [
           {
-            "name": "Ryllus Down The Cliff (TB)",
+            "name": "Ryllus: T-Bolt: Down The Cliff",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Ryllus Sprout-O-Matic",
+        "name": "Ryllus: Receive Spout-O-Matic",
         "map_locations": [
           {
             "map": "Ryllus",
@@ -890,7 +885,7 @@
         ],
         "sections": [
           {
-            "name": "Ryllus Sprout-O-Matic",
+            "name": "Ryllus: Receive Spout-O-Matic",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -907,19 +902,19 @@
         ],
         "sections": [
           {
-            "name": "Ryllus After the Wall (TB)",
+            "name": "Ryllus: T-Bolt: After the Wall",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Ryllus Wildfire Helmet",
+            "name": "Ryllus: Wildfire Helmet before temple entrance",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
         ]
       },
       {
-        "name": "Ryllus Sludge Mk9 Boots",
+        "name": "Ryllus: Sludge Mk9 Boots behind breakable rock",
         "map_locations": [
           {
             "map": "Ryllus",
@@ -929,7 +924,7 @@
         ],
         "sections": [
           {
-            "name": "Ryllus Sludge Mk9 Boots",
+            "name": "Ryllus: Sludge Mk9 Boots behind breakable rock",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -946,37 +941,37 @@
         ],
         "sections": [
           {
-            "name": "Purchase Agents of Doom",
+            "name": "Ryllus: Gadgetron Vendor: Agents of Doom - 25,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Bury The Pygmies (SP)",
+            "name": "Ryllus: Skill Point: Bury the Pygmies",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Lights Camera Action (SP)",
+            "name": "Ryllus: Skill Point: Lights, Camera, Action!",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ship It (SP)",
+            "name": "Ryllus: Skill Point: Ship It",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Buzzing Cameras",
+            "name": "Ryllus: Buzzing Cameras",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Investigate the artifact",
+            "name": "Ryllus: Investigate the artifact (Reach the temple)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Unlock the temple",
+            "name": "Ryllus: Unlock the temple",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -988,7 +983,7 @@
     "name": "3",
     "children": [
       {
-        "name": "Kalidon Behind The Ship (TB)",
+        "name": "Kalidon: T-Bolt: Behind Ship",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -998,14 +993,14 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Behind The Ship (TB)",
+            "name": "Kalidon: T-Bolt: Behind Ship",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Kalidon Side of Mechanoid Factory (TB)",
+        "name": "Kalidon: T-Bolt: Side of Mechanoid Factory",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -1015,14 +1010,14 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Side of Mechanoid Factory (TB)",
+            "name": "Kalidon: T-Bolt: Side of Mechanoid Factory",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Kalidon Grav-Ramps (TB)",
+        "name": "Kalidon: T-Bolt: Grav-Ramps",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -1032,7 +1027,7 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Grav-Ramps (TB)",
+            "name": "Kalidon: T-Bolt: Grav-Ramps",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
@@ -1049,29 +1044,29 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Learner's Permit (SC)",
+            "name": "Kalidon: Skyboard Challenge: Learner's Challenge",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Kalidon Speeding Ticket (SC)",
+            "name": "Kalidon: Skyboard Challenge: Speeding Ticket",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Kalidon Tricky Air (SC)",
+            "name": "Kalidon: Skyboard Challenge: Tricky Air",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Kalidon Master's Challenge (SC)",
+            "name": "Kalidon: Skyboard Challenge: Master's Challenge",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           }
         ]
       },
       {
-        "name": "Kalidon Sludge Mk9 Chestplate",
+        "name": "Kalidon: Sludge Mk9 Chestplate from Master's Challenge",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -1081,14 +1076,14 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Sludge Mk9 Chestplate",
+            "name": "Kalidon: Sludge Mk9 Chestplate from Master's Challenge",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
         ]
       },
       {
-        "name": "Kalidon Wildfire Boots",
+        "name": "Kalidon: Wildfire Boots inside factory",
         "map_locations": [
           {
             "map": "Kalidon",
@@ -1098,7 +1093,7 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Wildfire Boots",
+            "name": "Kalidon: Wildfire Boots inside factory",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1115,17 +1110,17 @@
         ],
         "sections": [
           {
-            "name": "Purchase Scorcher",
+            "name": "Kalidon: Gadgetron Vendor: Scorcher - 20,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Lacerator Lock On Mod",
+            "name": "Kalidon: Slim Cognito: Lacerator Lock On Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun Split Barrel Mod",
+            "name": "Kalidon: Slim Cognito: Concussion Gun Split Barrel Mod - 15,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1142,32 +1137,32 @@
         ],
         "sections": [
           {
-            "name": "Kalidon Shrink Ray",
+            "name": "Kalidon: Receive Shrink Ray",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Explosive Ordnance Disposal (SP)",
+            "name": "Kalidon: Skill Point: Explosive Ordnance Disposal",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Super Lombax (SP)",
+            "name": "Kalidon: Skill Point: Super Lombax",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Be A Cool Skyboarder (SP)",
+            "name": "Kalidon: Skill Point: Be A Cool Skyboarder",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Explore the planet",
+            "name": "Kalidon: Explore the planet",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Win the skyboard race",
+            "name": "Kalidon: Win the skyboard race (Complete Learner's Permit)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1179,7 +1174,7 @@
     "name": "4",
     "children": [
       {
-        "name": "Metalis Behind the Polarized Door (TB)",
+        "name": "Metalis: T-Bolt: Behind the Polarized Door",
         "map_locations": [
           {
             "map": "Metalis",
@@ -1189,7 +1184,7 @@
         ],
         "sections": [
           {
-            "name": "Metalis Behind the Polarized Door (TB)",
+            "name": "Metalis: T-Bolt: Behind the Polarized Door",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
@@ -1206,22 +1201,22 @@
         ],
         "sections": [
           {
-            "name": "Metalis Sludge Mk9 Helmet (CC)",
+            "name": "Metalis: Clank Challenge: Buzzsaw Blitz",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Crystallix Helmet (CC)",
+            "name": "Metalis: Clank Challenge: Smasherbot's Revenge",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Crystallix Gloves (CC)",
+            "name": "Metalis: Clank Challenge: The Uber Finals",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Metalis Polarizer (CC)",
+            "name": "Metalis: Clank Challenge: Night Impossible",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           }
@@ -1238,32 +1233,32 @@
         ],
         "sections": [
           {
-            "name": "Metalis Electroshock Gloves",
+            "name": "Metalis: Electroshock Gloves from Giant Clank",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Shutout (SP)",
+            "name": "Metalis: Skill Point: Shutout",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Terror of the Skies (SP)",
+            "name": "Metalis: Skill Point: Terror of the Skies",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ultimate Gladiator (SP)",
+            "name": "Metalis: Skill Point: Ultimate Gladiator",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Survive Robot War III",
+            "name": "Metalis: Survive Robot War III (Complete Buzzsaw Blitz)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Escape the planet",
+            "name": "Metalis: Escape the planet (Giant Clank)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1285,42 +1280,42 @@
         ],
         "sections": [
           {
-            "name": "Dreamtime Atop the floating hat (TB)",
+            "name": "Dreamtime: T-Bolt: Atop the floating hat",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime To the left of Ratchets Garage (TB)",
+            "name": "Dreamtime: T-Bolt: To the left of Ratchet's Garage",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Apparition of the Scuttle Crab (TB)",
+            "name": "Dreamtime: T-Bolt: Apparition of the Scuttle Crab",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Dreamtime Crystallix Chestplate",
+            "name": "Dreamtime: Crystallix Chestplate after Giant Clank chase",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Suck Cannon",
+            "name": "Dreamtime: Gadgetron Vendor: Suck Cannon - 30,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Friends Dont Hurt Friends (SP)",
+            "name": "Dreamtime: Skill Point: Friends Don't Hurt Friends",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Night Terrors (SP)",
+            "name": "Dreamtime: Skill Point: Night Terrors",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "??????????",
+            "name": "Dreamtime: Complete Dreamtime",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1342,42 +1337,42 @@
         ],
         "sections": [
           {
-            "name": "Outpost Omega Near the Entrance to DreamTime (TB)",
+            "name": "Outpost Omega: T-Bolt: Near the Entrance to DreamTime",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           },
           {
-            "name": "Outpost Omega Electroshock Boots (CC)",
+            "name": "Outpost Omega: Skyboard Challenge: Vertigo",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Outpost Omega Crystallix Boots",
+            "name": "Outpost Omega: Crystallix Boots during escape",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Bee Mine Glove",
+            "name": "Outpost Omega: Gadgetron Vendor: Bee Mine Glove - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Be An Awesome Skyboarder (SC)",
+            "name": "Outpost Omega: Skill Point: Be An Awesome Skyboarder",
             "item_count": 1,
             "icon": "icons/Skyboard_Challanges.png"
           },
           {
-            "name": "Escape from facility pt 1",
+            "name": "Outpost Omega: Escape from facility pt 1",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Escape the medical facility",
+            "name": "Outpost Omega: Escape the medical facility",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Rematch - Skyboard racers",
+            "name": "Outpost Omega: Rematch - Skyboard racers (Complete Interior Decorating)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1389,7 +1384,7 @@
     "name": "7",
     "children": [
       {
-        "name": "Challax Beside The Ultra Mech Pad (TB)",
+        "name": "Challax: T-Bolt: Beside The Ultra Mech Pad",
         "map_locations": [
           {
             "map": "Challax",
@@ -1399,14 +1394,14 @@
         ],
         "sections": [
           {
-            "name": "Challax Beside The Ultra Mech Pad (TB)",
+            "name": "Challax: T-Bolt: Beside The Ultra Mech Pad",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Challax Hidden Room (TB)",
+        "name": "Challax: T-Bolt: Hidden Room",
         "map_locations": [
           {
             "map": "Challax",
@@ -1416,14 +1411,14 @@
         ],
         "sections": [
           {
-            "name": "Challax Hidden Room (TB)",
+            "name": "Challax: T-Bolt: Hidden Room",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Challax Mimic Plant Lob (TB)",
+        "name": "Challax: T-Bolt: Mimic Plant Lob",
         "map_locations": [
           {
             "map": "Challax",
@@ -1433,7 +1428,7 @@
         ],
         "sections": [
           {
-            "name": "Challax Mimic Plant Lob (TB)",
+            "name": "Challax: T-Bolt: Mimic Plant Lob",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
@@ -1450,72 +1445,72 @@
         ],
         "sections": [
           {
-            "name": "Challax Electroshock Chestplate",
+            "name": "Challax: Electroshock Helmet after Dropship fight",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Challax Electroshock Helmet",
+            "name": "Challax: Gadgetron Vendor: Sniper Mine - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Sniper Mine",
+            "name": "Challax: Gadgetron Vendor: PDA - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Lacerator Double Barrel Mod",
+            "name": "Challax: Gadgetron Vendor: Bolt Grabber - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Acid Bomb Glove Acid Burn Mod",
+            "name": "Challax: Slim Cognito: Lacerator Double Barrel Mod - 30,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Acid Bomb Glove Epoxy Mod",
+            "name": "Challax: Slim Cognito: Acid Bomb Acid Burn Mod - 30,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun Lock On Mod",
+            "name": "Challax: Slim Cognito: Acid Bomb Epoxy Mod - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Concussion Gun Charge Up Mod",
+            "name": "Challax: Slim Cognito: Concussion Gun Lock On Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Bee Mine Glove Worker Mod",
+            "name": "Challax: Slim Cognito: Concussion Gun Charge Up Mod - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Skill Point Take Them Down A Shock",
+            "name": "Challax: Slim Cognito: Bee Mine Glove Worker Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "High Tech Weapons Master (SP)",
+            "name": "Challax: Skill Point: High Tech Weapons Master",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "No More Varmints (SP)",
+            "name": "Challax: Skill Point: No More Varmints!",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Start giant clank",
+            "name": "Metalis: Start Giant Clank",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Destroy the space fortress",
+            "name": "Challax: Destroy the space fortress (Giant Clank)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1527,7 +1522,7 @@
     "name": "8",
     "children": [
       {
-        "name": "Dayni Moon Bounce on the Blue mimic (TB)",
+        "name": "Dayni Moon: T-Bolt: Bounce on the Blue mimic",
         "map_locations": [
           {
             "map": "Dayni Moon",
@@ -1537,14 +1532,14 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Bounce on the Blue mimic (TB)",
+            "name": "Dayni Moon: T-Bolt: Bounce on the Blue mimic",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Dayni Moon Planting at the Barnyard (TB)",
+        "name": "Dayni Moon: T-Bolt: Planting at the Barnyard",
         "map_locations": [
           {
             "map": "Dayni Moon",
@@ -1554,7 +1549,7 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Planting at the Barnyard (TB)",
+            "name": "Dayni Moon: T-Bolt: Planting at the Barnyard",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
@@ -1571,12 +1566,12 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Mega Bomb Gloves (CC)",
+            "name": "Dayni Moon: Clank Challenge: The Ultimate Showdown",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           },
           {
-            "name": "Dayni Moon Mega Bomb Boots (CC)",
+            "name": "Dayni Moon: Clank Challenge: Infinite Improbability",
             "item_count": 1,
             "icon": "icons/Clank_Challanges.png"
           }
@@ -1593,57 +1588,52 @@
         ],
         "sections": [
           {
-            "name": "Dayni Moon Mega Bomb Helmet",
+            "name": "Dayni Moon: Mega Bomb Helmet before Luna fight",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Mootator",
+            "name": "Dayni Moon: Gadgetron Vendor: Shock Rocket - 55,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Shock Rocket",
+            "name": "Dayni Moon: Gadgetron Vendor: Map-O-Matic - 50,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ultimate Gladiator Dayni Moon (SP)",
+            "name": "Dayni Moon: Skill Point: Ultimate Gladiator",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Wool Protest (SP)",
+            "name": "Dayni Moon: Skill Point: Wool Protest",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Bouncy Bouncy Bouncy (SP)",
+            "name": "Dayni Moon: Skill Point: Bouncy, Bouncy, Bouncy",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Catch Luna",
+            "name": "Dayni Moon: Catch Luna",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Luna fight pt 1",
+            "name": "Dayni Moon: Luna fight pt 1",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Luna fight pt 2",
+            "name": "Dayni Moon: Luna fight pt 2",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "'Disable' Luna",
-            "item_count": 1,
-            "icon": "icons/Crate.png"
-          },
-          {
-            "name": "Escape from clank",
+            "name": "Dayni Moon: Defeat Luna",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1655,7 +1645,7 @@
     "name": "9",
     "children": [
       {
-        "name": "Inside Clank Wall jumping Technomite (TB)",
+        "name": "Inside Clank: T-Bolt: Wall jumping Technomite",
         "map_locations": [
           {
             "map": "Inside Clank",
@@ -1665,14 +1655,14 @@
         ],
         "sections": [
           {
-            "name": "Inside Clank Wall jumping Technomite (TB)",
+            "name": "Inside Clank: T-Bolt: Wall jumping Technomite",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
         ]
       },
       {
-        "name": "Inside Clank Walk behind the ladder (TB)",
+        "name": "Inside Clank: T-Bolt: Walk behind the ladder",
         "map_locations": [
           {
             "map": "Inside Clank",
@@ -1682,7 +1672,7 @@
         ],
         "sections": [
           {
-            "name": "Inside Clank Walk behind the ladder (TB)",
+            "name": "Inside Clank: T-Bolt: Walk behind the ladder",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
@@ -1699,27 +1689,27 @@
         ],
         "sections": [
           {
-            "name": "Inside Clank Mega Bomb Chestplate",
+            "name": "Inside Clank: Gadgetron Vendor: Static Barrier - 65,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Static Barrier",
+            "name": "Inside Clank: Skill Point: Not the Shock of Me Now",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Not The Shock of Me Now (SP)",
+            "name": "Inside Clank: Skill Point: Ratchet... Just Ratchet",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Ratchet Just Ratchet (SP)",
+            "name": "Inside Clank: Escape from Clank",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Defeat all technomites",
+            "name": "Inside Clank: Defeat all Technomites",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }
@@ -1731,7 +1721,7 @@
     "name": "10",
     "children": [
       {
-        "name": "Quodrona Ratchet Clones and Dummies (TB)",
+        "name": "Quodrona: T-Bolt: Ratchet Clones and Dummies",
         "map_locations": [
           {
             "map": "Quodrona",
@@ -1741,7 +1731,7 @@
         ],
         "sections": [
           {
-            "name": "Quodrona Ratchet Clones and Dummies (TB)",
+            "name": "Quodrona: T-Bolt: Ratchet Clones and Dummies",
             "item_count": 1,
             "icon": "icons/Titanium_bolt.png"
           }
@@ -1758,67 +1748,67 @@
         ],
         "sections": [
           {
-            "name": "Defeat Otto Destruct",
+            "name": "Quodrona: Defeat Otto Destruct",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Laser Tracer",
+            "name": "Quodrona: Gadgetron Vendor: Laser Tracer - 85,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Agents of Doom Launcher Mod",
+            "name": "Quodrona: Slim Cognito: Agents of Doom Launcher Mod - 20,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Scorcher Spitfire Mod",
+            "name": "Quodrona: Slim Cognito: Scorcher Spitfire Mod - 15,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Sniper Mine Split Beam Mod",
+            "name": "Quodrona: Slim Cognito: Sniper Mine Split Beam Mod - 25,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Shock Rocket Lock On Mod",
+            "name": "Quodrona: Slim Cognito: Shock Rocket Lock On Mod - 5,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Purchase Shock Rocket After Shock Mod",
+            "name": "Quodrona: Slim Cognito: Shock Rocket After Shock Mod - 25,000",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Elite Annihilation (SP)",
+            "name": "Quodrona: Skill Point: Elite Annihilation",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Storm The Front (SP)",
+            "name": "Quodrona: Skill Point: Storm the Front",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Clone Wars",
+            "name": "Quodrona: Clone Wars (Fight the Ratchet Clones)",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Runnnn from Otto",
+            "name": "Quodrona: Runnnn from Otto",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Defeat mecha Otto",
+            "name": "Quodrona: Defeat Mecha Otto",
             "item_count": 1,
             "icon": "icons/Crate.png"
           },
           {
-            "name": "Find Otto Destruct",
+            "name": "Quodrona: Find Otto Destruct",
             "item_count": 1,
             "icon": "icons/Crate.png"
           }

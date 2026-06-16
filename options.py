@@ -1,7 +1,16 @@
 from dataclasses import dataclass
 
-from Options import (Choice, DeathLink, DefaultOnToggle, PerGameCommonOptions, Range, Toggle,
-                     Accessibility, ProgressionBalancing, OptionGroup)
+from Options import (
+    Accessibility,
+    Choice,
+    DeathLink,
+    DefaultOnToggle,
+    OptionGroup,
+    PerGameCommonOptions,
+    ProgressionBalancing,
+    Range,
+    Toggle,
+)
 
 
 class ProgressiveWeapons(Choice):
@@ -42,6 +51,18 @@ class SkyboardChallenges(Choice):
     option_all_challenges = 1
     default = 0
 
+
+
+class AllMissions(DefaultOnToggle):
+    """Include story mission completions as location checks.
+    Covers main narrative objectives on each planet."""
+    display_name = "All Missions"
+
+
+class AllCutscenes(Toggle):
+    """Include cutscene and flag events as location checks.
+    Covers encounter triggers and scripted events detected via flag bits."""
+    display_name = "All Cutscenes"
 
 
 class ArmourSetChecks(DefaultOnToggle):
@@ -87,6 +108,14 @@ class StartingBolts(Range):
     default = 45_000
 
 
+class TrapChance(Range):
+    """Percent chance for each filler item to be replaced with a trap instead of Bolts."""
+    display_name = "Trap Chance"
+    range_start = 0
+    range_end = 100
+    default = 0
+
+
 class StartingSkin(Choice):
     """Cosmetic skin for Ratchet. Applied automatically on each planet load.
     All skins are unlocked in-game regardless of this choice."""
@@ -107,6 +136,8 @@ class RACSizeMatterOptions(PerGameCommonOptions):
     progressive_armour: ProgressiveArmour
     death_link: DeathLink
     death_amnesty: DeathAmnesty
+    all_missions: AllMissions
+    all_cutscenes: AllCutscenes
     clank_challenges: ClankChallenges
     skyboard_challenges: SkyboardChallenges
     armour_set_checks: ArmourSetChecks
@@ -115,6 +146,7 @@ class RACSizeMatterOptions(PerGameCommonOptions):
     starting_gadgets: StartingGadgets
     starting_bolts: StartingBolts
     starting_skin: StartingSkin
+    trap_chance: TrapChance
 
 racsm_option_groups = [
     OptionGroup("Generic Options", [
@@ -129,8 +161,11 @@ racsm_option_groups = [
         StartingBolts,
         ProgressiveWeapons,
         ProgressiveArmour,
+        TrapChance,
     ]),
     OptionGroup("RACSM Location Options", [
+        AllMissions,
+        AllCutscenes,
         ClankChallenges,
         SkyboardChallenges,
         SkillPoints,

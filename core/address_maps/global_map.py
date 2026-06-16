@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 from ...interface_orchestrator.structs.address_map import AddressMap
-from ..structs.armour import ArmourSetCollectedStruct, ArmourStruct
-from ..structs.challenges import ClankChallengeStruct, SkyboardStruct
-from ..structs.game_status import ControllerStruct, GameStatusStruct
-from ..structs.planet_progress import PlanetProgressStruct
-from ..structs.missions import MissionsStruct
-from ..structs.quick_select import QuickSelectStruct
-from ..structs.skill_points import SkillPointsStruct
-from ..structs.titanium_bolts import TitaniumBoltStruct
+from ..structs.game import (
+    ControllerStruct,
+    GameStatusStruct,
+    MissionsStruct,
+    PlanetProgressStruct,
+    QuickSelectStruct,
+)
+from ..structs.pickups import (
+    ArmourSetCollectedStruct,
+    ArmourStruct,
+    ClankChallengeStruct,
+    SkillPointsStruct,
+    SkyboardStruct,
+    TitaniumBoltStruct,
+)
 
 
 def build_global_address_map() -> AddressMap:

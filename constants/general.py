@@ -31,3 +31,10 @@ class RACSMLOCATION:
     INSIDE_CLANK_ESCAPE = "Inside Clank: Escape from Clank"
     QUODRONA_FIND = "Quodrona: Find Otto Destruct"
     QUODRONA_GOAL = "Quodrona: Defeat Otto Destruct"
+
+    TRAP_FEVERDREAMTIME = "Trap: Feverdream"
+    TRAP_RESET_LEVEL = "Trap: Reset Level"
+    TRAP_BRIGHTNESS = "Trap: Whats Gamma?"
+    TRAP_MIRROR_LEVEL = "Trap: Mirror Level"
+    TRAP_REVERSE_CONTROLS = "Trap: Reverse Controls"
+    TRAP_WEAPON_SWITCHING = "Trap: Weapon Switching"

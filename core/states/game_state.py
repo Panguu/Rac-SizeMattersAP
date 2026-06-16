@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ...pypine.pypine.pine import Pine
-    from .vendor_session import VendorSession
+    from ..vendor import VendorSession
 
 
 class PollAddress:

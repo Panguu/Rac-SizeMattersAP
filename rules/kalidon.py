@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ._helpers import has_projectile_weapon
+from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.general import RACSMLOCATION
+from ..constants.skillpoints import RACSMSKILLPOINT
+from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
+from ..constants.tbolts import RACSMTBOLT
+from ..constants.vendors import RACSMVENDORLOCATION
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld
@@ -17,36 +22,38 @@ def set_kalidon_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points:
-        mw.get_location("Explosive Ordnance Disposal (SP)", player).access_rule = _inside
-        mw.get_location("Super Lombax (SP)",                player).access_rule = _inside
-        mw.get_location("Be A Cool Skyboarder (SP)",        player).access_rule = lambda _: True
+        mw.get_location(RACSMSKILLPOINT.KALIDON_EXPLOSIVE,    player).access_rule = _inside
+        mw.get_location(RACSMSKILLPOINT.KALIDON_SUPER_LOMBAX, player).access_rule = _inside
+        mw.get_location(RACSMSKILLPOINT.KALIDON_SKYBOARDER,   player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────
-    mw.get_location("Explore the planet",    player).access_rule = _inside
-    mw.get_location("Win the skyboard race", player).access_rule = lambda _: True
+    if world.options.all_cutscenes:
+        mw.get_location(RacSMCutsceneLocations.KALIDON_EXPLORE, player).access_rule = _inside
+    if world.options.all_missions:
+        mw.get_location(RacSMCutsceneLocations.KALIDON_WIN,     player).access_rule = lambda _: True
 
     # ── Titanium Bolts ────────────────────────────────────────────────────────
-    mw.get_location("Kalidon Behind The Ship (TB)",           player).access_rule = lambda _: True
-    mw.get_location("Kalidon Side of Mechanoid Factory (TB)", player).access_rule = \
+    mw.get_location(RACSMTBOLT.KALIDON_SHIP,    player).access_rule = lambda _: True
+    mw.get_location(RACSMTBOLT.KALIDON_FACTORY, player).access_rule = \
         lambda state: state.has("Hypershot", player)
-    mw.get_location("Kalidon Grav-Ramps (TB)",                player).access_rule = _inside
+    mw.get_location(RACSMTBOLT.KALIDON_RAMP,    player).access_rule = _inside
 
     # ── Armour ────────────────────────────────────────────────────────────────
-    mw.get_location("Kalidon Sludge Mk9 Chestplate", player).access_rule = _inside
-    mw.get_location("Kalidon Wildfire Boots",         player).access_rule = _inside
+    mw.get_location(RACSMLOCATION.KALIDON_CHESTPLATE, player).access_rule = _inside
+    mw.get_location(RACSMLOCATION.KALIDON_BOOTS,      player).access_rule = _inside
 
     # ── Skyboard Challenges (skyboard_challenges >= 1) ────────────────────────
     if world.options.skyboard_challenges.value >= 1:
-        mw.get_location("Kalidon Learner's Permit (SC)",  player).access_rule = lambda _: True
-        mw.get_location("Kalidon Master's Challenge (SC)", player).access_rule = lambda _: True
-        mw.get_location("Kalidon Speeding Ticket (SC)",   player).access_rule = lambda _: True
-        mw.get_location("Kalidon Tricky Air (SC)",        player).access_rule = lambda _: True
+        mw.get_location(RACSMSKY.KALIDON_LEARNER, player).access_rule = lambda _: True
+        mw.get_location(RACSMSKY.KALIDON_MASTER,  player).access_rule = lambda _: True
+        mw.get_location(RACSMSKY.KALIDON_TICKET,  player).access_rule = lambda _: True
+        mw.get_location(RACSMSKY.KALIDON_TRICKY,  player).access_rule = lambda _: True
 
     # ── Vendors ───────────────────────────────────────────────────────────────
-    mw.get_location("Purchase Scorcher", player).access_rule = lambda _: True
+    mw.get_location(RACSMVENDORLOCATION.KALIDON_SCORCHER, player).access_rule = lambda _: True
 
     # ── Weapon Mod Vendor ─────────────────────────────────────────────────────
-    mw.get_location("Purchase Lacerator Lock On Mod",           player).access_rule = \
-        lambda state: state.can_reach("Purchase Lacerator", "Location", player)
-    mw.get_location("Purchase Concussion Gun Split Barrel Mod", player).access_rule = \
-        lambda state: state.can_reach("Purchase Concussion Gun", "Location", player)
+    mw.get_location(RACSMVENDORLOCATION.KALIDON_LACERATOR_LOCK,   player).access_rule = \
+        lambda state: state.can_reach(RACSMVENDORLOCATION.POKITARU_LACERATOR, "Location", player)
+    mw.get_location(RACSMVENDORLOCATION.KALIDON_CONCUSSION_SPLIT, player).access_rule = \
+        lambda state: state.can_reach(RACSMVENDORLOCATION.POKITARU_CONCUSSION, "Location", player)

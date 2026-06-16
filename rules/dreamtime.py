@@ -2,6 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.general import RACSMLOCATION
+from ..constants.skillpoints import RACSMSKILLPOINT
+from ..constants.tbolts import RACSMTBOLT
+from ..constants.vendors import RACSMVENDORLOCATION
 from ._helpers import has_projectile_weapon
 
 if TYPE_CHECKING:
@@ -18,20 +23,21 @@ def set_dreamtime_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points:
-        mw.get_location("Friends Dont Hurt Friends (SP)", player).access_rule = _base
-        mw.get_location("Night Terrors (SP)",              player).access_rule = _base
+        mw.get_location(RACSMSKILLPOINT.DREAMTIME_FRIENDS,       player).access_rule = _base
+        mw.get_location(RACSMSKILLPOINT.DREAMTIME_NIGHT_TERRORS, player).access_rule = _base
 
     # ── Missions ──────────────────────────────────────────────────────────────
-    mw.get_location("??????????", player).access_rule = _base
+    if world.options.all_missions:
+        mw.get_location(RacSMCutsceneLocations.DREAMTIME_COMPLETE, player).access_rule = _base
 
     # ── Titanium Bolts ────────────────────────────────────────────────────────
-    mw.get_location("Dreamtime Atop the floating hat (TB)",            player).access_rule = _base
-    mw.get_location("Dreamtime To the left of Ratchets Garage (TB)",   player).access_rule = _base
-    mw.get_location("Dreamtime Apparition of the Scuttle Crab (TB)",   player).access_rule = \
+    mw.get_location(RACSMTBOLT.DREAMTIME_HAT,    player).access_rule = _base
+    mw.get_location(RACSMTBOLT.DREAMTIME_GARAGE, player).access_rule = _base
+    mw.get_location(RACSMTBOLT.DREAMTIME_CRAB,   player).access_rule = \
         lambda state: (_base(state) and has_projectile_weapon(state, player))
 
     # ── Armour ────────────────────────────────────────────────────────────────
-    mw.get_location("Dreamtime Crystallix Chestplate", player).access_rule = _base
+    mw.get_location(RACSMLOCATION.DREAMTIME_CHESTPLATE, player).access_rule = _base
 
     # ── Vendors ───────────────────────────────────────────────────────────────
-    mw.get_location("Purchase Suck Cannon", player).access_rule = _base
+    mw.get_location(RACSMVENDORLOCATION.DREAMTIME_SUCK, player).access_rule = _base

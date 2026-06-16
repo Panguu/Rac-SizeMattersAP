@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from collections import defaultdict
 from typing import Callable
 
 from .base import MemoryInterface
+
+logger = logging.getLogger("Client")
 
 
 class MemoryWriter:
@@ -34,7 +37,14 @@ class MemoryWriter:
 
     def notify_change(self, address: int, new_value: bytes) -> None:
         for handler in list(self._handlers.get(address, [])):
-            handler(address, new_value)
+            try:
+                handler(address, new_value)
+            except Exception:
+                # A single handler failing must not kill the poller thread —
+                # that would silently stop ALL memory-change detection (planet
+                # transitions, skill points, missions, etc.) for the rest of
+                # the session.
+                logger.exception(f"[RAC] Struct-change handler failed for address {address:#010x}")
 
     def swap_interface(self, interface: MemoryInterface) -> None:
         self._interface.disconnect()

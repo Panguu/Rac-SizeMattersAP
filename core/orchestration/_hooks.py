@@ -4,16 +4,17 @@ import asyncio
 
 from CommonClient import logger
 
-from ..data.armour import ArmourPiece
-from ..data.locations.armour_pickups import ARMOUR_FLAG_TO_LOCATION
-from ..states.planets import PlanetState
-from ..states.player import PlayerMovementState
-from ..states.titanium_bolts import BOLT_BY_PLANET_AND_DELTA
-from ..states.weapon import (
+from ...constants.cutscenes import RacSMCutsceneLocations
+from ...constants.general import RACSMLOCATION
+from ...locations import (
     GADGET_INTERNAL_TO_LOCATION,
     MOD_INTERNAL_TO_LOCATION,
     WEAPON_INTERNAL_TO_LOCATION,
 )
+from ..armour import ARMOUR_FLAG_TO_LOCATION, ArmourPiece
+from ..planets import PlanetState
+from ..player import PlayerMovementState
+from ..titanium_bolts import BOLT_BY_PLANET_AND_DELTA
 
 
 class HooksMixin:
@@ -28,6 +29,7 @@ class HooksMixin:
         self._wire_mission_hooks()
         self._wire_menu_hooks()
         self._wire_planet_hooks()
+        self._wire_bonus_weapon_hooks()
 
     # ── Player ───────────────────────────────────────────────────────────────
 
@@ -123,9 +125,9 @@ class HooksMixin:
     # Missions that coincide with a gadget pickup: fire both the gadget
     # location and the mission location when complete.
     _MISSION_GADGET_LOCATION: dict[str, str] = {
-        "Buzzing Cameras":     "Ryllus Sprout-O-Matic",
-        "Win the skyboard race": "Kalidon Shrink Ray",
-        "Survive Robot War III": "Metalis Electroshock Gloves",
+        RacSMCutsceneLocations.RYLLUS_BUZZING: RACSMLOCATION.RYLLUS_SPROUT,
+        RacSMCutsceneLocations.KALIDON_WIN:    RACSMLOCATION.KALIDON_SHRINK,
+        RacSMCutsceneLocations.METALIS_WAR:    RACSMLOCATION.METALIS_GLOVES,
     }
 
     def _wire_mission_hooks(self) -> None:
@@ -135,7 +137,7 @@ class HooksMixin:
             gadget_loc = self._MISSION_GADGET_LOCATION.get(name)
             if gadget_loc:
                 self._send_location(gadget_loc)
-            if name == "Defeat Otto Destruct":
+            if name == RacSMCutsceneLocations.QUODRONA_GOAL:
                 self._on_goal()
 
         self.missions.set_mission_complete_callback(on_mission_complete)
@@ -143,7 +145,7 @@ class HooksMixin:
     # ── Menus ─────────────────────────────────────────────────────────────────
 
     def _wire_menu_hooks(self) -> None:
-        self.vendor.on_menu_open   = lambda: self.quick_select.freeze()
+        self.vendor.on_menu_open   = lambda: (self.quick_select.freeze(), self._on_vendor_open())
         self.vendor.on_menu_close  = lambda: (self.quick_select.unfreeze(), self._on_vendor_close())
         self.menu.set_pause_close_callback(lambda: self._on_pause_close())
         self.menu.on_travel_menu_close = lambda: self._on_travel_menu_close()
@@ -185,3 +187,19 @@ class HooksMixin:
                         self._send_location(loc)
                 return on_mod_purchased
             ps.on_vendor_mod_purchased = make_mod_hook(planet_id)
+
+    # ── Bonus weapon pickup (Pokitaru starter weapons) ───────────────────────
+
+    _BONUS_TRIGGER_WEAPONS: frozenset[str] = frozenset({
+        "lacerator", "acid_bomb_glove", "concussion_gun",
+    })
+
+    def _wire_bonus_weapon_hooks(self) -> None:
+        prev_on_weapon_acquired = self.weapons.on_weapon_acquired
+
+        def on_weapon_acquired(name: str) -> None:
+            prev_on_weapon_acquired(name)
+            if name in self._BONUS_TRIGGER_WEAPONS:
+                self._on_bonus_weapon_pickup(name)
+
+        self.weapons.on_weapon_acquired = on_weapon_acquired

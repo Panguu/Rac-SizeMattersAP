@@ -2,8 +2,10 @@ from typing import NamedTuple
 
 from BaseClasses import ItemClassification
 
+from .constants.items import RACSMITEM
 from .core.data import WEAPON_MAX_LEVELS, WEAPON_MOD_COUNTS
 from .core.data.infobots import INFOBOT_ITEM_TO_PLANET
+from .core.traps import TRAP_DURATIONS
 
 BASE_ID = 77_700_000
 
@@ -14,72 +16,72 @@ class RACItemData(NamedTuple):
 
 
 WEAPON_DISPLAY_TO_INTERNAL: dict[str, str] = {
-    "Lacerator":       "lacerator",
-    "Concussion Gun":  "concussion_gun",
-    "Acid Bomb Glove": "acid_bomb_glove",
-    "Agents of Doom":  "agents_of_doom",
-    "Bee Mine Glove":  "bee_mine_glove",
-    "Static Barrier":  "static_barrier",
-    "Shock Rocket":    "shock_rocket",
-    "Sniper Mine":     "sniper_mine",
-    "Scorcher":        "scorcher",
-    "Laser Tracer":    "laser_tracer",
-    "Suck Cannon":     "suck_cannon",
-    "Mootator":        "mootator",
-    "RYNO":            "ryno",
+    RACSMITEM.LACERATOR:       "lacerator",
+    RACSMITEM.CONCUSSION_GUN:  "concussion_gun",
+    RACSMITEM.ACID_BOMB_GLOVE: "acid_bomb_glove",
+    RACSMITEM.AGENTS_OF_DOOM:  "agents_of_doom",
+    RACSMITEM.BEE_MINE_GLOVE:  "bee_mine_glove",
+    RACSMITEM.STATIC_BARRIER:  "static_barrier",
+    RACSMITEM.SHOCK_ROCKET:    "shock_rocket",
+    RACSMITEM.SNIPER_MINE:     "sniper_mine",
+    RACSMITEM.SCORCHER:        "scorcher",
+    RACSMITEM.LASER_TRACER:    "laser_tracer",
+    RACSMITEM.SUCK_CANNON:     "suck_cannon",
+    RACSMITEM.MOOTATOR:        "mootator",
+    RACSMITEM.RYNO:            "ryno",
 }
 
 GADGET_DISPLAY_TO_INTERNAL: dict[str, str] = {
-    "Hypershot":      "hypershot",
-    "Sprout-O-Matic": "sprout_o_matic",
-    "Polarizer":      "polarizer",
-    "PDA":            "pda",
-    "Shrink Ray":     "shrink_ray",
-    "Bolt Grabber":   "bolt_grabber",
-    "Map-O-Matic":    "map_o_matic",
-    "Box Breaker":    "box_breaker",
+    RACSMITEM.HYPERSHOT:      "hypershot",
+    RACSMITEM.SPROUT_O_MATIC: "sprout_o_matic",
+    RACSMITEM.POLARIZER:      "polarizer",
+    RACSMITEM.PDA:            "pda",
+    RACSMITEM.SHRINK_RAY:     "shrink_ray",
+    RACSMITEM.BOLT_GRABBER:   "bolt_grabber",
+    RACSMITEM.MAP_O_MATIC:    "map_o_matic",
+    RACSMITEM.BOX_BREAKER:    "box_breaker",
 }
 
 ARMOUR_DISPLAY_TO_INTERNAL: dict[str, tuple[str, int]] = {
-    "Wildfire Chestplate":      ("wildfire",     0x01),
-    "Wildfire Helmet":          ("wildfire",     0x02),
-    "Wildfire Gloves":          ("wildfire",     0x04),
-    "Wildfire Boots":           ("wildfire",     0x10),
-    "Sludge Mk9 Chestplate":    ("sludge",       0x01),
-    "Sludge Mk9 Helmet":        ("sludge",       0x02),
-    "Sludge Mk9 Gloves":        ("sludge",       0x04),
-    "Sludge Mk9 Boots":         ("sludge",       0x10),
-    "Crystallix Chestplate":    ("crystallix",   0x01),
-    "Crystallix Helmet":        ("crystallix",   0x02),
-    "Crystallix Gloves":        ("crystallix",   0x04),
-    "Crystallix Boots":         ("crystallix",   0x10),
-    "Electroshock Chestplate":  ("electroshock", 0x01),
-    "Electroshock Helmet":      ("electroshock", 0x02),
-    "Electroshock Gloves":      ("electroshock", 0x04),
-    "Electroshock Boots":       ("electroshock", 0x10),
-    "Mega Bomb Chestplate":     ("mega_bomb",    0x01),
-    "Mega Bomb Helmet":         ("mega_bomb",    0x02),
-    "Mega Bomb Gloves":         ("mega_bomb",    0x04),
-    "Mega Bomb Boots":          ("mega_bomb",    0x10),
-    "Hyperborean Chestplate":   ("hyperborean",  0x01),
-    "Hyperborean Helmet":       ("hyperborean",  0x02),
-    "Hyperborean Gloves":       ("hyperborean",  0x04),
-    "Hyperborean Boots":        ("hyperborean",  0x10),
-    "Chameleon Chestplate":     ("chameleon",    0x01),
-    "Chameleon Helmet":         ("chameleon",    0x02),
-    "Chameleon Gloves":         ("chameleon",    0x04),
-    "Chameleon Boots":          ("chameleon",    0x10),
+    RACSMITEM.WILDFIRE_CHESTPLATE:     ("wildfire",     0x01),
+    RACSMITEM.WILDFIRE_HELMET:         ("wildfire",     0x02),
+    RACSMITEM.WILDFIRE_GLOVES:         ("wildfire",     0x04),
+    RACSMITEM.WILDFIFE_BOOTS:          ("wildfire",     0x10),
+    RACSMITEM.SLUDGE_MK9_CHESTPLATE:   ("sludge",       0x01),
+    RACSMITEM.SLUDGE_MK9_HELMET:       ("sludge",       0x02),
+    RACSMITEM.SLUDGE_MK9_GLOVES:       ("sludge",       0x04),
+    RACSMITEM.SLUDGE_MK9_BOOTS:        ("sludge",       0x10),
+    RACSMITEM.CRYSTALLIX_CHESTPLATE:   ("crystallix",   0x01),
+    RACSMITEM.CRYSTALLIX_HELMET:       ("crystallix",   0x02),
+    RACSMITEM.CRYSTALLIX_GLOVES:       ("crystallix",   0x04),
+    RACSMITEM.CRYSTALLIX_BOOTS:        ("crystallix",   0x10),
+    RACSMITEM.ELECTROSHOCK_CHESTPLATE: ("electroshock", 0x01),
+    RACSMITEM.ELECTROSHOCK_HELMET:     ("electroshock", 0x02),
+    RACSMITEM.ELECTROSHOCK_GLOVES:     ("electroshock", 0x04),
+    RACSMITEM.ELECTROSHOCK_BOOTS:      ("electroshock", 0x10),
+    RACSMITEM.MEGA_BOMB_CHESTPLATE:    ("mega_bomb",    0x01),
+    RACSMITEM.MEGA_BOMB_HELMET:        ("mega_bomb",    0x02),
+    RACSMITEM.MEGA_BOMB_GLOVES:        ("mega_bomb",    0x04),
+    RACSMITEM.MEGA_BOMB_BOOTS:         ("mega_bomb",    0x10),
+    RACSMITEM.HYPERBOREAN_CHESTPLATE:  ("hyperborean",  0x01),
+    RACSMITEM.HYPERBOREAN_HELMET:      ("hyperborean",  0x02),
+    RACSMITEM.HYPERBOREAN_GLOVES:      ("hyperborean",  0x04),
+    RACSMITEM.HYPERBOREAN_BOOTS:       ("hyperborean",  0x10),
+    RACSMITEM.CHAMELEON_CHESTPLATE:    ("chameleon",    0x01),
+    RACSMITEM.CHAMELEON_HELMET:        ("chameleon",    0x02),
+    RACSMITEM.CHAMELEON_GLOVES:        ("chameleon",    0x04),
+    RACSMITEM.CHAMELEON_BOOTS:         ("chameleon",    0x10),
 }
 
 _PROGRESSION_WEAPONS: frozenset[str] = frozenset({
-    "Lacerator",
-    "Concussion Gun",
-    "Shock Rocket",
-    "Sniper Mine",
-    "Laser Tracer",
-    "Scorcher",
-    "RYNO",
-    "Mootator",
+    RACSMITEM.LACERATOR,
+    RACSMITEM.CONCUSSION_GUN,
+    RACSMITEM.SHOCK_ROCKET,
+    RACSMITEM.SNIPER_MINE,
+    RACSMITEM.LASER_TRACER,
+    RACSMITEM.SCORCHER,
+    RACSMITEM.RYNO,
+    RACSMITEM.MOOTATOR,
 })
 
 WEAPON_ITEM_TABLE: dict[str, RACItemData] = {
@@ -117,7 +119,9 @@ WEAPON_PROGRESSIVE_ITEM_TABLE: dict[str, RACItemData] = {
 }
 
 
-_PROGRESSION_GADGETS: frozenset[str] = frozenset({"Hypershot", "Sprout-O-Matic", "Shrink Ray", "Polarizer"})
+_PROGRESSION_GADGETS: frozenset[str] = frozenset({
+    RACSMITEM.HYPERSHOT, RACSMITEM.SPROUT_O_MATIC, RACSMITEM.SHRINK_RAY, RACSMITEM.POLARIZER,
+})
 
 GADGET_ITEM_TABLE: dict[str, RACItemData] = {
     name: RACItemData(
@@ -153,12 +157,17 @@ ARMOUR_PROGRESSIVE_ITEM_TABLE: dict[str, RACItemData] = {
 }
 
 FILLER_ITEM_TABLE: dict[str, RACItemData] = {
-    "Bolts": RACItemData(BASE_ID + 400, ItemClassification.filler),
+    RACSMITEM.BOLTS: RACItemData(BASE_ID + 400, ItemClassification.filler),
 }
 
 INFOBOT_ITEM_TABLE: dict[str, RACItemData] = {
     name: RACItemData(BASE_ID + 500 + idx, ItemClassification.progression)
     for idx, name in enumerate(INFOBOT_ITEM_TO_PLANET, start=1)
+}
+
+TRAP_ITEM_TABLE: dict[str, RACItemData] = {
+    name: RACItemData(BASE_ID + 600 + idx, ItemClassification.trap)
+    for idx, name in enumerate(TRAP_DURATIONS, start=1)
 }
 
 ALL_ITEMS: dict[str, RACItemData] = {
@@ -169,6 +178,7 @@ ALL_ITEMS: dict[str, RACItemData] = {
     **ARMOUR_PROGRESSIVE_ITEM_TABLE,
     **INFOBOT_ITEM_TABLE,
     **FILLER_ITEM_TABLE,
+    **TRAP_ITEM_TABLE,
 }
 
 ITEM_ID_TO_NAME: dict[int, str] = {data.code: name for name, data in ALL_ITEMS.items()}

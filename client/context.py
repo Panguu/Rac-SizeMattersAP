@@ -5,189 +5,34 @@ from typing import Any
 
 tracker_loaded: bool = False
 try:
-    from worlds.tracker.TrackerClient import (
-        TrackerCommandProcessor as ClientCommandProcessor,
-    )
     from worlds.tracker.TrackerClient import TrackerGameContext as CommonContext
     tracker_loaded = True
 except ImportError:
-    from CommonClient import ClientCommandProcessor, CommonContext
+    from CommonClient import CommonContext
 from CommonClient import logger
 
-from ..core.data import PLANET_STATE_ADDRESSES, SKILL_POINT_ADDRESS
-from ..core.data.controller import ButtonState
-from ..core.game_orchestrator import GameOrchestrator as GameWiring
-from ..core.states.game_state import GameState
-from ..core.memory import (
+from ..core import (
     ARMOUR_ADDRESSES,
     BOLTS,
+    PLANET_STATE_ADDRESSES,
     PLAYER_ARMOUR_SLOTS,
+    SKILL_POINT_ADDRESS,
     Int64State,
     MemoryItemState,
+    TextColour,
+    colored_text,
 )
-from ..core.states.vendor_session import VendorPoller, VendorSession
+from ..core.game_orchestrator import GameOrchestrator as GameWiring
+from ..core.states.game_state import GameState
+from ..core.vendor import VendorPoller, VendorSession
 from ..locations import ALL_LOCATIONS
 from ..pypine.pypine.pine import Pine
+from .command_processor import RACCommandProcessor
 from .constants import GAME_NAME
-from .cutscene_handler import CutsceneHandlerMixin
 from .deathlink import DeathLinkMixin
-from .events_handler import EventsHandlerMixin
-from .inventory import InventoryMixin
+from .handlers import CutsceneHandlerMixin, EventsHandlerMixin
 from .pine_mixin import PineMixin
-from .vendor_handler import VendorHandlerMixin
-
-
-class RACCommandProcessor(ClientCommandProcessor):
-    ctx: RACContext
-
-    def _cmd_reconnect(self) -> bool:
-        """Reconnect to PCSX2 and re-apply received Archipelago items."""
-        asyncio.create_task(self.ctx.reconnect_pine())
-        return True
-
-    def _cmd_disconnect_game(self) -> bool:
-        """Disconnect from PCSX2 without closing the client."""
-        asyncio.create_task(self.ctx.disconnect_pine())
-        return True
-
-    def _cmd_scan(self) -> bool:
-        """Force a fresh weapon array scan."""
-        asyncio.create_task(self.ctx.rescan_weapons())
-        return True
-
-    def _cmd_button_debug(self) -> bool:
-        """Read and log the current controller button state."""
-        ctx = self.ctx
-        if not ctx.pine_connected:
-            logger.info("[RAC] Not connected to PPSSPP.")
-            return False
-        btn = ButtonState.read(ctx.pine)
-        logger.info(f"[RAC] Pause/Select buttons : {btn.pause_sel!r}  (raw {int(btn.pause_sel):#04x})")
-        logger.info(f"[RAC] Controller buttons   : {btn.buttons!r}  (raw {int(btn.buttons):#04x})")
-        return True
-
-    def _cmd_debug(self) -> bool:
-        """Toggle verbose debug logging for R&C: Size Matters."""
-        self.ctx._debug_messages = not self.ctx._debug_messages
-        state = "enabled" if self.ctx._debug_messages else "disabled"
-        logger.info(f"[RAC] Debug messages {state}.")
-        return True
-
-    def _cmd_vendor(self) -> bool:
-        """Log current vendor unlock state (owned weapons + planet-unlocked purchasables)."""
-        if not self.ctx.pine_connected:
-            logger.info("[RAC] Not connected to PCSX2.")
-            return False
-        for line in self.ctx._wiring.vendor_unlock.debug_lines():
-            logger.info(line)
-        return True
-
-    def _cmd_mission_change(self) -> bool:
-        """Show the 2-byte mission progress at each planet's address.
-        Run before and after completing a mission to observe value changes."""
-        import struct as _struct
-        from ..core.data.addresses import PLANET_MISSION_ADDRESSES
-
-        ctx = self.ctx
-        if not ctx.pine_connected:
-            logger.info("[RAC] Not connected to PCSX2.")
-            return False
-
-        acc      = ctx._wiring._orchestrator.accessor
-        snapshot: dict[str, int] = getattr(self, "_mission_snapshot", {})
-
-        logger.info("[RAC] ── Mission state (2-byte per planet) ───────────────────")
-        for planet, addr in PLANET_MISSION_ADDRESSES.items():
-            raw = acc.read_raw(addr, 2)
-            if not raw or len(raw) < 2:
-                logger.info(f"[RAC]   {planet:<16}  {addr:#010x}  <read error>")
-                continue
-            value = _struct.unpack_from("<H", raw)[0]
-            prev  = snapshot.get(planet)
-            if prev is not None and value != prev:
-                delta = f"  =>  {prev:#06x} -> {value:#06x}  (XOR {value ^ prev:#06x})"
-            else:
-                delta = ""
-            logger.info(f"[RAC]   {planet:<16}  {addr:#010x}  {value:#06x}{delta}")
-            snapshot[planet] = value
-
-        self._mission_snapshot = snapshot
-        logger.info("[RAC] ─────────────────────────────────────────────────────────")
-        return True
-
-    def _cmd_state(self) -> bool:
-        """Log all current client states."""
-        ctx = self.ctx
-        gs  = ctx._gs
-        vs  = gs.vendor_session
-
-        logger.info(f"[RAC] Planet         : {ctx.current_planet}")
-        logger.info(f"[RAC] PINE connected : {ctx.pine_connected}")
-        logger.info(f"[RAC] Game flags     : dead={gs.is_dead}  picking_up={gs.is_picking_up}"
-                    f"  in_menu={gs.is_in_menu}  preloaded={gs.is_preloaded}")
-        logger.info(f"[RAC] Planet state   : {ctx._planet_state!r}")
-        logger.info(f"[RAC] Armour pickup  : {ctx._armour_pickup_state!r}")
-        logger.info(f"[RAC] Player armour  : {ctx._player_armour_state!r}")
-        logger.info(f"[RAC] Armour slots   : {ctx._armour_slot_state!r}")
-        logger.info(f"[RAC] Player weapons : {ctx._player_weapon_state!r}")
-        logger.info(f"[RAC] Player gadgets : {ctx._player_gadget_state!r}")
-        if gs.tracked_vendor is not None:
-            logger.info(f"[RAC] Vendor session : planet={gs.tracked_vendor}")
-            logger.info(f"[RAC]   weapon state : {vs.weapon_state!r}")
-            logger.info(f"[RAC]   gadget state : {vs.gadget_state!r}")
-            logger.info(f"[RAC]   pending      : weapons={vs.purchased_weapons}  gadgets={vs.purchased_gadgets}"
-                        f"  mods={vs.purchased_mods}")
-        else:
-            logger.info("[RAC] Vendor session : inactive")
-        logger.info(f"[RAC] Tracked armour : {gs.tracked_armour!r}")
-        logger.info(f"[RAC] Titanium bolts : {ctx._titanium_bolt_state!r}")
-        logger.info(f"[RAC] Skill points   : {ctx._skill_point_state!r}")
-        logger.info(f"[RAC] Pending pickup locs : {ctx._pending_armour_pickup_locs or 'none'}")
-        return True
-
-    def _cmd_skill_points(self) -> bool:
-        """Show current skill point bitmask and earned status for each SP.
-        Run again after earning a skill point to see what changed."""
-        import struct as _struct
-        from ..core.states.skill_points import SKILL_POINTS, SKILL_POINT_ADDRESS
-
-        ctx = self.ctx
-        sp  = ctx._wiring.skill_points
-
-        if not ctx.pine_connected:
-            logger.info("[RAC] Not connected to PPSSPP.")
-            return False
-
-        # Fresh read directly from memory — bypasses cached _bits.
-        raw = ctx._wiring._orchestrator.accessor.read_raw(SKILL_POINT_ADDRESS, 8)
-        if not raw or len(raw) < 8:
-            logger.info(f"[RAC] Could not read skill point memory at {SKILL_POINT_ADDRESS:#010x}.")
-            return False
-        live = _struct.unpack_from("<Q", raw)[0]
-
-        prev: int | None = getattr(self, "_sp_snapshot", None)
-        self._sp_snapshot = live
-        changed = live ^ prev if prev is not None else 0
-
-        logger.info(
-            f"[RAC] ── Skill Points  addr={SKILL_POINT_ADDRESS:#010x}"
-            f"  raw={live:#018x}"
-            f"  cached={sp._bits:#018x}"
-            f"  planet_loaded={sp._planet_loaded}"
-            f"  enabled={sp._enabled} ──"
-        )
-        if prev is not None:
-            logger.info(f"[RAC]   prev={prev:#018x}  delta={changed:#018x}  ({bin(changed).count('1')} changed)")
-
-        for name, info in SKILL_POINTS.items():
-            earned  = bool(live & info.mask)
-            marker  = "✓" if earned else " "
-            chg     = "  <-- changed" if (changed & info.mask) else ""
-            logger.info(f"[RAC]  [{marker}] bit {info.bit:2d}  mask={info.mask:#018x}  {name}{chg}")
-
-        total = bin(live).count("1")
-        logger.info(f"[RAC] ── {total}/{len(SKILL_POINTS)} earned ─────────────────────────────────────────")
-        return True
+from .vendor import InventoryMixin, VendorHandlerMixin
 
 
 class RACContext(
@@ -258,11 +103,14 @@ class RACContext(
         )
         self._pending_armour_pickup_locs: list[str] = []
         self._processed_item_count = 0
+        self._processed_trap_count = 0
         self._starting_bolts_granted = False
         self._death_count = 0
         self._weapon_array_base: int | None = None
         self._pending_item_apply = True
         self._pending_vendor_checks: list[str] = []
+        self._already_hinted: set[int] = set()
+        self._notification_item_index: int = 0
         self._armour_set_checks_enabled = False
         self._gs = GameState(
             ipc=self.pine,
@@ -305,6 +153,7 @@ class RACContext(
 
         if cmd == "Connected":
             self.slot_data = args.get("slot_data", {})
+            self._already_hinted.clear()
             self._death_link_enabled = bool(self.slot_data.get("death_link", False))
             self._armour_set_checks_enabled = bool(self.slot_data.get("armour_set_checks", False))
             self._wiring.clank.set_mode(int(self.slot_data.get("clank_challenges", 1)))
@@ -325,15 +174,28 @@ class RACContext(
                 death_amnesty      = lambda: int(self.slot_data.get("death_amnesty", 1)),
                 death_link_enabled = lambda: self._death_link_enabled,
                 on_goal            = lambda: asyncio.create_task(self._send_goal_status()),
+                on_vendor_open     = lambda: asyncio.create_task(self._send_vendor_hints()),
                 on_vendor_close    = self._on_menu_close_for_armour_sets,
+                on_bonus_weapon_pickup = self._grant_random_bonus_item,
             )
             checked = self._checked_location_names()
             asyncio.create_task(self._wiring.on_ap_connected(self.slot_data, checked))
             self._pending_item_apply = True
             asyncio.create_task(self._apply_received_items())
+            self._write_notification_text(colored_text(
+                "Connected to ", TextColour.YELLOW, "Archipelago", TextColour.WHITE,
+            ))
             return
 
         if cmd == "ReceivedItems":
+            if args.get("index", 0) == 0:
+                # Full resync (initial connect or reconnect). The base handler
+                # just rebuilt items_received from scratch with the player's
+                # entire history — none of these are newly received this
+                # session, so baseline the one-shot-effect counters past them
+                # to avoid replaying old notifications/traps that already fired.
+                self._notification_item_index = len(self.items_received)
+                self._processed_trap_count = len(self.items_received)
             checked = self._checked_location_names()
             asyncio.create_task(self._wiring.on_ap_received_items(checked))
             self._pending_item_apply = True
@@ -344,6 +206,12 @@ class RACContext(
             data = args.get("data", {})
             if data.get("source") != self.auth:
                 asyncio.create_task(self._receive_death_link(data))
+
+    def on_connection_closed(self) -> None:
+        super().on_connection_closed()
+        self._write_notification_text(colored_text(
+            "Disconnected from ", TextColour.YELLOW, "Archipelago", TextColour.WHITE,
+        ))
 
     def make_gui(self):
         ui = super().make_gui()

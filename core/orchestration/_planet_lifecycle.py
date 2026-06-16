@@ -1,16 +1,26 @@
 from __future__ import annotations
 
 import asyncio
+import struct
 import time
 
+from ..address_maps import CURRENT_PLANET_ADDRESS, PLANET_MISSION_ADDRESSES
 from ..address_maps.planet_map import build_combined_address_map
-from ..data.addresses import CURRENT_PLANET_ADDRESS
-from ..data.cutscenes import POKITARU_RYLLUS_ALT_TRIGGER
-from ..memory import load_weapons_for_planet
-from ..data.planets import Planets
-from ._constants import PLANET_NAMES, POLL_INTERVAL
+from ..cutscenes import POKITARU_RYLLUS_ALT_TRIGGER
+from ..game_orchestrator import PLANET_NAMES, POLL_INTERVAL
+from ..memory import GADGETS, load_weapons_for_planet
+from ..planets import Planets
 
 _TRANSITION_SETTLE_S = 1.0
+
+_OUTPOST_OMEGA_1_ID = 0x06
+
+# Giant Clank on Metalis is unreachable/disabled (no AP location for it — see
+# locations.py). Tracked via a bit on the Challax mission address (the game
+# shares that progress word between the two Giant Clank sequences); forcing it
+# set on every Metalis entry stops the game from triggering the sequence.
+_GIANT_CLANK_ADDR = PLANET_MISSION_ADDRESSES["Challax"]
+_GIANT_CLANK_MASK = 0x0010
 
 
 class PlanetLifecycleMixin:
@@ -54,13 +64,42 @@ class PlanetLifecycleMixin:
         self.skin.apply(self._orchestrator.accessor)
         load_weapons_for_planet(planet_id)
         self._on_initial_planet_load(planet_id)
-        if self._initial_load_done:
+        if planet_id == Planets.METALIS.planet_id:
+            self._suppress_giant_clank()
+        if planet_id == _OUTPOST_OMEGA_1_ID:
+            self._force_shrink_ray()
+        elif self._initial_load_done:
             self._reapply_inv()
         self.armour.apply_world_armour()
         self.armour.restore_equipped_slots()
         if self._swap_task:
             self._swap_task.cancel()
         self._swap_task = asyncio.create_task(self._swap_to_planet(planet_id))
+
+    def _suppress_giant_clank(self) -> None:
+        """Force the Giant Clank trigger bit set so the game treats it as
+        already done and never starts the (unreachable) sequence."""
+        try:
+            raw = self._orchestrator.accessor.read_raw(_GIANT_CLANK_ADDR, 2)
+            if not raw or len(raw) < 2:
+                return
+            value = struct.unpack_from("<H", raw)[0]
+            if not value & _GIANT_CLANK_MASK:
+                self._orchestrator.accessor.write_raw(
+                    _GIANT_CLANK_ADDR, struct.pack("<H", value | _GIANT_CLANK_MASK)
+                )
+        except Exception as exc:
+            self._log(f"[RAC] _suppress_giant_clank failed: {exc}")
+
+    def _force_shrink_ray(self) -> None:
+        """Force-unlock the Shrinkray on Outpost Omega 1 without reapplying
+        the rest of the AP weapon/gadget inventory."""
+        try:
+            shrink_ray = GADGETS.get("shrink_ray")
+            if shrink_ray is not None:
+                self._orchestrator.accessor.write_raw(shrink_ray.unlocked, bytes([0x01]))
+        except Exception as exc:
+            self._log(f"[RAC] _force_shrink_ray failed: {exc}")
 
     def _on_planet_exit(self, planet_id: int) -> None:
         if self._active_planet_id == planet_id:

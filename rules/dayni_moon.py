@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ._helpers import has_projectile_weapon, infobot
+from ..constants.clank_challenges import RACSMTCLANK as RACSMCLANK
+from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.general import RACSMLOCATION
+from ..constants.skillpoints import RACSMSKILLPOINT
+from ..constants.tbolts import RACSMTBOLT
+from ..constants.vendors import RACSMVENDORLOCATION
+from ._helpers import has_projectile_weapon
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld
@@ -12,50 +18,52 @@ def set_dayni_moon_rules(world: RACSizeMatterWorld) -> None:
     player = world.player
     mw = world.multiworld
 
-    _base      = lambda state: (state.has("Sprout-O-Matic", player)
-                                and has_projectile_weapon(state, player))
+    _base       = lambda state: (state.has("Sprout-O-Matic", player)
+                                 and has_projectile_weapon(state, player))
     _shrink_ray = lambda state: (_base(state) and state.has("Shrink Ray", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points:
-        mw.get_location("Ultimate Gladiator Dayni Moon (SP)", player).access_rule = lambda _: True
-        mw.get_location("Wool Protest (SP)",                  player).access_rule = _base
-        mw.get_location("Bouncy Bouncy Bouncy (SP)",          player).access_rule = _base
+        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_GLADIATOR,    player).access_rule = lambda _: True
+        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_WOOL_PROTEST, player).access_rule = _base
+        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_BOUNCY,       player).access_rule = _base
 
     # ── Missions ──────────────────────────────────────────────────────────────
-    mw.get_location("Catch Luna",        player).access_rule = _shrink_ray
-    mw.get_location("Luna fight pt 1",   player).access_rule = _shrink_ray
-    mw.get_location("Luna fight pt 2",   player).access_rule = _shrink_ray
-    mw.get_location("'Disable' Luna",    player).access_rule = _shrink_ray
-    mw.get_location("Escape from clank", player).access_rule = _shrink_ray
+    if world.options.all_missions:
+        mw.get_location(RacSMCutsceneLocations.DAYNI_MOON,      player).access_rule = _shrink_ray
+        mw.get_location(RacSMCutsceneLocations.DAYNI_MOON_LUNA, player).access_rule = _shrink_ray
+    if world.options.all_cutscenes:
+        mw.get_location(RacSMCutsceneLocations.DAYNI_MOON_FIGHT1, player).access_rule = _shrink_ray
+        mw.get_location(RacSMCutsceneLocations.DAYNI_MOON_FIGHT2, player).access_rule = _shrink_ray
 
     # ── Titanium Bolts ────────────────────────────────────────────────────────
-    mw.get_location("Dayni Moon Planting at the Barnyard (TB)", player).access_rule = _base
-    mw.get_location("Dayni Moon Bounce on the Blue mimic (TB)", player).access_rule = _shrink_ray
+    mw.get_location(RACSMTBOLT.DAYNI_MOON_BARN,  player).access_rule = _base
+    mw.get_location(RACSMTBOLT.DAYNI_MOON_MIMIC, player).access_rule = _shrink_ray
 
     # ── Armour ────────────────────────────────────────────────────────────────
-    mw.get_location("Dayni Moon Mega Bomb Helmet", player).access_rule = _base
+    mw.get_location(RACSMLOCATION.DAYNI_MOON_HELMET, player).access_rule = _base
 
     # ── Clank Challenges — item rewards (clank_challenges >= 1) ───────────────
     if world.options.clank_challenges.value >= 1:
-        mw.get_location("Dayni Moon The Ultimate Showdown - Mega Bomb Gloves (CC)", player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Infinite Improbability - Mega Bomb Boots (CC)", player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_SHOWDOWN,  player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_INFINITE,  player).access_rule = lambda _: True
 
     # ── Clank Challenges — individual completions (clank_challenges >= 2) ─────
     if world.options.clank_challenges.value >= 2:
-        mw.get_location("Dayni Moon Two's A Crowd (CC)",        player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Reverse Into Victory (CC)", player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Emergency Bridge (CC)",     player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Leap Of Faith (CC)",        player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Welcome to Dayni (CC)",     player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Round Up! (CC)",            player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Variety Is Shocking (CC)",  player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Tom Sawyer (CC)",           player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Smasherbot Returns! (CC)",  player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon Tri-bomb Tournament (CC)",  player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon A-rooouund the Bend (CC)",  player).access_rule = lambda _: True
-        mw.get_location("Dayni Moon The Thin Bouncy Line (CC)", player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_CROWD,      player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_REVERSE,    player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_BRIDGE,     player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_LEAP,       player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_WELCOME,    player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_ROUND,      player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_VARIETY,    player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_SAWYER,     player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_SMASHER,    player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_TOURNAMENT, player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_AROUND,     player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_LINE,       player).access_rule = lambda _: True
+        mw.get_location(RACSMCLANK.DAYNI_MOON_HAY,        player).access_rule = lambda _: True
 
     # ── Vendors ───────────────────────────────────────────────────────────────
-    mw.get_location("Purchase Shock Rocket", player).access_rule = lambda _: True
-    mw.get_location("Purchase Map-O-Matic",  player).access_rule = lambda _: True
+    mw.get_location(RACSMVENDORLOCATION.DAYNI_MOON_SHOCK, player).access_rule = lambda _: True
+    mw.get_location(RACSMVENDORLOCATION.DAYNI_MOON_MAP,   player).access_rule = lambda _: True

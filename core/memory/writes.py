@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from ...pypine.pypine.pine import Pine
-from ..data import ArmourPiece, WeaponAddresses
+from ..armour import ArmourPiece
 from ..states.game_state import GameState
+from ..weapons import WeaponAddresses
 from .singletons import (
     _ARMOUR_PIECES,
     _ARMOUR_SET_ORDER,

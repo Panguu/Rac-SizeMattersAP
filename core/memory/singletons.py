@@ -1,16 +1,9 @@
 from __future__ import annotations
 
-from ..data import (
-    ARMOUR_BASE,
-    TITANIUM_BOLT_BASE,
-    WEAPON_ARRAY_BASE_BY_PLANET,
-    ArmourAddresses,
-    ArmourPiece,
-    GadgetAddresses,
-    TitaniumBoltAddresses,
-    WeaponAddresses,
-    build_weapons,
-)
+from ..address_maps import ARMOUR_BASE, TITANIUM_BOLT_BASE, WEAPON_ARRAY_BASE_BY_PLANET
+from ..armour import ArmourAddresses, ArmourPiece
+from ..titanium_bolts import TitaniumBoltAddresses
+from ..weapons import GadgetAddresses, WeaponAddresses, build_weapons
 
 WEAPONS: dict[str, WeaponAddresses] = {}
 GADGETS: dict[str, GadgetAddresses] = {}

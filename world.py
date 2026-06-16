@@ -6,6 +6,7 @@ from BaseClasses import Item, ItemClassification, Location, Tutorial
 
 from worlds.AutoWorld import WebWorld, World
 
+from .constants.items import RACSMITEM
 from .items import (
     ALL_ITEMS,
     ARMOUR_ITEM_TABLE,
@@ -13,6 +14,7 @@ from .items import (
     ARMOUR_SETS,
     GADGET_ITEM_TABLE,
     INFOBOT_ITEM_TABLE,
+    TRAP_ITEM_TABLE,
     WEAPON_ITEM_TABLE,
     WEAPON_PROGRESSIVE_ITEM_TABLE,
     WEAPON_PROGRESSIVE_STEPS_BY_MODE,
@@ -111,7 +113,7 @@ class RACSizeMatterWorld(World):
         # Fill any remaining slots
         unfilled = len(self.multiworld.get_unfilled_locations(self.player))
         filler_needed = max(0, unfilled - len(pool))
-        pool += ["Bolts"] * filler_needed
+        pool += [self.get_filler_item_name() for _ in range(filler_needed)]
 
         for name in pool:
             self.multiworld.itempool.append(self.create_item(name))
@@ -127,8 +129,8 @@ class RACSizeMatterWorld(World):
 
     def generate_basic(self) -> None:
         # Pokitaru and Ryllus are always the starting planets.
-        self._precollect("Pokitaru Infobot")
-        self._precollect("Ryllus Infobot")
+        self._precollect(RACSMITEM.POKITARU)
+        self._precollect(RACSMITEM.RYLLUS)
 
         if self.options.starting_bolts.value > 0:
             self.multiworld.push_precollected(self.create_item("Bolts"))
@@ -170,4 +172,7 @@ class RACSizeMatterWorld(World):
         return slot_data
 
     def get_filler_item_name(self) -> str:
+        trap_chance = self.options.trap_chance.value
+        if trap_chance and self.random.randint(1, 100) <= trap_chance:
+            return self.random.choice(list(TRAP_ITEM_TABLE))
         return "Bolts"

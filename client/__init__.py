@@ -7,7 +7,8 @@ from argparse import Namespace
 
 from CommonClient import get_base_parser, gui_enabled, handle_url_arg, server_loop
 
-from .context import RACCommandProcessor, RACContext, tracker_loaded
+from .command_processor import RACCommandProcessor
+from .context import RACContext, tracker_loaded
 
 __all__ = ["RACCommandProcessor", "RACContext", "run_client"]
 

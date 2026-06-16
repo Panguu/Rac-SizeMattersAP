@@ -1,7 +1,7 @@
 from enum import IntFlag
 
 from ...pypine.pypine.pine import Pine
-from .addresses import CONTROLLER_BUTTONS_ADDRESS, CONTROLLER_PAUSE_SELECT_ADDRESS
+from ..address_maps import CONTROLLER_BUTTONS_ADDRESS, CONTROLLER_PAUSE_SELECT_ADDRESS
 
 """
 Controller Logic

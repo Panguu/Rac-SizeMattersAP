@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ._helpers import infobot
+from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.skillpoints import RACSMSKILLPOINT
+from ..constants.tbolts import RACSMTBOLT
+from ..constants.vendors import RACSMVENDORLOCATION
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld
@@ -17,32 +20,34 @@ def set_quodrona_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points:
-        mw.get_location("Elite Annihilation (SP)", player).access_rule = _checks
-        mw.get_location("Storm The Front (SP)",    player).access_rule = _checks
+        mw.get_location(RACSMSKILLPOINT.QUODRONA_ELITE,  player).access_rule = _checks
+        mw.get_location(RACSMSKILLPOINT.QUODRONA_STORM,  player).access_rule = _checks
 
     # ── Missions ──────────────────────────────────────────────────────────────
-    mw.get_location("Clone Wars",        player).access_rule = _checks
-    mw.get_location("Runnnn from Otto",  player).access_rule = _checks
-    mw.get_location("Defeat mecha Otto", player).access_rule = _checks
-    mw.get_location("Find Otto Destruct", player).access_rule = _checks
+    if world.options.all_cutscenes:
+        mw.get_location(RacSMCutsceneLocations.QUODRONA_CLONE, player).access_rule = _checks
+        mw.get_location(RacSMCutsceneLocations.QUODRONA_CHASE, player).access_rule = _checks
+        mw.get_location(RacSMCutsceneLocations.QUODRONA_MECHA, player).access_rule = _checks
+    if world.options.all_missions:
+        mw.get_location(RacSMCutsceneLocations.QUODRONA_FIND,  player).access_rule = _checks
 
     # ── Titanium Bolts ────────────────────────────────────────────────────────
-    mw.get_location("Quodrona Ratchet Clones and Dummies (TB)", player).access_rule = _checks
+    mw.get_location(RACSMTBOLT.QUODRONA_DUMMIES, player).access_rule = _checks
 
     # ── Boss ──────────────────────────────────────────────────────────────────
-    mw.get_location("Defeat Otto Destruct", player).access_rule = _checks
+    mw.get_location(RacSMCutsceneLocations.QUODRONA_GOAL, player).access_rule = _checks
 
     # ── Vendors ───────────────────────────────────────────────────────────────
-    mw.get_location("Purchase Laser Tracer", player).access_rule = lambda _: True
+    mw.get_location(RACSMVENDORLOCATION.QUODRONA_LASER, player).access_rule = lambda _: True
 
     # ── Weapon Mod Vendor ─────────────────────────────────────────────────────
-    mw.get_location("Purchase Agents of Doom Launcher Mod",  player).access_rule = \
-        lambda state: state.can_reach("Purchase Agents of Doom", "Location", player)
-    mw.get_location("Purchase Scorcher Spitfire Mod",        player).access_rule = \
-        lambda state: state.can_reach("Purchase Scorcher", "Location", player)
-    mw.get_location("Purchase Sniper Mine Split Beam Mod",   player).access_rule = \
-        lambda state: state.can_reach("Purchase Sniper Mine", "Location", player)
-    mw.get_location("Purchase Shock Rocket Lock On Mod",     player).access_rule = \
-        lambda state: state.can_reach("Purchase Shock Rocket", "Location", player)
-    mw.get_location("Purchase Shock Rocket After Shock Mod", player).access_rule = \
-        lambda state: state.can_reach("Purchase Shock Rocket", "Location", player)
+    mw.get_location(RACSMVENDORLOCATION.QUODRONA_AGENTS_LAUNCHER,  player).access_rule = \
+        lambda state: state.can_reach(RACSMVENDORLOCATION.RYLLUS_AGENTS, "Location", player)
+    mw.get_location(RACSMVENDORLOCATION.QUODRONA_SCORCHER_SPITFIRE, player).access_rule = \
+        lambda state: state.can_reach(RACSMVENDORLOCATION.KALIDON_SCORCHER, "Location", player)
+    mw.get_location(RACSMVENDORLOCATION.QUODRONA_SNIPER_SPLIT,     player).access_rule = \
+        lambda state: state.can_reach(RACSMVENDORLOCATION.CHALLAX_SNIPER, "Location", player)
+    mw.get_location(RACSMVENDORLOCATION.QUODRONA_SHOCK_LOCK,       player).access_rule = \
+        lambda state: state.can_reach(RACSMVENDORLOCATION.DAYNI_MOON_SHOCK, "Location", player)
+    mw.get_location(RACSMVENDORLOCATION.QUODRONA_SHOCK_AFTER,      player).access_rule = \
+        lambda state: state.can_reach(RACSMVENDORLOCATION.DAYNI_MOON_SHOCK, "Location", player)

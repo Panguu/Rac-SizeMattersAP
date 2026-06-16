@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 import threading
 import time
 
 from .writer import MemoryWriter
+
+logger = logging.getLogger("Client")
 
 
 class MemoryPoller:
@@ -60,5 +63,10 @@ class MemoryPoller:
 
     def _loop(self) -> None:
         while self._running:
-            self.poll_once()
+            try:
+                self.poll_once()
+            except Exception:
+                # Never let the poller thread die — that silently stops ALL
+                # memory-change detection for the rest of the session.
+                logger.exception("[RAC] Poller iteration failed")
             time.sleep(self._interval)

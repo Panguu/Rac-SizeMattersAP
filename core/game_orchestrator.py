@@ -9,38 +9,44 @@ from CommonClient import logger
 
 from ..interface_orchestrator import Orchestrator
 from ..pypine.pypine.pine import Pine
-from .address_maps.global_map import build_global_address_map
-from .address_maps.planet_map import build_planet_address_map
-from .data.addresses import (
+from .address_maps import (
     CURRENT_PLANET_ADDRESS,
     MENU_ADDR_BY_PLANET_ID,
     PLAYER_ADDRS,
     WEAPON_ARRAY_BASE_BY_PLANET,
 )
-from .data.display_text_box import TextBoxDisplayAddrs
+from .address_maps.global_map import build_global_address_map
+from .address_maps.planet_map import build_planet_address_map
+from .armour import ArmourSetCollectedState, ArmourState
+from .challenges import ClankChallengeState, SkyboardChallengeState
+from .display_text import DisplayedTextBoxState, DisplayTextBoxState, SmallTextBoxAddrs
 from .memory.pine_interface import PineInterface
+from .menu import MenuState
+from .missions import MissionsState
+from .planets import Planet, Planets, PlanetState, PlanetUnlockState
+from .player import PlayerState
+from .quick_select import QuickSelectState
+from .skill_points import SkillPointState
+from .skins import SkinState
+from .titanium_bolts import TitaniumBoltState
+from .vendor import VendorState, VendorUnlockState
+from .weapons import WeaponState
+
+_TEXT_BOX_BY_PLANET = {tb.planet_id: tb for tb in SmallTextBoxAddrs}
+
+POLL_INTERVAL: float = 0.1
+
+PLANET_NAMES: dict[int, str] = {
+    p.planet_id: p.name
+    for p in vars(Planets).values()
+    if isinstance(p, Planet)
+}
+
+# Mixins import PLANET_NAMES / POLL_INTERVAL from this module, so they must be
+# imported only after those names are defined above.
 from .orchestration._ap_sync import APSyncMixin
-from .orchestration._constants import PLANET_NAMES, POLL_INTERVAL
 from .orchestration._hooks import HooksMixin
 from .orchestration._planet_lifecycle import PlanetLifecycleMixin
-from .states.armour import ArmourState
-from .states.skins import SkinState
-from .states.armour_sets import ArmourSetCollectedState
-from .states.challenges import ClankChallengeState, SkyboardChallengeState
-from .states.display_text_box import DisplayedTextBoxState, DisplayTextBoxState
-from .states.menu import MenuState
-from .states.planet_unlock import PlanetUnlockState
-from .states.planets import PlanetState
-from .states.player import PlayerState
-from .states.quick_select import QuickSelectState
-from .states.skill_points import SkillPointState
-from .states.titanium_bolts import TitaniumBoltState
-from .states.missions import MissionsState
-from .states.vendor import VendorState
-from .states.vendor_unlock import VendorUnlockState
-from .states.weapon import WeaponState
-
-_TEXT_BOX_BY_PLANET = {tb.planet_id: tb for tb in TextBoxDisplayAddrs}
 
 
 class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
@@ -60,7 +66,7 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         self.armour             = ArmourState(acc, self._global_map, storage)
         self.armour_sets        = ArmourSetCollectedState(acc, self._global_map, storage)
         self.bolts              = TitaniumBoltState(acc, self._global_map, storage)
-        self.skill_points       = SkillPointState(acc, self._global_map, storage)
+        self.skill_points       = SkillPointState(acc, self._global_map, storage, log=self._log)
         self.planet_unlock      = PlanetUnlockState(acc, self._global_map, storage)
         self.quick_select       = QuickSelectState(acc, self._global_map, storage)
         self.clank              = ClankChallengeState(acc, self._global_map, storage)
@@ -82,8 +88,10 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         self._death_amnesty:      Callable[[], int]      = lambda: 1
         self._death_link_enabled: Callable[[], bool]     = lambda: False
         self._on_goal:            Callable[[], None]     = lambda: None
+        self._on_vendor_open:     Callable[[], None]     = lambda: None
         self._on_vendor_close:    Callable[[], None]     = lambda: None
         self._on_pause_close:     Callable[[], None]     = lambda: None
+        self._on_bonus_weapon_pickup: Callable[[str], None] = lambda _: None
 
         self.planet_states: dict[int, PlanetState] = self._build_planet_states(acc, storage)
 
@@ -139,8 +147,10 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         death_amnesty:      Callable[[], int],
         death_link_enabled: Callable[[], bool] = lambda: False,
         on_goal:            Callable[[], None]  = lambda: None,
+        on_vendor_open:     Callable[[], None]  = lambda: None,
         on_vendor_close:    Callable[[], None]  = lambda: None,
         on_pause_close:     Callable[[], None]  = lambda: None,
+        on_bonus_weapon_pickup: Callable[[str], None] = lambda _: None,
     ) -> None:
         self._send_location      = lambda name: send_location(name) if self._initial_load_done else None
         self._send_deathlink     = send_deathlink
@@ -148,8 +158,10 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         self._death_amnesty      = death_amnesty
         self._death_link_enabled = death_link_enabled
         self._on_goal            = on_goal
+        self._on_vendor_open     = on_vendor_open
         self._on_vendor_close    = on_vendor_close
         self._on_pause_close     = on_pause_close
+        self._on_bonus_weapon_pickup = on_bonus_weapon_pickup
 
         _raw_reapply = reapply_inv
 
@@ -210,7 +222,7 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
 
     @property
     def vendor_active(self) -> bool:
-        from .states.vendor import VendorSessionState
+        from .vendor import VendorSessionState
         return self.vendor.session != VendorSessionState.CLOSED
 
     @property
@@ -218,9 +230,18 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         return self.player.is_picking_up or self._pickup_detection_active
 
     @property
+    def is_transitioning(self) -> bool:
+        return self._transitioning
+
+    @property
+    def is_in_menu(self) -> bool:
+        from .menu import MenuStateValue
+        return self.menu.current != MenuStateValue.CLOSED
+
+    @property
     def writes_blocked(self) -> bool:
         """True while a travel menu is open, during cooldown after close, or mid-transition."""
-        from .states.menu import MenuStateValue
+        from .menu import MenuStateValue
         if self.menu.current in (MenuStateValue.SKYBOARD_MENU, MenuStateValue.PLANET_MENU):
             return True
         if self._transitioning:

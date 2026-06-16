@@ -7,8 +7,17 @@ from typing import Any
 
 from CommonClient import logger
 
-from ..core.data import BY_ID as PLANETS_BY_ID
-from ..core.data import PLAYER_ADDRS, PLAYER_HEALTH, PLAYER_STATE, PlayerState
+from ..core import (
+    PLANETS_BY_ID,
+    PLAYER_ADDRS,
+    PLAYER_HEALTH,
+    PLAYER_STATE,
+    TextColour,
+    colored_text,
+)
+from ..core import (
+    PlayerMovementState as PlayerState,
+)
 
 _DEATH_CAUSES: dict[PlayerState, list[str]] = {
     PlayerState.FishDeath: [
@@ -80,6 +89,10 @@ class DeathLinkMixin:
             if self._gs.current_planet in PLANETS_BY_ID
             else "an unknown planet"
         )
+        cause_text = _death_cause(player_state)
+        self._write_notification_text(colored_text(
+            TextColour.RED, "Deathlink: ", source, TextColour.WHITE, " ", cause_text,
+        ))
         asyncio.create_task(
             self.send_msgs([
                 {
@@ -89,7 +102,7 @@ class DeathLinkMixin:
                         "time": now,
                         "source": source,
                         "cause": (
-                            f"{source} {_death_cause(player_state)} on {planet_name}"
+                            f"{source} {cause_text} on {planet_name}"
                             " in Ratchet & Clank: Size Matters."
                         ),
                     },
@@ -104,9 +117,12 @@ class DeathLinkMixin:
         if timestamp and timestamp <= self._last_death_link:
             return
         self._last_death_link = max(timestamp, time.time())
-        cause = data.get("cause")
-        if cause:
-            self._log(f"[RAC] DeathLink received: {cause}")
+        source = data.get("source", "Unknown")
+        cause  = data.get("cause") or f"{source} died"
+        self._log(f"[RAC] DeathLink received: {cause}")
+        self._write_notification_text(colored_text(
+            TextColour.RED, "Deathlink: ", source, TextColour.WHITE, " ", cause,
+        ))
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
             await loop.run_in_executor(None, self._kill_player_sync)

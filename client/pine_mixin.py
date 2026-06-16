@@ -4,23 +4,12 @@ import asyncio
 
 from CommonClient import logger
 
-from ..core.data import CURRENT_PLANET_ADDRESS
-from ..core.memory import load_weapons_for_planet
+from ..core import CURRENT_PLANET_ADDRESS, load_weapons_for_planet
 from ..universal_tracker import PLANET_ID_TO_REGION
 from .constants import EXPECTED_GAME_ID, POLL_INTERVAL
 
 
 class PineMixin:
-    async def disconnect_pine(self) -> None:
-        await self._wiring.stop()
-        async with self._pine_lock:
-            self.pine_connected = False
-            try:
-                self.pine.disconnect()
-            except Exception:
-                pass
-        self._log("[RAC] Disconnected from PCSX2. Use /reconnect to reconnect.")
-
     async def reconnect_pine(self) -> None:
         async with self._pine_lock:
             self.pine_connected = False
@@ -29,20 +18,6 @@ class PineMixin:
             except Exception:
                 pass
         await self._attempt_pine_connect()
-
-    async def rescan_weapons(self) -> None:
-        if not self.pine_connected:
-            self._log("[RAC] Not connected to PCSX2.")
-            return
-        loop = asyncio.get_event_loop()
-        async with self._pine_lock:
-            loaded = await loop.run_in_executor(None, load_weapons_for_planet, self._prev_planet)
-        if loaded:
-            self._log(f"[RAC] Weapon addresses reloaded for planet {self._prev_planet:#04x}.")
-            self._pending_item_apply = True
-            await self._apply_received_items()
-        else:
-            self._log(f"[RAC] No weapon addresses for planet {self._prev_planet:#04x}.", "warning")
 
     async def _attempt_pine_connect(self) -> None:
         loop = asyncio.get_event_loop()
@@ -72,6 +47,9 @@ class PineMixin:
                 self.pine_connected = False
                 return
         await self._wiring.start()
+        # Baseline before applying so the catch-up batch of items already
+        # received before this PCSX2 connection doesn't pop a notification.
+        self._notification_item_index = len(self.items_received)
         await self._apply_received_items()
         await self._send_map_page(self.current_planet)
 

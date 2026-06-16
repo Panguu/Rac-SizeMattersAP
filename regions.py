@@ -4,18 +4,20 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Region
 
+from .constants.planets import RACSMPLANET
 from .locations import (
     ALL_CLANK_LOCATIONS,
     ARMOUR_PICKUP_LOCATIONS,
     ARMOUR_SET_CHECK_LOCATIONS,
     BOSS_LOCATIONS,
     CHALLENGE_LOCATIONS,
+    CUTSCENE_LOCATIONS,
     EXTRA_SKYBOARD_LOCATIONS,
     GADGET_PICKUP_LOCATIONS,
     GADGET_VENDOR_LOCATIONS,
-    MISSION_LOCATIONS,
     SKILL_POINT_LOCATIONS,
     SKYBOARD_ITEM_LOCATIONS,
+    STORY_MISSION_LOCATIONS,
     TITANIUM_BOLT_LOCATIONS,
     WEAPON_MOD_VENDOR_LOCATIONS,
     WEAPON_VENDOR_LOCATIONS,
@@ -25,16 +27,16 @@ if TYPE_CHECKING:
     from .world import RACSizeMatterWorld
 
 PLANET_NAMES: tuple[str, ...] = (
-    "Pokitaru",
-    "Ryllus",
-    "Kalidon",
-    "Metalis",
-    "Dreamtime",
-    "Outpost Omega",
-    "Challax",
-    "Dayni Moon",
-    "Inside Clank",
-    "Quodrona",
+    RACSMPLANET.POKITARU,
+    RACSMPLANET.RYLLUS,
+    RACSMPLANET.KALIDON,
+    RACSMPLANET.METALIS,
+    RACSMPLANET.DREAMTIME,
+    RACSMPLANET.OUTPOST_OMEGA,
+    RACSMPLANET.CHALLAX,
+    RACSMPLANET.DAYNI_MOON,
+    RACSMPLANET.INSIDE_CLANK,
+    RACSMPLANET.QUODRONA,
 )
 
 
@@ -57,8 +59,11 @@ def create_regions(world: RACSizeMatterWorld) -> None:
         GADGET_PICKUP_LOCATIONS,
         WEAPON_VENDOR_LOCATIONS,
         GADGET_VENDOR_LOCATIONS,
-        MISSION_LOCATIONS,
     ]
+    if world.options.all_missions:
+        location_tables.append(STORY_MISSION_LOCATIONS)
+    if world.options.all_cutscenes:
+        location_tables.append(CUTSCENE_LOCATIONS)
     if world.options.skill_points:
         location_tables.append(SKILL_POINT_LOCATIONS)
     location_tables.append(WEAPON_MOD_VENDOR_LOCATIONS)
@@ -78,7 +83,7 @@ def create_regions(world: RACSizeMatterWorld) -> None:
             location = RACLocation(player, loc_name, loc_data.code, region)
             region.locations.append(location)
 
-    quodrona = planet_regions["Quodrona"]
+    quodrona = planet_regions[RACSMPLANET.QUODRONA]
     victory_loc = RACLocation(player, "Quodrona Completed", None, quodrona)
     victory_loc.place_locked_item(world.create_event("Victory"))
     quodrona.locations.append(victory_loc)
