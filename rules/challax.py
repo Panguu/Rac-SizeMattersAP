@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-
 from ..constants.general import RACSMLOCATION
 from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
