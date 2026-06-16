@@ -21,8 +21,9 @@ def set_kalidon_rules(world: RACSizeMatterWorld) -> None:
                              and state.has("Shrink Ray", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.KALIDON_EXPLOSIVE,    player).access_rule = _inside
+    if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.KALIDON_SUPER_LOMBAX, player).access_rule = _inside
         mw.get_location(RACSMSKILLPOINT.KALIDON_SKYBOARDER,   player).access_rule = lambda _: True
 

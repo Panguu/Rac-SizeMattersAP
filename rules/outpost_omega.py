@@ -21,7 +21,7 @@ def set_outpost_omega_rules(world: RACSizeMatterWorld) -> None:
                                and state.has("Sprout-O-Matic", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.OUTPOST_OMEGA_AWESOME, player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────

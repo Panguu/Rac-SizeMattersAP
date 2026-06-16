@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+
 from ..constants.general import RACSMLOCATION
 from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
@@ -23,17 +24,14 @@ def set_challax_rules(world: RACSizeMatterWorld) -> None:
                              and state.has("Sprout-O-Matic", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.CHALLAX_MASTER,   player).access_rule = _sprout
+    if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.CHALLAX_VARMINTS, player).access_rule = _sprout
 
     # ── Missions ──────────────────────────────────────────────────────────────
     # Giant Clank disabled/unreachable — METALIS_CLANK and CHALLAX_CLANK are
     # commented out of the location pool in locations.py, so no rule is set here.
-    # if world.options.all_cutscenes:
-    #     mw.get_location(RacSMCutsceneLocations.METALIS_CLANK, player).access_rule = lambda _: True
-    # if world.options.all_missions:
-    #     mw.get_location(RacSMCutsceneLocations.CHALLAX_CLANK, player).access_rule = lambda _: True
 
     # ── Titanium Bolts ────────────────────────────────────────────────────────
     mw.get_location(RACSMTBOLT.CHALLAX_MECH_PAD, player).access_rule = lambda _: True

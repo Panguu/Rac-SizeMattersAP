@@ -15,7 +15,8 @@ from .locations import (
     EXTRA_SKYBOARD_LOCATIONS,
     GADGET_PICKUP_LOCATIONS,
     GADGET_VENDOR_LOCATIONS,
-    SKILL_POINT_LOCATIONS,
+    EASY_SKILL_POINT_LOCATIONS,
+    HARD_SKILL_POINT_LOCATIONS,
     SKYBOARD_ITEM_LOCATIONS,
     STORY_MISSION_LOCATIONS,
     TITANIUM_BOLT_LOCATIONS,
@@ -64,8 +65,10 @@ def create_regions(world: RACSizeMatterWorld) -> None:
         location_tables.append(STORY_MISSION_LOCATIONS)
     if world.options.all_cutscenes:
         location_tables.append(CUTSCENE_LOCATIONS)
-    if world.options.skill_points:
-        location_tables.append(SKILL_POINT_LOCATIONS)
+    if world.options.skill_points.value >= 1:
+        location_tables.append(EASY_SKILL_POINT_LOCATIONS)
+    if world.options.skill_points.value >= 2:
+        location_tables.append(HARD_SKILL_POINT_LOCATIONS)
     location_tables.append(WEAPON_MOD_VENDOR_LOCATIONS)
     if world.options.clank_challenges.value >= 1:
         location_tables.append(CHALLENGE_LOCATIONS)

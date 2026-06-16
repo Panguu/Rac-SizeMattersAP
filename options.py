@@ -70,9 +70,16 @@ class ArmourSetChecks(DefaultOnToggle):
     display_name = "Armour Set Checks"
 
 
-class SkillPoints(Toggle):
-    """Include skill point challenges as location checks."""
+class SkillPoints(Choice):
+    """Include skill point challenges as location checks.
+    off: no skill point checks.
+    easy: exploration and combat skill points only (excludes arena/challenge-based ones).
+    hard: all skill points including arena/skyboard challenge ones."""
     display_name = "Skill Points"
+    option_off  = 0
+    option_easy = 1
+    option_hard = 2
+    default = 0
 
 
 class StartingWeapons(Range):

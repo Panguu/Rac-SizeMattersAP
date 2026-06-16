@@ -156,7 +156,7 @@ class RACSizeMatterWorld(World):
             "clank_challenges": self.options.clank_challenges.value,
             "skyboard_challenges": self.options.skyboard_challenges.value,
 
-            "skill_points": bool(self.options.skill_points.value),
+            "skill_points": self.options.skill_points.value,
             "armour_set_checks": bool(self.options.armour_set_checks.value),
             "starting_bolts": self.options.starting_bolts.value,
             "death_amnesty": self.options.death_amnesty.value,

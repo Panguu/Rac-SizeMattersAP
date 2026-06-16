@@ -19,7 +19,7 @@ def set_quodrona_rules(world: RACSizeMatterWorld) -> None:
                              and state.has("Hypershot", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.QUODRONA_ELITE,  player).access_rule = _checks
         mw.get_location(RACSMSKILLPOINT.QUODRONA_STORM,  player).access_rule = _checks
 

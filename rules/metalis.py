@@ -16,7 +16,7 @@ def set_metalis_rules(world: RACSizeMatterWorld) -> None:
     mw = world.multiworld
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.METALIS_SHUTOUT,   player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.METALIS_TERROR,    player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.METALIS_GLADIATOR, player).access_rule = lambda _: True

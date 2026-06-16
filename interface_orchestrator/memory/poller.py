@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import threading
 import time
@@ -18,6 +19,7 @@ class MemoryPoller:
         self._cache: dict[int, bytes] = {}
         self._thread: threading.Thread | None = None
         self._running = False
+        self._asyncio_loop: asyncio.AbstractEventLoop | None = None
 
     def watch(self, address: int, size: int) -> None:
         self._addresses[address] = size
@@ -46,11 +48,22 @@ class MemoryPoller:
 
             if self._cache.get(address) != current:
                 self._cache[address] = current
-                self._writer.notify_change(address, current)
+                if self._asyncio_loop is not None:
+                    # Dispatch to the asyncio thread so handlers never race
+                    # with asyncio-thread PINE I/O that holds _pine_lock.
+                    self._asyncio_loop.call_soon_threadsafe(
+                        self._writer.notify_change, address, current
+                    )
+                else:
+                    self._writer.notify_change(address, current)
 
     def start(self) -> None:
         if self._running:
             return
+        try:
+            self._asyncio_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            self._asyncio_loop = None
         self._running = True
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()

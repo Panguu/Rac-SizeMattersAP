@@ -22,7 +22,7 @@ def set_dreamtime_rules(world: RACSizeMatterWorld) -> None:
                            and state.has("Sprout-O-Matic", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.DREAMTIME_FRIENDS,       player).access_rule = _base
         mw.get_location(RACSMSKILLPOINT.DREAMTIME_NIGHT_TERRORS, player).access_rule = _base
 

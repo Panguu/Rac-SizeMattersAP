@@ -23,10 +23,11 @@ def set_dayni_moon_rules(world: RACSizeMatterWorld) -> None:
     _shrink_ray = lambda state: (_base(state) and state.has("Shrink Ray", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
-        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_GLADIATOR,    player).access_rule = lambda _: True
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_WOOL_PROTEST, player).access_rule = _base
         mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_BOUNCY,       player).access_rule = _base
+    if world.options.skill_points.value >= 2:
+        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_GLADIATOR,    player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────
     if world.options.all_missions:

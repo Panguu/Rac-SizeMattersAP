@@ -159,7 +159,7 @@ class RACContext(
             self._wiring.clank.set_mode(int(self.slot_data.get("clank_challenges", 1)))
             self._wiring.skyboard.set_enabled(int(self.slot_data.get("skyboard_challenges", 0)) >= 1)
             self._wiring.skill_points.set_enabled(
-                bool(self.slot_data.get("skill_points", False)),
+                int(self.slot_data.get("skill_points", 0)) >= 1,
                 planet_loaded=self._wiring._initial_load_done,
             )
             self._wiring.skin.set_skin_by_option(int(self.slot_data.get("starting_skin", 0)))

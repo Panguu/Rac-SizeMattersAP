@@ -16,7 +16,7 @@ def set_inside_clank_rules(world: RACSizeMatterWorld) -> None:
     mw = world.multiworld
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.INSIDE_CLANK_SHOCK,   player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.INSIDE_CLANK_RATCHET, player).access_rule = lambda _: True
 

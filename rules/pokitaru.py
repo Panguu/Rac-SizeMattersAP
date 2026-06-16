@@ -17,7 +17,7 @@ def set_pokitaru_rules(world: RACSizeMatterWorld) -> None:
     mw = world.multiworld
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.POKITARU_TRAIN, player).access_rule = \
             lambda state: has_projectile_weapon(state, player)
         mw.get_location(RACSMSKILLPOINT.POKITARU_BOAT, player).access_rule = lambda _: True

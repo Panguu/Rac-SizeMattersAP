@@ -12,7 +12,7 @@ from .core.challenges import (
     GADGETBOT_CLANK_PICKUPS,
     GADGETBOT_TOSS_CLANK_PICKUPS,
 )
-from .core.skill_points import SKILL_POINTS
+from .core.skill_points import CHALLENGE_SKILL_POINTS, SKILL_POINTS
 from .core.titanium_bolts import TITANIUM_BOLTS
 
 BASE_ID = 77_700_000
@@ -89,6 +89,16 @@ ARMOUR_SET_CHECK_LOCATIONS: dict[str, RACLocationData] = {
 SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
     name: RACLocationData(BASE_ID + 4000 + idx, sp.region)
     for idx, (name, sp) in enumerate(SKILL_POINTS.items(), start=1)
+}
+
+EASY_SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
+    name: data for name, data in SKILL_POINT_LOCATIONS.items()
+    if name not in CHALLENGE_SKILL_POINTS
+}
+
+HARD_SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
+    name: data for name, data in SKILL_POINT_LOCATIONS.items()
+    if name in CHALLENGE_SKILL_POINTS
 }
 
 GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {

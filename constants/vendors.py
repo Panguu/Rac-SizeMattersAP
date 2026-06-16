@@ -2,10 +2,10 @@
 
 class RACSMVENDORLOCATION:
     """Constant strings for each Weapon/Weapon Mod location name."""
-    POKITARU_LACERATOR = "Pokitaru: Gadgetron Vendor: Lacerator - 5,000"
-    POKITARU_ACID = "Pokitaru: Gadgetron Vendor: Acid Bomb Glove - 5,000"
+    POKITARU_LACERATOR = "Pokitaru: Gadgetron Vendor: Lacerator - 0"
+    POKITARU_ACID = "Pokitaru: Gadgetron Vendor: Acid Bomb Glove - 0"
     POKITARU_CONCUSSION = "Pokitaru: Gadgetron Vendor: Concussion Gun - 10,000"
-    POKITARU_HYPERSHOT = "Pokitaru: Gadgetron Vendor: Hypershot - 10,000"
+    POKITARU_HYPERSHOT = "Pokitaru: Gadgetron Vendor: Hypershot - 5,000"
     RYLLUS_AGENTS = "Ryllus: Gadgetron Vendor: Agents of Doom - 25,000"
     KALIDON_SCORCHER = "Kalidon: Gadgetron Vendor: Scorcher - 20,000"
     KALIDON_LACERATOR_LOCK = "Kalidon: Slim Cognito: Lacerator Lock On Mod - 5,000"

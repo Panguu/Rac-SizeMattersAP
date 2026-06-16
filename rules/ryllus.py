@@ -20,7 +20,7 @@ def set_ryllus_rules(world: RACSizeMatterWorld) -> None:
                            and state.has("Sprout-O-Matic", player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points:
+    if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.RYLLUS_BURY,    player).access_rule = _full
         mw.get_location(RACSMSKILLPOINT.RYLLUS_CAMERA,  player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.RYLLUS_SHIP_IT, player).access_rule = _full

@@ -489,7 +489,7 @@ class InventoryMixin:
         try:
             current = self.pine.read_int32(PLAYER_BOLT_COUNT)
             for _ in range(bolt_items_to_grant):
-                grant = min(200000, max(30000, int(current * 0.2)))
+                grant = min(200000, max(75000, int(current * 0.2)))
                 current += grant
             self.pine.write_int32(PLAYER_BOLT_COUNT, current)
         except Exception as exc:
