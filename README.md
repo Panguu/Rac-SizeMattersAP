@@ -11,6 +11,6 @@ This is an initial implementation for the PS2 version of the game. You can find 
 - Vendors do not always allow you to buy ammo (spam vendor open menu and you should be able to buy ammo if this happens)
 
 ## Massive thanks
-The build script and pypine is vendored from [evilwb/pypine](https://github.com/evilwb/pypine). Based on https://projects.govanify.com/govanify/pine. this couldnt have been done without his pcsx2 interface.
+PyPine is vendored from [evilwb/pypine](https://github.com/evilwb/pypine). Based on https://projects.govanify.com/govanify/pine. this couldnt have been done without his pcsx2 interface.
 
 Massive inspiration from RAC2 and RAC3 AP's for how to handle Ratchet and Clank games.
