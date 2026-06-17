@@ -18,7 +18,9 @@ logger = logging.getLogger("Client")
 __all__ = [
     "SkillPoint",
     "SKILL_POINTS",
-    "CHALLENGE_SKILL_POINTS",
+    "HARD_SKILL_POINTS",
+    "CLANK_CHALLENGE_SKILL_POINTS",
+    "SKYBOARD_CHALLENGE_SKILL_POINTS",
     "SKILL_POINT_BY_PLANET_AND_MASK",
     "LOCATION_SKILL_POINTS",
     "SKILL_POINT_ADDRESS",
@@ -93,14 +95,35 @@ SKILL_POINTS: dict[str, SkillPoint] = {
     RACSMSKILLPOINT.QUODRONA_STORM:          SkillPoint(0x0A, 37, RACSMPLANET.QUODRONA),
 }
 
-CHALLENGE_SKILL_POINTS: frozenset[str] = frozenset({
-    RACSMSKILLPOINT.KALIDON_SKYBOARDER,
-    RACSMSKILLPOINT.METALIS_SHUTOUT,
+# Curated "hard" tier for the Skill Points option. Everything else in SKILL_POINTS
+# that isn't also a Clank/Skyboard challenge skill point counts as "easy".
+HARD_SKILL_POINTS: frozenset[str] = frozenset({
+    RACSMSKILLPOINT.RYLLUS_BURY,
+    RACSMSKILLPOINT.KALIDON_SUPER_LOMBAX,
     RACSMSKILLPOINT.METALIS_TERROR,
+    RACSMSKILLPOINT.DREAMTIME_FRIENDS,
+    RACSMSKILLPOINT.DREAMTIME_NIGHT_TERRORS,
+    RACSMSKILLPOINT.CHALLAX_MASTER,
+    RACSMSKILLPOINT.DAYNI_MOON_WOOL_PROTEST,
+    RACSMSKILLPOINT.INSIDE_CLANK_SHOCK,
+    RACSMSKILLPOINT.INSIDE_CLANK_RATCHET,
+    RACSMSKILLPOINT.QUODRONA_ELITE,
+    RACSMSKILLPOINT.QUODRONA_STORM,
+})
+
+# Earned from Clank Challenge arenas — gated by enable_clank_challenge_skill_points,
+# independent of the Skill Points easy/hard tier.
+CLANK_CHALLENGE_SKILL_POINTS: frozenset[str] = frozenset({
+    RACSMSKILLPOINT.METALIS_SHUTOUT,
     RACSMSKILLPOINT.METALIS_GLADIATOR,
     RACSMSKILLPOINT.DAYNI_MOON_GLADIATOR,
+})
+
+# Earned from Skyboard Challenges — gated by enable_skyboard_challenge_skill_points,
+# independent of the Skill Points easy/hard tier.
+SKYBOARD_CHALLENGE_SKILL_POINTS: frozenset[str] = frozenset({
+    RACSMSKILLPOINT.KALIDON_SKYBOARDER,
     RACSMSKILLPOINT.OUTPOST_OMEGA_AWESOME,
-    RACSMSKILLPOINT.CHALLAX_VARMINTS,
 })
 
 # (planet_id, mask) → location name — mirrors BOLT_BY_PLANET_AND_DELTA

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
@@ -22,7 +23,7 @@ def set_pokitaru_rules(world: RACSizeMatterWorld) -> None:
             lambda state: has_projectile_weapon(state, player)
         mw.get_location(RACSMSKILLPOINT.POKITARU_BOAT, player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.POKITARU_COWS, player).access_rule = \
-            lambda state: has_weapon(state, player, "Mootator")
+            lambda state: has_weapon(state, player, RACSMITEM.MOOTATOR)
 
     # ── Missions ──────────────────────────────────────────────────────────────
     if world.options.all_missions:

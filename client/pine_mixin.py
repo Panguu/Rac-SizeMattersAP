@@ -4,7 +4,7 @@ import asyncio
 
 from CommonClient import logger
 
-from ..core import CURRENT_PLANET_ADDRESS, load_weapons_for_planet
+from ..core import CURRENT_PLANET_ADDRESS, TextColour, colored_text, load_weapons_for_planet
 from ..universal_tracker import PLANET_ID_TO_REGION
 from .constants import EXPECTED_GAME_ID, POLL_INTERVAL
 
@@ -17,9 +17,9 @@ class PineMixin:
                 self.pine.disconnect()
             except Exception:
                 pass
-        await self._attempt_pine_connect()
+        await self._attempt_pine_connect(is_reconnect=True)
 
-    async def _attempt_pine_connect(self) -> None:
+    async def _attempt_pine_connect(self, is_reconnect: bool = False) -> None:
         loop = asyncio.get_event_loop()
         async with self._pine_lock:
             try:
@@ -35,7 +35,11 @@ class PineMixin:
                 self.pine_connected = False
                 return
 
-            self._log("[RAC] Connected to PCSX2 - R&C: Size Matters detected.")
+            self._log(
+                "[RAC] Reconnected to PCSX2 - R&C: Size Matters detected."
+                if is_reconnect else
+                "[RAC] Connected to PCSX2 - R&C: Size Matters detected."
+            )
             self.pine_connected = True
             try:
                 await loop.run_in_executor(None, self._read_initial_state_sync)
@@ -52,6 +56,10 @@ class PineMixin:
         self._notification_item_index = len(self.items_received)
         await self._apply_received_items()
         await self._send_map_page(self.current_planet)
+        if is_reconnect:
+            self._write_notification_text(colored_text(
+                "Reconnected to ", TextColour.YELLOW, "PCSX2", TextColour.WHITE,
+            ))
 
     async def _read_initial_state(self) -> None:
         loop = asyncio.get_event_loop()

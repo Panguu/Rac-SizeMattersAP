@@ -7,6 +7,7 @@ from BaseClasses import Item, ItemClassification, Location, Tutorial
 from worlds.AutoWorld import WebWorld, World
 
 from .constants.items import RACSMITEM
+from .core.data import WEAPON_MOD_COUNTS
 from .items import (
     ALL_ITEMS,
     ARMOUR_ITEM_TABLE,
@@ -14,10 +15,16 @@ from .items import (
     ARMOUR_SETS,
     GADGET_ITEM_TABLE,
     INFOBOT_ITEM_TABLE,
+    PROGRESSIVE_ARMOUR_NAME,
+    PROGRESSIVE_MOD_NAME,
+    PROGRESSIVE_WEAPON_NAME,
     TRAP_ITEM_TABLE,
+    WEAPON_DISPLAY_TO_INTERNAL,
     WEAPON_ITEM_TABLE,
+    WEAPON_MOD_ITEM_TABLE,
     WEAPON_PROGRESSIVE_ITEM_TABLE,
-    WEAPON_PROGRESSIVE_STEPS_BY_MODE,
+    WEAPON_PROGRESSIVE_MOD_ITEM_TABLE,
+    WEAPON_PROGRESSIVE_STEPS,
 )
 from .locations import ALL_LOCATIONS
 from .options import RACSizeMatterOptions, racsm_option_groups
@@ -94,19 +101,25 @@ class RACSizeMatterWorld(World):
 
     def create_items(self) -> None:
         pool: list[str] = []
-        prog_mode = self.options.progressive_weapons.value
-        if prog_mode > 0:
-            for display, steps in WEAPON_PROGRESSIVE_STEPS_BY_MODE[prog_mode].items():
-                pool += [f"{display} Progressive Weapon"] * steps
+        if self.options.progressive_weapons:
+            for display, steps in WEAPON_PROGRESSIVE_STEPS.items():
+                pool += [PROGRESSIVE_WEAPON_NAME[display]] * steps
         else:
             pool += list(WEAPON_ITEM_TABLE)
+
+        if self.options.progressive_mods:
+            for display in PROGRESSIVE_MOD_NAME:
+                internal = WEAPON_DISPLAY_TO_INTERNAL[display]
+                pool += [PROGRESSIVE_MOD_NAME[display]] * WEAPON_MOD_COUNTS.get(internal, 0)
+        else:
+            pool += list(WEAPON_MOD_ITEM_TABLE)
 
         pool += list(GADGET_ITEM_TABLE)
         pool += list(INFOBOT_ITEM_TABLE)
 
         if self.options.progressive_armour:
             for display, _ in ARMOUR_SETS:
-                pool += [f"{display} Progressive Pickup"] * 4
+                pool += [PROGRESSIVE_ARMOUR_NAME[display]] * 4
         else:
             pool += list(ARMOUR_ITEM_TABLE)
 
@@ -137,7 +150,7 @@ class RACSizeMatterWorld(World):
 
         weapon_count = self.options.starting_weapons.value
         if weapon_count > 0:
-            if self.options.progressive_weapons.value > 0:
+            if self.options.progressive_weapons:
                 pool = list(WEAPON_PROGRESSIVE_ITEM_TABLE.keys())
             else:
                 pool = list(WEAPON_ITEM_TABLE.keys())
@@ -157,10 +170,13 @@ class RACSizeMatterWorld(World):
             "skyboard_challenges": self.options.skyboard_challenges.value,
 
             "skill_points": self.options.skill_points.value,
+            "enable_clank_challenge_skill_points": bool(self.options.enable_clank_challenge_skill_points.value),
+            "enable_skyboard_challenge_skill_points": bool(self.options.enable_skyboard_challenge_skill_points.value),
             "armour_set_checks": bool(self.options.armour_set_checks.value),
             "starting_bolts": self.options.starting_bolts.value,
             "death_amnesty": self.options.death_amnesty.value,
             "progressive_weapons": self.options.progressive_weapons.value,
+            "progressive_mods": self.options.progressive_mods.value,
             "progressive_armour": self.options.progressive_armour.value,
             "starting_weapons": self.options.starting_weapons.value,
             "starting_gadgets": self.options.starting_gadgets.value,

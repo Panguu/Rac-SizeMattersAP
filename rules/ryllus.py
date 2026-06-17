@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from ..constants.cutscenes import RacSMCutsceneLocations
 from ..constants.general import RACSMLOCATION
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
@@ -16,14 +17,15 @@ def set_ryllus_rules(world: RACSizeMatterWorld) -> None:
     player = world.player
     mw = world.multiworld
 
-    _full = lambda state: (state.has("Hypershot", player)
-                           and state.has("Sprout-O-Matic", player))
+    _full = lambda state: (state.has(RACSMITEM.HYPERSHOT, player)
+                           and state.has(RACSMITEM.SPROUT_O_MATIC, player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points.value >= 1:
-        mw.get_location(RACSMSKILLPOINT.RYLLUS_BURY,    player).access_rule = _full
         mw.get_location(RACSMSKILLPOINT.RYLLUS_CAMERA,  player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.RYLLUS_SHIP_IT, player).access_rule = _full
+    if world.options.skill_points.value >= 2:
+        mw.get_location(RACSMSKILLPOINT.RYLLUS_BURY, player).access_rule = _full
 
     # ── Missions ──────────────────────────────────────────────────────────────
     if world.options.all_cutscenes:
@@ -37,7 +39,7 @@ def set_ryllus_rules(world: RACSizeMatterWorld) -> None:
     mw.get_location(RACSMTBOLT.RYLLUS_WALL,   player).access_rule = _full
     mw.get_location(RACSMLOCATION.RYLLUS_HELMET, player).access_rule = _full
     mw.get_location(RACSMLOCATION.RYLLUS_BOOTS,  player).access_rule = \
-        lambda state: state.has("Sprout-O-Matic", player)
+        lambda state: state.has(RACSMITEM.SPROUT_O_MATIC, player)
 
     # ── Vendors ───────────────────────────────────────────────────────────────
     mw.get_location(RACSMVENDORLOCATION.RYLLUS_AGENTS, player).access_rule = lambda _: True

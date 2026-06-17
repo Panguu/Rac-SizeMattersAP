@@ -16,17 +16,17 @@ def set_challax_rules(world: RACSizeMatterWorld) -> None:
     player = world.player
     mw = world.multiworld
 
-    _base   = lambda state: (state.has("Shrink Ray", player)
-                             and state.has("Polarizer", player))
-    _sprout = lambda state: (state.has("Shrink Ray", player)
-                             and state.has("Polarizer", player)
-                             and state.has("Sprout-O-Matic", player))
+    _base   = lambda state: (state.has(RACSMITEM.SHRINK_RAY, player)
+                             and state.has(RACSMITEM.POLARIZER, player))
+    _sprout = lambda state: (state.has(RACSMITEM.SHRINK_RAY, player)
+                             and state.has(RACSMITEM.POLARIZER, player)
+                             and state.has(RACSMITEM.SPROUT_O_MATIC, player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points.value >= 1:
-        mw.get_location(RACSMSKILLPOINT.CHALLAX_MASTER,   player).access_rule = _sprout
-    if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.CHALLAX_VARMINTS, player).access_rule = _sprout
+    if world.options.skill_points.value >= 2:
+        mw.get_location(RACSMSKILLPOINT.CHALLAX_MASTER,   player).access_rule = _sprout
 
     # ── Missions ──────────────────────────────────────────────────────────────
     # Giant Clank disabled/unreachable — METALIS_CLANK and CHALLAX_CLANK are
@@ -42,7 +42,7 @@ def set_challax_rules(world: RACSizeMatterWorld) -> None:
         lambda state: (_base(state) or state.has(RACSMITEM.DAYNI_MOON, player))
 
     # ── Vendors ───────────────────────────────────────────────────────────────
-    _shrink_ray = lambda state: (state.has("Shrink Ray", player))
+    _shrink_ray = lambda state: (state.has(RACSMITEM.SHRINK_RAY, player))
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_SNIPER, player).access_rule = _shrink_ray
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_PDA,    player).access_rule = _shrink_ray
 

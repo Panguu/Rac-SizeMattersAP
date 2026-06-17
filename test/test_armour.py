@@ -10,7 +10,7 @@ class TestProgressiveArmour(RACSizeMatterTestBase):
     def test_progressive_armour_items_in_pool(self) -> None:
         pool_names = [item.name for item in self.multiworld.itempool]
         self.assertTrue(
-            any(name.endswith(" Progressive Pickup") for name in pool_names),
+            any(name in ARMOUR_PROGRESSIVE_ITEM_TABLE for name in pool_names),
             "No progressive armour items found in pool",
         )
 
@@ -45,7 +45,7 @@ class TestNonProgressiveArmour(RACSizeMatterTestBase):
     def test_no_progressive_armour_in_pool(self) -> None:
         pool_names = [item.name for item in self.multiworld.itempool]
         self.assertFalse(
-            any(name.endswith(" Progressive Pickup") for name in pool_names),
+            any(name in ARMOUR_PROGRESSIVE_ITEM_TABLE for name in pool_names),
             "Progressive armour items found in non-progressive pool",
         )
 

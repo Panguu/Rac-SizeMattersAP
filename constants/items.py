@@ -68,6 +68,17 @@ class RACSMITEM:
     PROGRESSIVE_MOOTATOR = "Progressive Mootator"
     PROGRESSIVE_RYNO = "Progressive RYNO"
 
+    PROGRESSIVE_LACERATOR_MOD = "Progressive Lacerator Mod"
+    PROGRESSIVE_CONCUSSION_GUN_MOD = "Progressive Concussion Gun Mod"
+    PROGRESSIVE_ACID_BOMB_GLOVE_MOD = "Progressive Acid Bomb Glove Mod"
+    PROGRESSIVE_AGENTS_OF_DOOM_MOD = "Progressive Agents of Doom Mod"
+    PROGRESSIVE_BEE_MINE_GLOVE_MOD = "Progressive Bee Mine Glove Mod"
+    PROGRESSIVE_STATIC_BARRIER_MOD = "Progressive Static Barrier Mod"
+    PROGRESSIVE_SHOCK_ROCKET_MOD = "Progressive Shock Rocket Mod"
+    PROGRESSIVE_SNIPER_MINE_MOD = "Progressive Sniper Mine Mod"
+    PROGRESSIVE_SCORCHER_MOD = "Progressive Scorcher Mod"
+    PROGRESSIVE_LASER_TRACER_MOD = "Progressive Laser Tracer Mod"
+
     PROGRESSIVE_WILDFIRE = "Progressive Wildfire Armor"
     PROGRESSIVE_SLUDGE_MK9 ="Progressive Sludge Mk9 Armor"
     PROGRESSIVE_CRYSTALLIX = "Progressive Crystallix Armor"

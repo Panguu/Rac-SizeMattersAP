@@ -1,15 +1,31 @@
 """Tests for weapon-related options: progressive weapons and starting weapons."""
-from ..items import WEAPON_ITEM_TABLE, WEAPON_PROGRESSIVE_ITEM_TABLE, WEAPON_PROGRESSIVE_STEPS
+from ..items import (
+    PROGRESSIVE_WEAPON_NAME,
+    WEAPON_ITEM_TABLE,
+    WEAPON_PROGRESSIVE_ITEM_TABLE,
+    WEAPON_PROGRESSIVE_STEPS,
+)
 from .bases import RACSizeMatterTestBase
 
 
 class TestProgressiveWeapons(RACSizeMatterTestBase):
-    options = {"progressive_weapons": 1}
+    # Weapon mod items are always in the pool regardless of progressive_weapons,
+    # so enough extra location categories must be enabled to hold the larger
+    # progressive-weapons item pool (more copies needed for level-ups).
+    options = {
+        "progressive_weapons": 1,
+        "all_cutscenes": 1,
+        "clank_challenges": 2,
+        "skyboard_challenges": 1,
+        "skill_points": 2,
+        "enable_clank_challenge_skill_points": 1,
+        "enable_skyboard_challenge_skill_points": 1,
+    }
 
     def test_progressive_weapon_items_in_pool(self) -> None:
         pool_names = [item.name for item in self.multiworld.itempool]
         self.assertTrue(
-            any(name.endswith(" Progressive Weapon") for name in pool_names),
+            any(name in WEAPON_PROGRESSIVE_ITEM_TABLE for name in pool_names),
             "No progressive weapon items found in pool",
         )
 
@@ -21,7 +37,7 @@ class TestProgressiveWeapons(RACSizeMatterTestBase):
     def test_progressive_item_count_matches_steps(self) -> None:
         pool_names = [item.name for item in self.multiworld.itempool]
         for display, steps in WEAPON_PROGRESSIVE_STEPS.items():
-            prog_name = f"{display} Progressive Weapon"
+            prog_name = PROGRESSIVE_WEAPON_NAME[display]
             actual = pool_names.count(prog_name)
             self.assertEqual(actual, steps, f"{prog_name}: expected {steps} copies, got {actual}")
 
@@ -43,7 +59,7 @@ class TestNonProgressiveWeapons(RACSizeMatterTestBase):
     def test_no_progressive_weapon_items_in_pool(self) -> None:
         pool_names = [item.name for item in self.multiworld.itempool]
         self.assertFalse(
-            any(name.endswith(" Progressive Weapon") for name in pool_names),
+            any(name in WEAPON_PROGRESSIVE_ITEM_TABLE for name in pool_names),
             "Progressive weapon items found in non-progressive pool",
         )
 
@@ -87,14 +103,14 @@ class TestStartingWeaponsZero(RACSizeMatterTestBase):
         precollected = [
             item.name for item in self.multiworld.precollected_items[self.player]
             if item.name in WEAPON_ITEM_TABLE
-               or item.name.endswith(" Progressive Weapon")
+               or item.name in WEAPON_PROGRESSIVE_ITEM_TABLE
         ]
         self.assertEqual(len(precollected), 0)
 
     def test_all_weapons_available_in_pool(self) -> None:
         pool_names = {item.name for item in self.multiworld.itempool}
         has_any_weapon = any(
-            w in pool_names or f"{w} Progressive Weapon" in pool_names
+            w in pool_names or PROGRESSIVE_WEAPON_NAME[w] in pool_names
             for w in WEAPON_ITEM_TABLE
         )
         self.assertTrue(has_any_weapon, "No weapons found in pool with starting_weapons=0")

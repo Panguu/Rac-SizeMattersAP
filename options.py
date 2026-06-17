@@ -13,18 +13,19 @@ from Options import (
 )
 
 
-class ProgressiveWeapons(Choice):
-    """Controls how weapons, mods, and level upgrades are distributed.
-    off: Weapons, mods, and levels are individual random items.
-    progressive_mods: Progressive Weapon items unlock the weapon then grant mods in sequence.
-    progressive_levels: Progressive Weapon items unlock the weapon then grant level upgrades.
-    all_progressive: Progressive Weapon items grant the unlock, mods, then level upgrades in sequence."""
+class ProgressiveWeapons(Toggle):
+    """Replace each weapon's individual unlock item with a single Progressive Weapon
+    item per weapon: the first copy unlocks the weapon, each subsequent copy grants
+    the next level upgrade. When off, weapons are normal individual items with no
+    level-up items (levels work as in vanilla)."""
     display_name = "Progressive Weapons"
-    option_off                = 0
-    option_progressive_mods   = 1
-    option_progressive_levels = 2
-    option_all_progressive    = 3
-    default = 0
+
+
+class ProgressiveMods(Toggle):
+    """Replace each weapon's individual mod items with a single Progressive Mod item
+    per weapon: each copy grants the next mod slot in sequence. When off, each mod
+    slot is its own individual item."""
+    display_name = "Progressive Mods"
 
 
 class ProgressiveArmour(Toggle):
@@ -73,13 +74,28 @@ class ArmourSetChecks(DefaultOnToggle):
 class SkillPoints(Choice):
     """Include skill point challenges as location checks.
     off: no skill point checks.
-    easy: exploration and combat skill points only (excludes arena/challenge-based ones).
-    hard: all skill points including arena/skyboard challenge ones."""
+    easy: a curated set of easier skill points only.
+    hard: also includes a curated set of harder skill points.
+    Clank Challenge and Skyboard Challenge skill points are controlled separately
+    by the Enable Clank Challenge Skill Points and Enable Skyboard Challenge Skill
+    Points options below, regardless of this setting."""
     display_name = "Skill Points"
     option_off  = 0
     option_easy = 1
     option_hard = 2
     default = 0
+
+
+class EnableClankChallengeSkillPoints(Toggle):
+    """Include skill points earned from Clank Challenge arenas as location checks,
+    regardless of the Clank Challenges option."""
+    display_name = "Enable Clank Challenge Skill Points"
+
+
+class EnableSkyboardChallengeSkillPoints(Toggle):
+    """Include skill points earned from Skyboard Challenges as location checks,
+    regardless of the Skyboard Challenges option."""
+    display_name = "Enable Skyboard Challenge Skill Points"
 
 
 class StartingWeapons(Range):
@@ -140,6 +156,7 @@ class StartingSkin(Choice):
 @dataclass
 class RACSizeMatterOptions(PerGameCommonOptions):
     progressive_weapons: ProgressiveWeapons
+    progressive_mods: ProgressiveMods
     progressive_armour: ProgressiveArmour
     death_link: DeathLink
     death_amnesty: DeathAmnesty
@@ -149,6 +166,8 @@ class RACSizeMatterOptions(PerGameCommonOptions):
     skyboard_challenges: SkyboardChallenges
     armour_set_checks: ArmourSetChecks
     skill_points: SkillPoints
+    enable_clank_challenge_skill_points: EnableClankChallengeSkillPoints
+    enable_skyboard_challenge_skill_points: EnableSkyboardChallengeSkillPoints
     starting_weapons: StartingWeapons
     starting_gadgets: StartingGadgets
     starting_bolts: StartingBolts
@@ -167,6 +186,7 @@ racsm_option_groups = [
         StartingGadgets,
         StartingBolts,
         ProgressiveWeapons,
+        ProgressiveMods,
         ProgressiveArmour,
         TrapChance,
     ]),
@@ -176,6 +196,8 @@ racsm_option_groups = [
         ClankChallenges,
         SkyboardChallenges,
         SkillPoints,
+        EnableClankChallengeSkillPoints,
+        EnableSkyboardChallengeSkillPoints,
         ArmourSetChecks,
     ]),
     OptionGroup("RACSM Cosmetic Options", [

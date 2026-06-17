@@ -12,7 +12,12 @@ from .core.challenges import (
     GADGETBOT_CLANK_PICKUPS,
     GADGETBOT_TOSS_CLANK_PICKUPS,
 )
-from .core.skill_points import CHALLENGE_SKILL_POINTS, SKILL_POINTS
+from .core.skill_points import (
+    CLANK_CHALLENGE_SKILL_POINTS,
+    HARD_SKILL_POINTS,
+    SKILL_POINTS,
+    SKYBOARD_CHALLENGE_SKILL_POINTS,
+)
 from .core.titanium_bolts import TITANIUM_BOLTS
 
 BASE_ID = 77_700_000
@@ -93,12 +98,24 @@ SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
 
 EASY_SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
     name: data for name, data in SKILL_POINT_LOCATIONS.items()
-    if name not in CHALLENGE_SKILL_POINTS
+    if name not in HARD_SKILL_POINTS
+    and name not in CLANK_CHALLENGE_SKILL_POINTS
+    and name not in SKYBOARD_CHALLENGE_SKILL_POINTS
 }
 
 HARD_SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
     name: data for name, data in SKILL_POINT_LOCATIONS.items()
-    if name in CHALLENGE_SKILL_POINTS
+    if name in HARD_SKILL_POINTS
+}
+
+CLANK_CHALLENGE_SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
+    name: data for name, data in SKILL_POINT_LOCATIONS.items()
+    if name in CLANK_CHALLENGE_SKILL_POINTS
+}
+
+SKYBOARD_CHALLENGE_SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
+    name: data for name, data in SKILL_POINT_LOCATIONS.items()
+    if name in SKYBOARD_CHALLENGE_SKILL_POINTS
 }
 
 GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {

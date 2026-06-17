@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from ..constants.clank_challenges import RACSMTCLANK as RACSMCLANK
 from ..constants.cutscenes import RacSMCutsceneLocations
 from ..constants.general import RACSMLOCATION
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
@@ -18,16 +19,17 @@ def set_dayni_moon_rules(world: RACSizeMatterWorld) -> None:
     player = world.player
     mw = world.multiworld
 
-    _base       = lambda state: (state.has("Sprout-O-Matic", player)
+    _base       = lambda state: (state.has(RACSMITEM.SPROUT_O_MATIC, player)
                                  and has_projectile_weapon(state, player))
-    _shrink_ray = lambda state: (_base(state) and state.has("Shrink Ray", player))
+    _shrink_ray = lambda state: (_base(state) and state.has(RACSMITEM.SHRINK_RAY, player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points.value >= 1:
-        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_WOOL_PROTEST, player).access_rule = _base
-        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_BOUNCY,       player).access_rule = _base
+        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_BOUNCY, player).access_rule = _base
     if world.options.skill_points.value >= 2:
-        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_GLADIATOR,    player).access_rule = lambda _: True
+        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_WOOL_PROTEST, player).access_rule = _base
+    if world.options.enable_clank_challenge_skill_points:
+        mw.get_location(RACSMSKILLPOINT.DAYNI_MOON_GLADIATOR, player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────
     if world.options.all_missions:

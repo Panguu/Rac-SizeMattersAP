@@ -7,8 +7,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 80,
-            "y": 420
+            "x": 813,
+            "y": 231
           }
         ],
         "sections": [
@@ -79,8 +79,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 200,
-            "y": 150
+            "x": 171,
+            "y": 240
           }
         ],
         "sections": [
@@ -151,8 +151,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 370,
-            "y": 470
+            "x": 369,
+            "y": 33
           }
         ],
         "sections": [
@@ -253,8 +253,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 510,
-            "y": 100
+            "x": 768,
+            "y": 318
           }
         ],
         "sections": [
@@ -320,8 +320,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 270,
-            "y": 310
+            "x": 450,
+            "y": 207
           }
         ],
         "sections": [
@@ -372,8 +372,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 640,
-            "y": 380
+            "x": 183,
+            "y": 366
           }
         ],
         "sections": [
@@ -424,8 +424,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 740,
-            "y": 140
+            "x": 627,
+            "y": 390
           }
         ],
         "sections": [
@@ -521,8 +521,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 840,
-            "y": 460
+            "x": 663,
+            "y": 81
           }
         ],
         "sections": [
@@ -603,8 +603,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 930,
-            "y": 240
+            "x": 552,
+            "y": 207
           }
         ],
         "sections": [
@@ -650,8 +650,8 @@
         "map_locations": [
           {
             "map": "Galaxy",
-            "x": 1000,
-            "y": 400
+            "x": 870,
+            "y": 114
           }
         ],
         "sections": [

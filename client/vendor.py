@@ -30,7 +30,11 @@ from ..items import (
     ARMOUR_PIECE_BITMASKS,
     ARMOUR_SET_DISPLAY_TO_INTERNAL,
     GADGET_DISPLAY_TO_INTERNAL,
+    PROGRESSIVE_ARMOUR_NAME,
+    PROGRESSIVE_MOD_NAME,
+    PROGRESSIVE_WEAPON_NAME,
     WEAPON_DISPLAY_TO_INTERNAL,
+    WEAPON_MOD_NAME_TO_SLOT,
 )
 from ..locations import (
     GADGET_INTERNAL_TO_LOCATION,
@@ -41,6 +45,10 @@ from ..locations import (
 )
 
 _SMALL_BOX_BY_PLANET = {tb.planet_id: tb for tb in SmallTextBoxAddrs}
+
+PROGRESSIVE_WEAPON_NAME_REVERSE = {v: k for k, v in PROGRESSIVE_WEAPON_NAME.items()}
+PROGRESSIVE_ARMOUR_NAME_REVERSE = {v: k for k, v in PROGRESSIVE_ARMOUR_NAME.items()}
+PROGRESSIVE_MOD_NAME_REVERSE = {v: k for k, v in PROGRESSIVE_MOD_NAME.items()}
 
 
 # ── Vendor handler ───────────────────────────────────────────────────────────────
@@ -193,22 +201,33 @@ class InventoryMixin:
         for key in self._planet_state.values:
             self._planet_state.add(key, 0)
 
-        weapon_prog_counts: dict[str, int] = {}
-        armour_prog_counts: dict[str, int] = {}
-        weapon_unlocked:    dict[str, int] = {}
-        gadget_unlocked:    dict[str, int] = {}
-        weapon_mods:        dict[str, int] = {}  # internal_name → max mods count
+        weapon_prog_counts:     dict[str, int] = {}
+        weapon_mod_prog_counts: dict[str, int] = {}
+        armour_prog_counts:     dict[str, int] = {}
+        weapon_unlocked:        dict[str, int] = {}
+        gadget_unlocked:        dict[str, int] = {}
+        weapon_mod_slots:       dict[str, set[int]] = {}  # internal_name → unlocked 1-indexed slots
 
         infobot_planets: set[str] = set()
         for network_item in self.items_received:
             item_name = self.item_names[self.game].get(network_item.item, "")
 
-            if item_name.endswith(" Progressive Weapon"):
-                display = item_name[: -len(" Progressive Weapon")]
+            if item_name in PROGRESSIVE_WEAPON_NAME_REVERSE:
+                display = PROGRESSIVE_WEAPON_NAME_REVERSE[item_name]
                 weapon_prog_counts[display] = weapon_prog_counts.get(display, 0) + 1
                 continue
-            if item_name.endswith(" Progressive Pickup"):
-                display = item_name[: -len(" Progressive Pickup")]
+            if item_name in PROGRESSIVE_MOD_NAME_REVERSE:
+                display = PROGRESSIVE_MOD_NAME_REVERSE[item_name]
+                weapon_mod_prog_counts[display] = weapon_mod_prog_counts.get(display, 0) + 1
+                continue
+            if item_name in WEAPON_MOD_NAME_TO_SLOT:
+                mod_display, slot = WEAPON_MOD_NAME_TO_SLOT[item_name]
+                mod_internal = WEAPON_DISPLAY_TO_INTERNAL.get(mod_display)
+                if mod_internal:
+                    weapon_mod_slots.setdefault(mod_internal, set()).add(slot)
+                continue
+            if item_name in PROGRESSIVE_ARMOUR_NAME_REVERSE:
+                display = PROGRESSIVE_ARMOUR_NAME_REVERSE[item_name]
                 armour_prog_counts[display] = armour_prog_counts.get(display, 0) + 1
                 continue
 
@@ -242,8 +261,7 @@ class InventoryMixin:
                     bitmask |= bit
             self._player_armour_state.add(internal, bitmask)
 
-        # Progressive weapons
-        prog_mode = int(self.slot_data.get("progressive_weapons", 0))
+        # Progressive weapons: first copy unlocks, each further copy levels up
         weapon_levels: dict[str, int] = {}
         for display, count in weapon_prog_counts.items():
             internal = WEAPON_DISPLAY_TO_INTERNAL.get(display)
@@ -251,27 +269,25 @@ class InventoryMixin:
                 continue
             if count >= 1:
                 weapon_unlocked[internal] = 1
-            n_mods = WEAPON_MOD_COUNTS.get(internal, 0)
-            if prog_mode == 1:  # progressive_mods: unlock then mods, no levels
-                weapon_mods[internal] = min(count - 1, n_mods)
-                weapon_levels[internal] = 0
-            elif prog_mode == 2:  # progressive_levels: unlock then levels, no mods
-                weapon_mods[internal] = 0
-                weapon_levels[internal] = min(max(0, count - 1), WEAPON_MAX_LEVELS.get(internal, 1) - 1)
-            else:  # all_progressive (3): unlock, mods, then levels
-                weapon_mods[internal] = min(count - 1, n_mods)
-                level_steps = max(0, count - 1 - n_mods)
-                weapon_levels[internal] = min(level_steps, WEAPON_MAX_LEVELS.get(internal, 1) - 1)
+            weapon_levels[internal] = min(max(0, count - 1), WEAPON_MAX_LEVELS.get(internal, 1) - 1)
         self._gs.tracked_weapon_levels = weapon_levels
+
+        # Progressive mods: each copy unlocks the next mod slot in sequence
+        for display, count in weapon_mod_prog_counts.items():
+            internal = WEAPON_DISPLAY_TO_INTERNAL.get(display)
+            if not internal:
+                continue
+            n_mods = WEAPON_MOD_COUNTS.get(internal, 0)
+            weapon_mod_slots.setdefault(internal, set()).update(range(1, min(count, n_mods) + 1))
 
         # Populate weapon/gadget player states (updates addresses if weapons are loaded)
         if WEAPONS:
             self._player_weapon_state.update_addresses(_build_weapon_addresses())
             for name in WEAPONS:
                 self._player_weapon_state.add(name, weapon_unlocked.get(name, 0))
-                mods = weapon_mods.get(name, 0)
+                slots = weapon_mod_slots.get(name, set())
                 for i in range(1, WEAPON_MOD_COUNTS.get(name, 0) + 1):
-                    self._player_weapon_state.add(f"{name}_mod_{i}", 1 if mods >= i else 0)
+                    self._player_weapon_state.add(f"{name}_mod_{i}", 1 if i in slots else 0)
 
         if GADGETS:
             self._player_gadget_state.update_addresses(_build_gadget_addresses())

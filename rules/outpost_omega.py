@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
 from ..constants.tbolts import RACSMTBOLT
@@ -16,12 +17,12 @@ def set_outpost_omega_rules(world: RACSizeMatterWorld) -> None:
     player = world.player
     mw = world.multiworld
 
-    _facility = lambda state: (state.has("Shrink Ray", player)
-                               and state.has("Hypershot", player)
-                               and state.has("Sprout-O-Matic", player))
+    _facility = lambda state: (state.has(RACSMITEM.SHRINK_RAY, player)
+                               and state.has(RACSMITEM.HYPERSHOT, player)
+                               and state.has(RACSMITEM.SPROUT_O_MATIC, player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points.value >= 2:
+    if world.options.enable_skyboard_challenge_skill_points:
         mw.get_location(RACSMSKILLPOINT.OUTPOST_OMEGA_AWESOME, player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────
@@ -43,4 +44,4 @@ def set_outpost_omega_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Vendors ───────────────────────────────────────────────────────────────
     mw.get_location(RACSMVENDORLOCATION.OUTPOST_OMEGA_BEE, player).access_rule = \
-        lambda state: state.has("Shrink Ray", player)
+        lambda state: state.has(RACSMITEM.SHRINK_RAY, player)

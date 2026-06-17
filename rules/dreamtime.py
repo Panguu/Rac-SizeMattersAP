@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from ..constants.cutscenes import RacSMCutsceneLocations
 from ..constants.general import RACSMLOCATION
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
@@ -18,11 +19,11 @@ def set_dreamtime_rules(world: RACSizeMatterWorld) -> None:
     mw = world.multiworld
 
     # Entrance already requires Hypershot + Sprout-O-Matic.
-    _base = lambda state: (state.has("Hypershot", player)
-                           and state.has("Sprout-O-Matic", player))
+    _base = lambda state: (state.has(RACSMITEM.HYPERSHOT, player)
+                           and state.has(RACSMITEM.SPROUT_O_MATIC, player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points.value >= 1:
+    if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.DREAMTIME_FRIENDS,       player).access_rule = _base
         mw.get_location(RACSMSKILLPOINT.DREAMTIME_NIGHT_TERRORS, player).access_rule = _base
 

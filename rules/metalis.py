@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from ..constants.clank_challenges import RACSMTCLANK as RACSMCLANK
 from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 
@@ -17,8 +18,9 @@ def set_metalis_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points.value >= 2:
+        mw.get_location(RACSMSKILLPOINT.METALIS_TERROR, player).access_rule = lambda _: True
+    if world.options.enable_clank_challenge_skill_points:
         mw.get_location(RACSMSKILLPOINT.METALIS_SHUTOUT,   player).access_rule = lambda _: True
-        mw.get_location(RACSMSKILLPOINT.METALIS_TERROR,    player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.METALIS_GLADIATOR, player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────
@@ -28,7 +30,7 @@ def set_metalis_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Titanium Bolts ────────────────────────────────────────────────────────
     mw.get_location(RACSMTBOLT.METALIS_DOOR, player).access_rule = \
-        lambda state: state.has("Polarizer", player) and state.has("Hypershot", player)
+        lambda state: state.has(RACSMITEM.POLARIZER, player) and state.has(RACSMITEM.HYPERSHOT, player)
 
     # ── Clank Challenges — item rewards (clank_challenges >= 1) ───────────────
     if world.options.clank_challenges.value >= 1:

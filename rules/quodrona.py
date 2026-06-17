@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
@@ -15,11 +16,11 @@ def set_quodrona_rules(world: RACSizeMatterWorld) -> None:
     player = world.player
     mw = world.multiworld
 
-    _checks = lambda state: (state.has("Shrink Ray", player)
-                             and state.has("Hypershot", player))
+    _checks = lambda state: (state.has(RACSMITEM.SHRINK_RAY, player)
+                             and state.has(RACSMITEM.HYPERSHOT, player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points.value >= 1:
+    if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.QUODRONA_ELITE,  player).access_rule = _checks
         mw.get_location(RACSMSKILLPOINT.QUODRONA_STORM,  player).access_rule = _checks
 

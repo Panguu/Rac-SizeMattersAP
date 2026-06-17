@@ -6,7 +6,7 @@ from typing import Any
 class APSyncMixin:
     """Syncs game state with Archipelago server events."""
 
-    async def on_ap_connected(
+    def on_ap_connected(
         self,
         slot_data: dict[str, Any],
         checked_location_names: set[str],
@@ -20,7 +20,7 @@ class APSyncMixin:
         self.armour_sets.sync_from_ap(checked_location_names)
         self.missions.sync_from_ap(checked_location_names)
 
-    async def on_ap_received_items(self, checked_location_names: set[str]) -> None:
+    def on_ap_received_items(self, checked_location_names: set[str]) -> None:
         self._checked_locations = checked_location_names
         self.clank.sync_from_ap(checked_location_names)
         self.skyboard.sync_from_ap(checked_location_names)

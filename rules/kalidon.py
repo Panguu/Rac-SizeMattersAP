@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from ..constants.cutscenes import RacSMCutsceneLocations
 from ..constants.general import RACSMLOCATION
+from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
 from ..constants.tbolts import RACSMTBOLT
@@ -17,15 +18,16 @@ def set_kalidon_rules(world: RACSizeMatterWorld) -> None:
     player = world.player
     mw = world.multiworld
 
-    _inside = lambda state: (state.has("Hypershot", player)
-                             and state.has("Shrink Ray", player))
+    _inside = lambda state: (state.has(RACSMITEM.HYPERSHOT, player)
+                             and state.has(RACSMITEM.SHRINK_RAY, player))
 
     # ── Skill Points ──────────────────────────────────────────────────────────
     if world.options.skill_points.value >= 1:
         mw.get_location(RACSMSKILLPOINT.KALIDON_EXPLOSIVE,    player).access_rule = _inside
     if world.options.skill_points.value >= 2:
         mw.get_location(RACSMSKILLPOINT.KALIDON_SUPER_LOMBAX, player).access_rule = _inside
-        mw.get_location(RACSMSKILLPOINT.KALIDON_SKYBOARDER,   player).access_rule = lambda _: True
+    if world.options.enable_skyboard_challenge_skill_points:
+        mw.get_location(RACSMSKILLPOINT.KALIDON_SKYBOARDER, player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────
     if world.options.all_cutscenes:
@@ -36,7 +38,7 @@ def set_kalidon_rules(world: RACSizeMatterWorld) -> None:
     # ── Titanium Bolts ────────────────────────────────────────────────────────
     mw.get_location(RACSMTBOLT.KALIDON_SHIP,    player).access_rule = lambda _: True
     mw.get_location(RACSMTBOLT.KALIDON_FACTORY, player).access_rule = \
-        lambda state: state.has("Hypershot", player)
+        lambda state: state.has(RACSMITEM.HYPERSHOT, player)
     mw.get_location(RACSMTBOLT.KALIDON_RAMP,    player).access_rule = _inside
 
     # ── Armour ────────────────────────────────────────────────────────────────

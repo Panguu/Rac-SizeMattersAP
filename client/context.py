@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from typing import Any
 
 tracker_loaded: bool = False
@@ -126,6 +127,13 @@ class RACContext(
 
         self._wiring = GameWiring(self.pine, log=self._log)
 
+    async def _guarded_wiring_call(self, fn: Callable[[], None]) -> None:
+        """Runs a synchronous GameOrchestrator call under the PINE lock so it
+        can't interleave PINE requests with game_watcher's poll loop."""
+        loop = asyncio.get_event_loop()
+        async with self._pine_lock:
+            await loop.run_in_executor(None, fn)
+
     def _checked_location_names(self) -> set[str]:
         id_to_name = {v: k for k, v in self._location_name_to_id.items()}
         return {
@@ -179,7 +187,9 @@ class RACContext(
                 on_bonus_weapon_pickup = self._grant_random_bonus_item,
             )
             checked = self._checked_location_names()
-            asyncio.create_task(self._wiring.on_ap_connected(self.slot_data, checked))
+            asyncio.create_task(self._guarded_wiring_call(
+                lambda: self._wiring.on_ap_connected(self.slot_data, checked)
+            ))
             self._pending_item_apply = True
             asyncio.create_task(self._apply_received_items())
             self._write_notification_text(colored_text(
@@ -197,7 +207,9 @@ class RACContext(
                 self._notification_item_index = len(self.items_received)
                 self._processed_trap_count = len(self.items_received)
             checked = self._checked_location_names()
-            asyncio.create_task(self._wiring.on_ap_received_items(checked))
+            asyncio.create_task(self._guarded_wiring_call(
+                lambda: self._wiring.on_ap_received_items(checked)
+            ))
             self._pending_item_apply = True
             asyncio.create_task(self._apply_received_items())
             return

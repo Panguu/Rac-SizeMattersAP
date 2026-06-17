@@ -92,30 +92,77 @@ WEAPON_ITEM_TABLE: dict[str, RACItemData] = {
     for idx, name in enumerate(WEAPON_DISPLAY_TO_INTERNAL, start=1)
 }
 
-WEAPON_PROGRESSIVE_STEPS_MODS: dict[str, int] = {
-    display: 1 + WEAPON_MOD_COUNTS.get(internal, 0)
-    for display, internal in WEAPON_DISPLAY_TO_INTERNAL.items()
-}
-
-WEAPON_PROGRESSIVE_STEPS_LEVELS: dict[str, int] = {
+# Steps for the "Progressive {Weapon}" item: 1 copy unlocks the weapon, each
+# subsequent copy grants the next level up.
+WEAPON_PROGRESSIVE_STEPS: dict[str, int] = {
     display: 1 + max(0, WEAPON_MAX_LEVELS.get(internal, 1) - 1)
     for display, internal in WEAPON_DISPLAY_TO_INTERNAL.items()
 }
 
-WEAPON_PROGRESSIVE_STEPS: dict[str, int] = {
-    display: 1 + WEAPON_MOD_COUNTS.get(internal, 0) + max(0, WEAPON_MAX_LEVELS.get(internal, 1) - 1)
-    for display, internal in WEAPON_DISPLAY_TO_INTERNAL.items()
-}
-
-WEAPON_PROGRESSIVE_STEPS_BY_MODE: dict[int, dict[str, int]] = {
-    1: WEAPON_PROGRESSIVE_STEPS_MODS,
-    2: WEAPON_PROGRESSIVE_STEPS_LEVELS,
-    3: WEAPON_PROGRESSIVE_STEPS,
+PROGRESSIVE_WEAPON_NAME: dict[str, str] = {
+    RACSMITEM.LACERATOR:       RACSMITEM.PROGRESSIVE_LACERATOR,
+    RACSMITEM.CONCUSSION_GUN:  RACSMITEM.PROGRESSIVE_CONCUSSION_GUN,
+    RACSMITEM.ACID_BOMB_GLOVE: RACSMITEM.PROGRESSIVE_ACID_BOMB_GLOVE,
+    RACSMITEM.AGENTS_OF_DOOM:  RACSMITEM.PROGRESSIVE_AGENTS_OF_DOOM,
+    RACSMITEM.BEE_MINE_GLOVE:  RACSMITEM.PROGRESSIVE_BEE_MINE_GLOVE,
+    RACSMITEM.STATIC_BARRIER:  RACSMITEM.PROGRESSIVE_STATIC_BARRIER,
+    RACSMITEM.SHOCK_ROCKET:    RACSMITEM.PROGRESSIVE_SHOCK_ROCKET,
+    RACSMITEM.SNIPER_MINE:     RACSMITEM.PROGRESSIVE_SNIPER_MINE,
+    RACSMITEM.SCORCHER:        RACSMITEM.PROGRESSIVE_SCORCHER,
+    RACSMITEM.LASER_TRACER:    RACSMITEM.PROGRESSIVE_LASER_TRACER,
+    RACSMITEM.SUCK_CANNON:     RACSMITEM.PROGRESSIVE_SUCK_CANNON,
+    RACSMITEM.MOOTATOR:        RACSMITEM.PROGRESSIVE_MOOTATOR,
+    RACSMITEM.RYNO:            RACSMITEM.PROGRESSIVE_RYNO,
 }
 
 WEAPON_PROGRESSIVE_ITEM_TABLE: dict[str, RACItemData] = {
-    f"{display} Progressive Weapon": RACItemData(BASE_ID + 350 + idx, ItemClassification.progression)
+    PROGRESSIVE_WEAPON_NAME[display]: RACItemData(BASE_ID + 350 + idx, ItemClassification.progression)
     for idx, display in enumerate(WEAPON_DISPLAY_TO_INTERNAL)
+}
+
+# Weapons with at least one mod slot (suck_cannon/mootator/ryno have none).
+_WEAPONS_WITH_MODS: list[str] = [
+    display for display, internal in WEAPON_DISPLAY_TO_INTERNAL.items()
+    if WEAPON_MOD_COUNTS.get(internal, 0) > 0
+]
+
+PROGRESSIVE_MOD_NAME: dict[str, str] = {
+    RACSMITEM.LACERATOR:       RACSMITEM.PROGRESSIVE_LACERATOR_MOD,
+    RACSMITEM.CONCUSSION_GUN:  RACSMITEM.PROGRESSIVE_CONCUSSION_GUN_MOD,
+    RACSMITEM.ACID_BOMB_GLOVE: RACSMITEM.PROGRESSIVE_ACID_BOMB_GLOVE_MOD,
+    RACSMITEM.AGENTS_OF_DOOM:  RACSMITEM.PROGRESSIVE_AGENTS_OF_DOOM_MOD,
+    RACSMITEM.BEE_MINE_GLOVE:  RACSMITEM.PROGRESSIVE_BEE_MINE_GLOVE_MOD,
+    RACSMITEM.STATIC_BARRIER:  RACSMITEM.PROGRESSIVE_STATIC_BARRIER_MOD,
+    RACSMITEM.SHOCK_ROCKET:    RACSMITEM.PROGRESSIVE_SHOCK_ROCKET_MOD,
+    RACSMITEM.SNIPER_MINE:     RACSMITEM.PROGRESSIVE_SNIPER_MINE_MOD,
+    RACSMITEM.SCORCHER:        RACSMITEM.PROGRESSIVE_SCORCHER_MOD,
+    RACSMITEM.LASER_TRACER:    RACSMITEM.PROGRESSIVE_LASER_TRACER_MOD,
+}
+
+# One "Progressive {Weapon} Mod" item per mod slot — each additional copy
+# unlocks the next mod slot, independent of the weapon's unlock/level item.
+WEAPON_PROGRESSIVE_MOD_ITEM_TABLE: dict[str, RACItemData] = {
+    PROGRESSIVE_MOD_NAME[display]: RACItemData(BASE_ID + 380 + idx, ItemClassification.useful)
+    for idx, display in enumerate(_WEAPONS_WITH_MODS)
+}
+
+# Individual numbered mod items used when Progressive Mods is off — one item
+# per mod slot, each independently grants that specific slot.
+WEAPON_MOD_ITEM_TABLE: dict[str, RACItemData] = {
+    f"{display} Mod {i}": RACItemData(BASE_ID + 700 + idx, ItemClassification.useful)
+    for idx, (display, i) in enumerate(
+        (display, i)
+        for display in _WEAPONS_WITH_MODS
+        for i in range(1, WEAPON_MOD_COUNTS.get(WEAPON_DISPLAY_TO_INTERNAL[display], 0) + 1)
+    )
+}
+
+# "{Weapon} Mod {i}" item name -> (weapon display name, 1-indexed slot number)
+WEAPON_MOD_NAME_TO_SLOT: dict[str, tuple[str, int]] = {
+    name: (display, i)
+    for display in _WEAPONS_WITH_MODS
+    for i in range(1, WEAPON_MOD_COUNTS.get(WEAPON_DISPLAY_TO_INTERNAL[display], 0) + 1)
+    for name in (f"{display} Mod {i}",)
 }
 
 
@@ -151,8 +198,18 @@ ARMOUR_ITEM_TABLE: dict[str, RACItemData] = {
     for idx, name in enumerate(ARMOUR_DISPLAY_TO_INTERNAL, start=1)
 }
 
+PROGRESSIVE_ARMOUR_NAME: dict[str, str] = {
+    "Wildfire":     RACSMITEM.PROGRESSIVE_WILDFIRE,
+    "Sludge Mk9":   RACSMITEM.PROGRESSIVE_SLUDGE_MK9,
+    "Crystallix":   RACSMITEM.PROGRESSIVE_CRYSTALLIX,
+    "Electroshock": RACSMITEM.PROGRESSIVE_ELECTROSHOCK,
+    "Mega Bomb":    RACSMITEM.PROGRESSIVE_MEGA_BOMB,
+    "Hyperborean":  RACSMITEM.PROGRESSIVE_HYPERBOREAN,
+    "Chameleon":    RACSMITEM.PROGRESSIVE_CHAMELEON,
+}
+
 ARMOUR_PROGRESSIVE_ITEM_TABLE: dict[str, RACItemData] = {
-    f"{display} Progressive Pickup": RACItemData(BASE_ID + 370 + idx, ItemClassification.useful)
+    PROGRESSIVE_ARMOUR_NAME[display]: RACItemData(BASE_ID + 370 + idx, ItemClassification.useful)
     for idx, (display, _) in enumerate(ARMOUR_SETS)
 }
 
@@ -175,6 +232,8 @@ ALL_ITEMS: dict[str, RACItemData] = {
     **GADGET_ITEM_TABLE,
     **ARMOUR_ITEM_TABLE,
     **WEAPON_PROGRESSIVE_ITEM_TABLE,
+    **WEAPON_PROGRESSIVE_MOD_ITEM_TABLE,
+    **WEAPON_MOD_ITEM_TABLE,
     **ARMOUR_PROGRESSIVE_ITEM_TABLE,
     **INFOBOT_ITEM_TABLE,
     **FILLER_ITEM_TABLE,
