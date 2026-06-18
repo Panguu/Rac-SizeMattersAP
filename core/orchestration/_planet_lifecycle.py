@@ -4,14 +4,18 @@ import asyncio
 import struct
 import time
 
-from ..address_maps import CURRENT_PLANET_ADDRESS, PLANET_MISSION_ADDRESSES
+from ..address_maps import PLANET_MISSION_ADDRESSES
 from ..address_maps.planet_map import build_combined_address_map
 from ..cutscenes import POKITARU_RYLLUS_ALT_TRIGGER
 from ..game_orchestrator import PLANET_NAMES, POLL_INTERVAL
 from ..memory import GADGETS, load_weapons_for_planet
 from ..planets import Planets
-
-_TRANSITION_SETTLE_S = 1.0
+from ..structs.game import (
+    TRANSITION_GATE_ARRIVED,
+    TRANSITION_GATE_IDLE,
+    LoadingPlanetStruct,
+    TransitionGateStruct,
+)
 
 _OUTPOST_OMEGA_1_ID = 0x06
 
@@ -26,47 +30,94 @@ _GIANT_CLANK_MASK = 0x0010
 class PlanetLifecycleMixin:
     """Planet enter/exit, address-map swaps, initial load, and transition handling."""
 
-    def _on_travel_menu_close(self) -> None:
-        self._travel_close_time = time.monotonic() + 5.0
-        self._log("[RAC] Travel menu closed — writes blocked for 5 s in case of a level transition.")
-        asyncio.create_task(self._reapply_after_challenge_close())
+    # ── Transition gate (0x1EDDAD4) ──────────────────────────────────────────
+    # Authoritative source for when writes must stop/resume. Rests at
+    # TRANSITION_GATE_IDLE; any change away from idle means a transition has
+    # started (block writes now). TRANSITION_GATE_ARRIVED tells us the planet
+    # ID at LoadingPlanetStruct (0x1EDDAE4, right beside the gate) is now
+    # valid, so we can swap the address map (a local bookkeeping change, not
+    # a memory write). Returning to idle means the transition is fully
+    # settled — only then do we run the actual write cascade
+    # (_finish_planet_enter).
 
-    async def _reapply_after_challenge_close(self) -> None:
-        await asyncio.sleep(5.1)
-        self._reapply_inv()
-
-    def _poll_planet_transition(self) -> None:
-        if self._transition_start_time is None:
+    def _debug_print_transition_gate(self) -> None:
+        """Print the gate and loading-planet values once a second, for debugging."""
+        now = time.monotonic()
+        if now - self._last_gate_debug < 1.0:
             return
-        if time.monotonic() - self._transition_start_time < _TRANSITION_SETTLE_S:
-            return
+        self._last_gate_debug = now
         try:
-            raw = self._orchestrator.accessor.read_raw(CURRENT_PLANET_ADDRESS, 1)
-            planet_id = raw[0] if raw else 0
+            gate_raw = self._orchestrator.accessor.read_raw(TransitionGateStruct.BASE_ADDRESS, 4)
+            gate_val = int.from_bytes(gate_raw, "little") if gate_raw else 0
         except Exception:
+            gate_val = -1
+        try:
+            planet_raw = self._orchestrator.accessor.read_raw(LoadingPlanetStruct.BASE_ADDRESS, 4)
+            planet_val = int.from_bytes(planet_raw, "little") if planet_raw else 0
+        except Exception:
+            planet_val = -1
+        self._log(f"[RAC] Transition debug: gate={gate_val:#010x} loading_planet={planet_val:#010x}")
+
+    def _register_transition_gate(self) -> None:
+        self._orchestrator.accessor.on_struct_change(
+            TransitionGateStruct, self._on_transition_gate_change
+        )
+
+    def _on_transition_gate_change(self, address: int, new_bytes: bytes) -> None:
+        del address
+        if len(new_bytes) < 4:
             return
-        if planet_id in PLANET_NAMES:
-            self._log(
-                f"[RAC] Transition fallback: {PLANET_NAMES[planet_id]} detected "
-                f"via CURRENT_PLANET_ADDRESS — firing planet_enter."
-            )
-            self._on_planet_enter(planet_id)
+        value = struct.unpack_from("<I", new_bytes)[0]
+        prev = self._gate_value
+        self._gate_value = value
+        if value == prev:
+            return
+
+        left_idle    = prev == TRANSITION_GATE_IDLE and value != TRANSITION_GATE_IDLE
+        back_to_idle = prev != TRANSITION_GATE_IDLE and value == TRANSITION_GATE_IDLE
+
+        if left_idle:
+            self._log(f"[RAC] Transition gate left idle ({prev:#010x} -> {value:#010x}) — blocking writes.")
+            exiting_id = self._active_planet_id
+            if exiting_id in self.planet_states:
+                self.planet_states[exiting_id].planet_exit()
+
+        if value == TRANSITION_GATE_ARRIVED:
+            try:
+                raw = self._orchestrator.accessor.read_raw(LoadingPlanetStruct.BASE_ADDRESS, 4)
+                planet_id = raw[0] if raw else 0
+            except Exception:
+                planet_id = 0
+            if planet_id in self.planet_states:
+                self._gate_pending_planet_id = planet_id
+                self._log(
+                    f"[RAC] Transition gate arrived — landed on "
+                    f"{PLANET_NAMES.get(planet_id, hex(planet_id))}."
+                )
+
+        if back_to_idle:
+            pid = self._gate_pending_planet_id
+            self._gate_pending_planet_id = 0
+            if pid in self.planet_states:
+                self._log(
+                    f"[RAC] Transition gate settled back to idle — resuming on "
+                    f"{PLANET_NAMES.get(pid, hex(pid))}."
+                )
+                self.planet_states[pid].planet_enter()
 
     def _on_planet_enter(self, planet_id: int) -> None:
         if planet_id not in PLANET_NAMES:
             return
         self._transitioning         = False
-        self._travel_close_time     = None
-        self._transition_start_time = None
         self._active_planet_id      = planet_id
         if self._swap_task:
             self._swap_task.cancel()
         self._swap_task = asyncio.create_task(self._finish_planet_enter(planet_id))
 
     async def _finish_planet_enter(self, planet_id: int) -> None:
-        # Let the level finish loading before touching any memory — writing
-        # immediately on the enter signal can land mid-load.
-        await asyncio.sleep(_TRANSITION_SETTLE_S)
+        # The transition gate has already settled back to idle by the time
+        # planet_enter() fires, so it's safe to write immediately — no more
+        # artificial settle delay.
         self.clank.write_unlocks()
         self.skyboard.write_defaults()
         self.skin.apply(self._orchestrator.accessor)
@@ -111,8 +162,6 @@ class PlanetLifecycleMixin:
         if self._active_planet_id == planet_id:
             self._active_planet_id = 0
         self._transitioning         = True
-        self._travel_close_time     = None
-        self._transition_start_time = time.monotonic()
         self.armour.sync_slots()
         self.quick_select.freeze()
         if self._swap_task:

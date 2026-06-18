@@ -4,6 +4,7 @@ from typing import Any, ClassVar
 
 from BaseClasses import Item, ItemClassification, Location, Tutorial
 
+from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 
 from .constants.items import RACSMITEM
@@ -26,7 +27,19 @@ from .items import (
     WEAPON_PROGRESSIVE_STEPS,
 )
 from .locations import ALL_LOCATIONS
-from .options import RACSizeMatterOptions, racsm_option_groups
+from .options import (
+    AllCutscenes,
+    AllMissions,
+    ArmourSetChecks,
+    ClankChallenges,
+    EnableClankChallengeSkillPoints,
+    EnableSkyboardChallengeSkillPoints,
+    ProgressiveWeapons,
+    RACSizeMatterOptions,
+    SkillPoints,
+    SkyboardChallenges,
+    racsm_option_groups,
+)
 from .regions import create_regions
 from .rules import set_rules
 from .universal_tracker import setup_options_from_slot_data, tracker_world
@@ -101,8 +114,15 @@ class RACSizeMatterWorld(World):
     def create_items(self) -> None:
         pool: list[str] = []
         if self.options.progressive_weapons:
+            ryno_progressive = self.options.skill_points.value >= SkillPoints.option_hard
+            mootator_progressive = self.options.skill_points.value >= SkillPoints.option_easy
             for display, steps in WEAPON_PROGRESSIVE_STEPS.items():
-                pool += [PROGRESSIVE_WEAPON_NAME[display]] * steps
+                if display == RACSMITEM.RYNO and not ryno_progressive:
+                    pool.append(display)
+                elif display == RACSMITEM.MOOTATOR and not mootator_progressive:
+                    pool.append(display)
+                else:
+                    pool += [PROGRESSIVE_WEAPON_NAME[display]] * steps
         else:
             pool += list(WEAPON_ITEM_TABLE)
 
@@ -124,11 +144,52 @@ class RACSizeMatterWorld(World):
 
         # Fill any remaining slots
         unfilled = len(self.multiworld.get_unfilled_locations(self.player))
-        filler_needed = max(0, unfilled - len(pool))
-        pool += [self.get_filler_item_name() for _ in range(filler_needed)]
+        deficit = len(pool) - unfilled
+        if deficit > 0:
+            self.handle_not_enough_locations(deficit)
+        pool += [self.get_filler_item_name() for _ in range(-deficit)]
 
         for name in pool:
             self.multiworld.itempool.append(self.create_item(name))
+
+    def get_excluded_count(self) -> int:
+        return len(self.options.exclude_locations.value)
+
+    def handle_not_enough_locations(self, count: int) -> None:
+        """Check the available location and item counts, raise OptionError to warn the player of too few locations."""
+        excluded_count = self.get_excluded_count()
+        option_list: list[str] = []
+        if not self.options.all_missions:
+            option_list.append(AllMissions.display_name)
+        if not self.options.all_cutscenes:
+            option_list.append(AllCutscenes.display_name)
+        if self.options.skill_points.value < SkillPoints.option_hard:
+            option_list.append(SkillPoints.display_name)
+        if not self.options.enable_clank_challenge_skill_points:
+            option_list.append(EnableClankChallengeSkillPoints.display_name)
+        if not self.options.enable_skyboard_challenge_skill_points:
+            option_list.append(EnableSkyboardChallengeSkillPoints.display_name)
+        if not self.options.armour_set_checks:
+            option_list.append(ArmourSetChecks.display_name)
+        if self.options.clank_challenges.value < ClankChallenges.option_all:
+            option_list.append(ClankChallenges.display_name)
+        if self.options.skyboard_challenges.value < SkyboardChallenges.option_all:
+            option_list.append(SkyboardChallenges.display_name)
+        if excluded_count > 10:
+            option_list.append("Exclude Locations")
+        if not option_list:
+            option_list = ["dunno"]  # ¯\_(ツ)_/¯
+
+        message = f"Not enough location options enabled! {count} items have nowhere to be placed."
+        if count >= 20:
+            message += (f"\nThis large of a difference requires {ProgressiveWeapons.display_name} to be disabled, "
+                        f"{ClankChallenges.display_name} set to All, or {SkyboardChallenges.display_name} set to All.")
+        if count <= 10 and sum(self.options.start_inventory_from_pool.value.values()) <= 10:
+            message += "Consider adding some items to your starting_items_from_pool or "
+        else:
+            message += "Consider "
+        message += f"adjusting some of the following options: {option_list}"
+        raise OptionError(message)
 
     def _precollect(self, name: str) -> None:
         """Precollect an item and replace its copy in the pool with Bolts filler."""

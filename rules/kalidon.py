@@ -9,6 +9,7 @@ from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
+from ._helpers import has_weapon
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld
@@ -57,6 +58,6 @@ def set_kalidon_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Weapon Mod Vendor ─────────────────────────────────────────────────────
     mw.get_location(RACSMVENDORLOCATION.KALIDON_LACERATOR_LOCK,   player).access_rule = \
-        lambda state: state.can_reach(RACSMVENDORLOCATION.POKITARU_LACERATOR, "Location", player)
+        lambda state: has_weapon(state, player, RACSMITEM.LACERATOR)
     mw.get_location(RACSMVENDORLOCATION.KALIDON_CONCUSSION_SPLIT, player).access_rule = \
-        lambda state: state.can_reach(RACSMVENDORLOCATION.POKITARU_CONCUSSION, "Location", player)
+        lambda state: has_weapon(state, player, RACSMITEM.CONCUSSION_GUN)

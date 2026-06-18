@@ -9,6 +9,7 @@ from Options import (
     PerGameCommonOptions,
     ProgressionBalancing,
     Range,
+    StartInventoryPool,
     Toggle,
 )
 
@@ -155,6 +156,7 @@ class StartingSkin(Choice):
 
 @dataclass
 class RACSizeMatterOptions(PerGameCommonOptions):
+    start_inventory_from_pool: StartInventoryPool
     progressive_weapons: ProgressiveWeapons
     progressive_mods: ProgressiveMods
     progressive_armour: ProgressiveArmour

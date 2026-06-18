@@ -121,7 +121,7 @@ SKYBOARD_CHALLENGE_SKILL_POINT_LOCATIONS: dict[str, RACLocationData] = {
 GADGET_PICKUP_LOCATIONS: dict[str, RACLocationData] = {
     RACSMLOCATION.RYLLUS_SPROUT:  RACLocationData(BASE_ID + 1401, RACSMPLANET.RYLLUS),
     RACSMLOCATION.KALIDON_SHRINK: RACLocationData(BASE_ID + 1407, RACSMPLANET.KALIDON),
-    RACSMLOCATION.METALIS_GLOVES: RACLocationData(BASE_ID + 1406, RACSMPLANET.METALIS),
+    # RACSMLOCATION.METALIS_GLOVES: RACLocationData(BASE_ID + 1406, RACSMPLANET.METALIS),  # Giant Clank disabled
 }
 
 # ── Skyboard challenge locations ──────────────────────────────────────────────
@@ -174,8 +174,8 @@ _MISSION_ENTRIES: list[tuple[str, str, bool]] = [
     (RacSMCutsceneLocations.OUTPOST_OMEGA_ESCAPE,     RACSMPLANET.OUTPOST_OMEGA, False),
     (RacSMCutsceneLocations.OUTPOST_OMEGA_REMATCH,    RACSMPLANET.OUTPOST_OMEGA, False),
     # Challax
-    # (RacSMCutsceneLocations.METALIS_CLANK,          RACSMPLANET.CHALLAX,       True),   # Giant Clank disabled — unreachable
-    # (RacSMCutsceneLocations.CHALLAX_CLANK,          RACSMPLANET.CHALLAX,       False),  # Giant Clank disabled — unreachable
+    # (RacSMCutsceneLocations.METALIS_CLANK,          RACSMPLANET.CHALLAX,       True),   # Giant Clank disabled
+    # (RacSMCutsceneLocations.CHALLAX_CLANK,          RACSMPLANET.CHALLAX,       False),  # Giant Clank disabled
     # Dayni Moon
     (RacSMCutsceneLocations.DAYNI_MOON,               RACSMPLANET.DAYNI_MOON,    False),
     (RacSMCutsceneLocations.DAYNI_MOON_FIGHT1,        RACSMPLANET.DAYNI_MOON,    True),
@@ -271,8 +271,8 @@ GADGET_INTERNAL_TO_LOCATION: dict[str, str] = {v: k for k, v in VENDOR_GADGET_LO
 # Slot 1 = mod_slot_one, 2 = mod_slot_two, 3 = mod_slot_three in the weapon struct.
 # Scorcher Spitfire is confirmed in slot 2; all others use the first available slot.
 _MOD_SLOT_ASSIGNMENT: list[tuple[str, int, str]] = [
-    ("lacerator",       1, RACSMVENDORLOCATION.KALIDON_LACERATOR_LOCK),
-    ("lacerator",       2, RACSMVENDORLOCATION.CHALLAX_LACERATOR_DOUBLE),
+    ("lacerator",       2, RACSMVENDORLOCATION.KALIDON_LACERATOR_LOCK),
+    ("lacerator",       1, RACSMVENDORLOCATION.CHALLAX_LACERATOR_DOUBLE),
     ("acid_bomb_glove", 1, RACSMVENDORLOCATION.CHALLAX_ACID_BURN),
     ("acid_bomb_glove", 2, RACSMVENDORLOCATION.CHALLAX_ACID_EPOXY),
     ("concussion_gun",  1, RACSMVENDORLOCATION.KALIDON_CONCUSSION_SPLIT),

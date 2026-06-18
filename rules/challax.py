@@ -7,6 +7,7 @@ from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
+from ._helpers import has_weapon
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld
@@ -48,14 +49,14 @@ def set_challax_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Weapon Mod Vendor ─────────────────────────────────────────────────────
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_LACERATOR_DOUBLE,  player).access_rule = \
-        lambda state: _base(state) and state.can_reach(RACSMVENDORLOCATION.POKITARU_LACERATOR, "Location", player)
+        lambda state: _base(state) and has_weapon(state, player, RACSMITEM.LACERATOR)
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_ACID_BURN,         player).access_rule = \
-        lambda state: _base(state) and state.can_reach(RACSMVENDORLOCATION.POKITARU_ACID, "Location", player)
+        lambda state: _base(state) and has_weapon(state, player, RACSMITEM.ACID_BOMB_GLOVE)
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_ACID_EPOXY,        player).access_rule = \
-        lambda state: _base(state) and state.can_reach(RACSMVENDORLOCATION.POKITARU_ACID, "Location", player)
+        lambda state: _base(state) and has_weapon(state, player, RACSMITEM.ACID_BOMB_GLOVE)
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_CONCUSSION_LOCK,   player).access_rule = \
-        lambda state: _base(state) and state.can_reach(RACSMVENDORLOCATION.POKITARU_CONCUSSION, "Location", player)
+        lambda state: _base(state) and has_weapon(state, player, RACSMITEM.CONCUSSION_GUN)
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_CONCUSSION_CHARGE, player).access_rule = \
-        lambda state: _base(state) and state.can_reach(RACSMVENDORLOCATION.POKITARU_CONCUSSION, "Location", player)
+        lambda state: _base(state) and has_weapon(state, player, RACSMITEM.CONCUSSION_GUN)
     mw.get_location(RACSMVENDORLOCATION.CHALLAX_BEE_WORKER,        player).access_rule = \
-        lambda state: _base(state) and state.can_reach(RACSMVENDORLOCATION.OUTPOST_OMEGA_BEE, "Location", player)
+        lambda state: _base(state) and has_weapon(state, player, RACSMITEM.BEE_MINE_GLOVE)

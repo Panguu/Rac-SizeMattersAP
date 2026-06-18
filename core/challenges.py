@@ -6,6 +6,7 @@ from typing import NamedTuple
 
 from ..constants.clank_challenges import RACSMTCLANK as RACSMCLANK
 from ..constants.planets import RACSMPLANET
+from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
@@ -167,6 +168,21 @@ ALL_CLANK_ADDRESS_MAP: dict[int, str] = {
     if cp.address != 0
 }
 
+# Every individual challenge name per planet (Derby + Gadgetbot Toss + Gadgetbot).
+# Used as a failsafe: if every one of these is completed, the "Ultimate Gladiator"
+# skill point is sent even if its own in-game detection never fired.
+METALIS_CHALLENGE_NAMES: frozenset[str] = frozenset(
+    {*_METALIS_DERBY, *_METALIS_GADGETBOT_TOSS, *_METALIS_GADGETBOT}
+)
+DAYNI_MOON_CHALLENGE_NAMES: frozenset[str] = frozenset(
+    {*_DAYNI_DERBY, *_DAYNI_GADGETBOT_TOSS, *_DAYNI_GADGETBOT}
+)
+
+GLADIATOR_FAILSAFE: dict[str, str] = {
+    RACSMPLANET.METALIS:    RACSMSKILLPOINT.METALIS_GLADIATOR,
+    RACSMPLANET.DAYNI_MOON: RACSMSKILLPOINT.DAYNI_MOON_GLADIATOR,
+}
+
 
 # ── Skyboard addresses ─────────────────────────────────────────────────────────
 
@@ -237,6 +253,7 @@ class ClankChallengeState(BaseState):
         self._on_location_check: Callable[[str], None] = lambda _: None
         self._all_challenges: bool                    = False
         self._enabled:        bool                    = True
+        self._gladiator_sent: set[str]                = set()
 
     def set_mode(self, mode: int) -> None:
         self._enabled       = mode >= 1
@@ -270,11 +287,24 @@ class ClankChallengeState(BaseState):
                     self._completed.add(name)
                     self._on_location_check(name)
                     self.on_challenge_completed(name)
+                    self._check_gladiator_failsafe()
             else:
                 if count >= 2:
                     self._completed.add(name)
                     self._on_location_check(name)
                     self.on_challenge_completed(name)
+                    self._check_gladiator_failsafe()
+
+    def _check_gladiator_failsafe(self) -> None:
+        """If every individual challenge on a planet is complete, send that
+        planet's Ultimate Gladiator skill point even if its own in-game
+        detection never fired."""
+        if RACSMPLANET.METALIS not in self._gladiator_sent and METALIS_CHALLENGE_NAMES <= self._completed:
+            self._gladiator_sent.add(RACSMPLANET.METALIS)
+            self._on_location_check(GLADIATOR_FAILSAFE[RACSMPLANET.METALIS])
+        if RACSMPLANET.DAYNI_MOON not in self._gladiator_sent and DAYNI_MOON_CHALLENGE_NAMES <= self._completed:
+            self._gladiator_sent.add(RACSMPLANET.DAYNI_MOON)
+            self._on_location_check(GLADIATOR_FAILSAFE[RACSMPLANET.DAYNI_MOON])
 
     def sync(self) -> None:
         for addr, name in ALL_CLANK_ADDRESS_MAP.items():

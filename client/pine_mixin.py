@@ -137,7 +137,7 @@ class PineMixin:
         if loc_id in self._locally_checked_locations or loc_id in self.checked_locations:
             return
         server_locations = getattr(self, "server_locations", None)
-        if server_locations and loc_id not in server_locations:
+        if server_locations is not None and loc_id not in server_locations:
             logger.warning(f"[RAC] {kind}: {name!r} (id={loc_id}) not in server locations"
                            " — was game generated with the current options?")
             return

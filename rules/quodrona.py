@@ -7,6 +7,7 @@ from ..constants.items import RACSMITEM
 from ..constants.skillpoints import RACSMSKILLPOINT
 from ..constants.tbolts import RACSMTBOLT
 from ..constants.vendors import RACSMVENDORLOCATION
+from ._helpers import has_weapon
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld
@@ -43,12 +44,12 @@ def set_quodrona_rules(world: RACSizeMatterWorld) -> None:
 
     # ── Weapon Mod Vendor ─────────────────────────────────────────────────────
     mw.get_location(RACSMVENDORLOCATION.QUODRONA_AGENTS_LAUNCHER,  player).access_rule = \
-        lambda state: state.can_reach(RACSMVENDORLOCATION.RYLLUS_AGENTS, "Location", player)
+        lambda state: has_weapon(state, player, RACSMITEM.AGENTS_OF_DOOM)
     mw.get_location(RACSMVENDORLOCATION.QUODRONA_SCORCHER_SPITFIRE, player).access_rule = \
-        lambda state: state.can_reach(RACSMVENDORLOCATION.KALIDON_SCORCHER, "Location", player)
+        lambda state: has_weapon(state, player, RACSMITEM.SCORCHER)
     mw.get_location(RACSMVENDORLOCATION.QUODRONA_SNIPER_SPLIT,     player).access_rule = \
-        lambda state: state.can_reach(RACSMVENDORLOCATION.CHALLAX_SNIPER, "Location", player)
+        lambda state: has_weapon(state, player, RACSMITEM.SNIPER_MINE)
     mw.get_location(RACSMVENDORLOCATION.QUODRONA_SHOCK_LOCK,       player).access_rule = \
-        lambda state: state.can_reach(RACSMVENDORLOCATION.DAYNI_MOON_SHOCK, "Location", player)
+        lambda state: has_weapon(state, player, RACSMITEM.SHOCK_ROCKET)
     mw.get_location(RACSMVENDORLOCATION.QUODRONA_SHOCK_AFTER,      player).access_rule = \
-        lambda state: state.can_reach(RACSMVENDORLOCATION.DAYNI_MOON_SHOCK, "Location", player)
+        lambda state: has_weapon(state, player, RACSMITEM.SHOCK_ROCKET)

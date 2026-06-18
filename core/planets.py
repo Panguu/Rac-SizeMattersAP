@@ -17,7 +17,7 @@ from .address_maps import (
     PLANET_UNLOCK_ADDRESSES,
 )
 from .armour import ArmourPiece
-from .structs.game import GameStatusStruct, PlanetLoadStruct, PlanetProgressStruct
+from .structs.game import PlanetLoadStruct, PlanetProgressStruct
 
 if TYPE_CHECKING:
     from .armour import ArmourState
@@ -172,7 +172,6 @@ class PlanetState(BaseState):
         self._get_checked_locs:   Callable[[], set[str]] | None = None
         self._on_enter_callbacks: list[Callable[[], None]] = []
         self._on_exit_callbacks:  list[Callable[[], None]] = []
-        self._active_planet: int = 0
 
     def set_player_state(self, player: PlayerState) -> None:
         self._player = player
@@ -215,25 +214,10 @@ class PlanetState(BaseState):
     def add_exit_callback(self, fn: Callable[[], None]) -> None:
         self._on_exit_callbacks.append(fn)
 
-    def _register_handlers(self) -> None:
-        self.accessor.on_struct_change(GameStatusStruct, self._on_game_status_change)
-
-    def _unregister_handlers(self) -> None:
-        self.accessor.remove_struct_handler(GameStatusStruct, self._on_game_status_change)
-
-    def _on_game_status_change(self, address: int, new_bytes: bytes) -> None:
-        del address
-        offset = GameStatusStruct.field_offset("current_planet")
-        if len(new_bytes) <= offset:
-            return
-        new_planet = new_bytes[offset]
-        was_active = self._active_planet == self.planet_id
-        now_active = new_planet == self.planet_id
-        self._active_planet = new_planet
-        if now_active and not was_active:
-            self.planet_enter()
-        elif was_active and not now_active:
-            self.planet_exit()
+    # planet_enter()/planet_exit() are no longer self-triggered from
+    # GameStatusStruct — they're called externally by the transition-gate
+    # handler in orchestration/_planet_lifecycle.py, which still reads
+    # CURRENT_PLANET_ADDRESS to determine which planet was entered.
 
     def planet_enter(self) -> None:
         self._log(f"[RAC] [{self.name}] planet_enter")

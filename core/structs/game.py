@@ -206,6 +206,36 @@ def make_vendor_visibility_cls(planet_name: str, is_visible_addr: int) -> type[V
     )
 
 
+# ── Transition gate ────────────────────────────────────────────────────────────
+# Rests at TRANSITION_GATE_IDLE (0x000000FF). Any change away from idle means a
+# level transition has started — writes must stop immediately. It passes through
+# TRANSITION_GATE_ARRIVED (0x00000100) once the new planet is known (safe to swap
+# the address map then — that's a local bookkeeping change, not a memory write).
+# Returning to idle means the transition is fully settled and writes may resume.
+_TRANSITION_GATE_ADDR: int = 0x1EDDAD4
+
+TRANSITION_GATE_IDLE:    int = 0x000000FF
+TRANSITION_GATE_ARRIVED: int = 0x00000100
+
+
+class TransitionGateStruct(MemoryStruct):
+    BASE_ADDRESS = _TRANSITION_GATE_ADDR
+    _pack_ = 1
+    _fields_ = [("value", ctypes.c_uint32)]
+
+
+# Sits right beside the gate (+0x10) and holds the planet ID being loaded —
+# read this once the gate reaches TRANSITION_GATE_ARRIVED, instead of
+# CURRENT_PLANET_ADDRESS, which isn't reliable yet during the load itself.
+_LOADING_PLANET_ADDR: int = 0x1EDDAE4
+
+
+class LoadingPlanetStruct(MemoryStruct):
+    BASE_ADDRESS = _LOADING_PLANET_ADDR
+    _pack_ = 1
+    _fields_ = [("value", ctypes.c_uint32)]
+
+
 # ── Cutscenes ──────────────────────────────────────────────────────────────────
 
 _GOAL_ADDR = 0x3D7FC8

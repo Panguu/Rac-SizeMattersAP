@@ -28,6 +28,7 @@ from .player import PlayerState
 from .quick_select import QuickSelectState
 from .skill_points import SkillPointState
 from .skins import SkinState
+from .structs.game import TRANSITION_GATE_IDLE, TransitionGateStruct
 from .titanium_bolts import TitaniumBoltState
 from .vendor import VendorState, VendorUnlockState
 from .weapons import WeaponState
@@ -144,8 +145,9 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         self._first_swap_done: bool               = False
         self._death_count: int                    = 0
         self._transitioning: bool                 = False
-        self._travel_close_time: float | None     = None
-        self._transition_start_time: float | None = None
+        self._gate_value: int                     = TRANSITION_GATE_IDLE
+        self._gate_pending_planet_id: int         = 0
+        self._last_gate_debug: float              = 0.0
         self._pickup_detection_active: bool       = False
         self._last_quick_select_write: float      = 0.0
 
@@ -177,7 +179,10 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         _raw_reapply = reapply_inv
 
         def _guarded_reapply() -> None:
-            if self.writes_blocked or self.is_picking_up:
+            # writes_blocked only matters for planet-specific addresses (weapons/
+            # gadgets), which _raw_reapply already gates internally. Quick select
+            # and vendor unlock are global addresses, safe at any time.
+            if self.is_picking_up:
                 return
             _raw_reapply()
             self.quick_select.apply()
@@ -195,12 +200,24 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         except Exception:
             self._active_planet_id = 0
 
+        try:
+            gate_raw = self._orchestrator.accessor.read_raw(TransitionGateStruct.BASE_ADDRESS, 4)
+            self._gate_value = (
+                int.from_bytes(gate_raw, "little") if gate_raw and len(gate_raw) >= 4 else TRANSITION_GATE_IDLE
+            )
+        except Exception:
+            self._gate_value = TRANSITION_GATE_IDLE
+        self._register_transition_gate()
+
         if self._active_planet_id in self.planet_states:
             self._log(
                 f"[RAC] Connection on {PLANET_NAMES[self._active_planet_id]} "
-                f"-- triggering planet_enter immediately."
+                f"-- zeroing quick select and triggering planet_enter immediately."
             )
-            self._on_planet_enter(self._active_planet_id)
+            self.quick_select.zero()
+            self.planet_states[self._active_planet_id].planet_enter()
+        # else: not on a known planet yet — _on_initial_planet_load() zeroes
+        # quick select itself on the first transition into one.
 
         self._poll_task = asyncio.create_task(self._poll_loop())
 
@@ -222,11 +239,11 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         for ps in self.planet_states.values():
             ps.exit()
 
-        self._initial_load_done     = False
-        self._first_swap_done       = False
-        self._transitioning         = False
-        self._travel_close_time     = None
-        self._transition_start_time = None
+        self._initial_load_done      = False
+        self._first_swap_done        = False
+        self._transitioning          = False
+        self._gate_value              = TRANSITION_GATE_IDLE
+        self._gate_pending_planet_id  = 0
         self.planet_unlock.reset_session()
 
     # -- Properties -----------------------------------------------------------
@@ -251,15 +268,8 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
 
     @property
     def writes_blocked(self) -> bool:
-        """True while a travel menu is open, during cooldown after close, or mid-transition."""
-        from .menu import MenuStateValue
-        if self.menu.current in (MenuStateValue.SKYBOARD_MENU, MenuStateValue.PLANET_MENU):
-            return True
-        if self._transitioning:
-            return True
-        if self._travel_close_time is not None and time.monotonic() < self._travel_close_time:
-            return True
-        return False
+        """True while mid-transition, per the 0x1EDDAD4 transition gate."""
+        return self._transitioning
 
     # -- Poll loop ------------------------------------------------------------
 
@@ -267,9 +277,8 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         while True:
             try:
                 self._orchestrator.poll()
-                if self._transitioning:
-                    self._poll_planet_transition()
                 self._maybe_apply_quick_select()
+                self._debug_print_transition_gate()
             except Exception as exc:
                 logger.warning(f"[RAC] Poll error: {exc}")
             await asyncio.sleep(POLL_INTERVAL)
@@ -278,16 +287,17 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         """Periodic failsafe re-write of the quick select snapshot.
 
         Skips entirely on Outpost Omega (own logic to follow) or an unknown
-        planet, and defers while writes_blocked (transitioning, planet/skyboard
-        travel menu open, or within the post-close cooldown), picking up an
-        item, the purchase vendor is open, or the player has the Quick Select
-        pause-menu tab open (writing now would fight their live edits).
+        planet, and defers while picking up an item, the purchase vendor is
+        open, or the player has the Quick Select pause-menu tab open (writing
+        now would fight their live edits). Quick select is a global address,
+        so it isn't gated by writes_blocked (that only matters for
+        planet-specific addresses).
         """
         if self._active_planet_id in _OUTPOST_OMEGA_IDS:
             return
         if self._active_planet_id not in PLANET_NAMES:
             return
-        if self.writes_blocked or self.is_picking_up:
+        if self.is_picking_up:
             return
         if self.menu.is_vendor or self.menu.is_quick_select_menu:
             return

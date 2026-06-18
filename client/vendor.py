@@ -398,14 +398,18 @@ class InventoryMixin:
         self._sync_game_state_inventory()
         if self._wiring.is_picking_up:
             return
-        if self._wiring.writes_blocked:
-            self._log("[RAC] _apply_player_inventory_sync: all writes blocked — planet transition or travel menu open")
-            return
+        # Armour/planet-state addresses are global — safe to write at any time,
+        # transition or not.
         self._planet_state.give(self.pine)
         for key, addr in ARMOUR_ADDRESSES.items():
             ap_val = self._player_armour_state.get(key)
             existing = self.pine.read_int8(addr)
             self.pine.write_int8(addr, existing | ap_val)
+        # Weapon/gadget addresses are per-planet (a different array per planet) —
+        # only safe to write once the transition gate has settled on this planet.
+        if self._wiring.writes_blocked:
+            self._log("[RAC] _apply_player_inventory_sync: weapon/gadget write blocked — planet transition in progress")
+            return
         # Never write weapons or gadgets while vendor owns the weapon state.
         if self._gs.is_preloaded or self._gs.is_in_menu or self._wiring.vendor_active:
             self._log(f"[RAC] _apply_player_inventory_sync: weapon write blocked — "
@@ -479,8 +483,7 @@ class InventoryMixin:
     # ── Bolt items ────────────────────────────────────────────────────────────
 
     def _grant_new_bolt_items(self) -> None:
-        if self._wiring.writes_blocked:
-            return
+        # PLAYER_BOLT_COUNT is a global address — safe to write during a transition.
         new_items = self.items_received[self._processed_item_count:]
         self._processed_item_count = len(self.items_received)
 
@@ -516,8 +519,8 @@ class InventoryMixin:
     # ── Trap items ────────────────────────────────────────────────────────────
 
     def _grant_new_trap_items(self) -> None:
-        if self._wiring.writes_blocked:
-            return
+        # Trap addresses (DREAMTIME_EFFECT, BRIGHTNESS_ADDRESS, CHEATS) are all
+        # global — safe to write during a transition.
         new_items = self.items_received[self._processed_trap_count:]
         self._processed_trap_count = len(self.items_received)
 
@@ -549,9 +552,11 @@ class InventoryMixin:
                 self._skill_point_state.add(sp.mask)
 
     def _apply_world_states_sync(self) -> None:
-        """Write bolt, skill-point, and infobot states to memory."""
-        if self._wiring.writes_blocked:
-            return
+        """Write bolt, skill-point, and infobot states to memory.
+
+        All of these (titanium bolts, skill points, planet/infobot state) are
+        global addresses, so this is safe to run during a transition.
+        """
         self._seed_world_states()
         new_bolt = self._titanium_bolt_state.apply_or(self.pine)
         self._prev_bolt_pickup = new_bolt & BOLT_PICKUP_MASK

@@ -127,7 +127,7 @@ class HooksMixin:
     _MISSION_GADGET_LOCATION: dict[str, str] = {
         RacSMCutsceneLocations.RYLLUS_BUZZING: RACSMLOCATION.RYLLUS_SPROUT,
         RacSMCutsceneLocations.KALIDON_WIN:    RACSMLOCATION.KALIDON_SHRINK,
-        RacSMCutsceneLocations.METALIS_WAR:    RACSMLOCATION.METALIS_GLOVES,
+        # RacSMCutsceneLocations.METALIS_WAR:    RACSMLOCATION.METALIS_GLOVES,  # Giant Clank disabled — unreachable
     }
 
     def _wire_mission_hooks(self) -> None:
@@ -148,7 +148,6 @@ class HooksMixin:
         self.vendor.on_menu_open   = lambda: (self.quick_select.freeze(), self._on_vendor_open())
         self.vendor.on_menu_close  = lambda: (self.quick_select.unfreeze(), self._on_vendor_close())
         self.menu.set_pause_close_callback(lambda: self._on_pause_close())
-        self.menu.on_travel_menu_close = lambda: self._on_travel_menu_close()
 
     # ── Planet (armour / vendor purchases) ───────────────────────────────────
 

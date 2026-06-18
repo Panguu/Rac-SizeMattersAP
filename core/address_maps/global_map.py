@@ -7,6 +7,7 @@ from ..structs.game import (
     MissionsStruct,
     PlanetProgressStruct,
     QuickSelectStruct,
+    TransitionGateStruct,
 )
 from ..structs.pickups import (
     ArmourSetCollectedStruct,
@@ -32,5 +33,6 @@ def build_global_address_map() -> AddressMap:
         ClankChallengeStruct,
         SkyboardStruct,
         MissionsStruct,
+        TransitionGateStruct,
     )
     return address_map
