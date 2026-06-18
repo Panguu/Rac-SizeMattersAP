@@ -428,7 +428,7 @@ class InventoryMixin:
         """Called when lacerator/acid_bomb_glove/concussion_gun transitions
         locked->unlocked in-game. Force-unlocks a random AP-unlocked weapon
         or gadget the player doesn't already have equipped on this planet."""
-        if not self.pine_connected:
+        if not self.pine_connected or self._wiring.writes_blocked:
             return
         candidates: list[int] = []
         for name, unlocked in self._gs.tracked_weapons.items():
@@ -479,6 +479,8 @@ class InventoryMixin:
     # ── Bolt items ────────────────────────────────────────────────────────────
 
     def _grant_new_bolt_items(self) -> None:
+        if self._wiring.writes_blocked:
+            return
         new_items = self.items_received[self._processed_item_count:]
         self._processed_item_count = len(self.items_received)
 
@@ -514,6 +516,8 @@ class InventoryMixin:
     # ── Trap items ────────────────────────────────────────────────────────────
 
     def _grant_new_trap_items(self) -> None:
+        if self._wiring.writes_blocked:
+            return
         new_items = self.items_received[self._processed_trap_count:]
         self._processed_trap_count = len(self.items_received)
 
@@ -546,6 +550,8 @@ class InventoryMixin:
 
     def _apply_world_states_sync(self) -> None:
         """Write bolt, skill-point, and infobot states to memory."""
+        if self._wiring.writes_blocked:
+            return
         self._seed_world_states()
         new_bolt = self._titanium_bolt_state.apply_or(self.pine)
         self._prev_bolt_pickup = new_bolt & BOLT_PICKUP_MASK

@@ -27,12 +27,12 @@ class PlanetLifecycleMixin:
     """Planet enter/exit, address-map swaps, initial load, and transition handling."""
 
     def _on_travel_menu_close(self) -> None:
-        self._travel_close_time = time.monotonic() + 3.0
-        self._log("[RAC] Travel menu closed — writes blocked for 3 s.")
+        self._travel_close_time = time.monotonic() + 5.0
+        self._log("[RAC] Travel menu closed — writes blocked for 5 s in case of a level transition.")
         asyncio.create_task(self._reapply_after_challenge_close())
 
     async def _reapply_after_challenge_close(self) -> None:
-        await asyncio.sleep(3.1)
+        await asyncio.sleep(5.1)
         self._reapply_inv()
 
     def _poll_planet_transition(self) -> None:
@@ -59,6 +59,14 @@ class PlanetLifecycleMixin:
         self._travel_close_time     = None
         self._transition_start_time = None
         self._active_planet_id      = planet_id
+        if self._swap_task:
+            self._swap_task.cancel()
+        self._swap_task = asyncio.create_task(self._finish_planet_enter(planet_id))
+
+    async def _finish_planet_enter(self, planet_id: int) -> None:
+        # Let the level finish loading before touching any memory — writing
+        # immediately on the enter signal can land mid-load.
+        await asyncio.sleep(_TRANSITION_SETTLE_S)
         self.clank.write_unlocks()
         self.skyboard.write_defaults()
         self.skin.apply(self._orchestrator.accessor)
@@ -70,11 +78,9 @@ class PlanetLifecycleMixin:
             self._force_shrink_ray()
         elif self._initial_load_done:
             self._reapply_inv()
-        self.armour.apply_world_armour()
+        self.armour.apply_ap_armour()
         self.armour.restore_equipped_slots()
-        if self._swap_task:
-            self._swap_task.cancel()
-        self._swap_task = asyncio.create_task(self._swap_to_planet(planet_id))
+        await self._swap_to_planet(planet_id)
 
     def _suppress_giant_clank(self) -> None:
         """Force the Giant Clank trigger bit set so the game treats it as
@@ -148,7 +154,7 @@ class PlanetLifecycleMixin:
         self.skill_points.sync()
         self.armour_sets.sync()
         self._reapply_inv()
-        self.armour.apply_world_armour()
+        self.armour.apply_ap_armour()
 
     async def _monitor_ryllus_cutscene(self) -> None:
         await asyncio.sleep(1.0)

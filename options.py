@@ -36,20 +36,20 @@ class ProgressiveArmour(Toggle):
 class ClankChallenges(Choice):
     """Controls how Clank challenge arenas are included as location checks.
     item_challenges: only the armour/gadget reward for each challenge arena (default).
-    all_challenges: every individual challenge completion is a separate check."""
+    all: every individual challenge completion is a separate check."""
     display_name = "Clank Challenges"
     option_off             = 0
     option_item_challenges = 1
-    option_all_challenges  = 2
+    option_all             = 2
     default = 1
 
 
 class SkyboardChallenges(Choice):
     """Controls whether Skyboard race challenges are included as location checks.
-    all_challenges: every individual race completion is a separate check."""
+    all: every individual race completion is a separate check."""
     display_name = "Skyboard Challenges"
-    option_off            = 0
-    option_all_challenges = 1
+    option_off = 0
+    option_all = 1
     default = 0
 
 

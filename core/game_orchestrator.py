@@ -36,11 +36,21 @@ _TEXT_BOX_BY_PLANET = {tb.planet_id: tb for tb in SmallTextBoxAddrs}
 
 POLL_INTERVAL: float = 0.1
 
+# Quick select is re-applied on this cadence as a failsafe, independent of the
+# event-driven apply() calls in _guarded_reapply.
+QUICK_SELECT_WRITE_INTERVAL_S: float = 5.0
+
+# Outpost Omega (both visits) has its own quick-select/skyboard logic to follow,
+# so the periodic write never runs there at all.
+_OUTPOST_OMEGA_1_ID: int = 0x06
+
 PLANET_NAMES: dict[int, str] = {
     p.planet_id: p.name
     for p in vars(Planets).values()
     if isinstance(p, Planet)
 }
+
+_OUTPOST_OMEGA_IDS: frozenset[int] = frozenset({_OUTPOST_OMEGA_1_ID, Planets.OUTPOST_OMEGA_2.planet_id})
 
 # Mixins import PLANET_NAMES / POLL_INTERVAL from this module, so they must be
 # imported only after those names are defined above.
@@ -137,6 +147,7 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
         self._travel_close_time: float | None     = None
         self._transition_start_time: float | None = None
         self._pickup_detection_active: bool       = False
+        self._last_quick_select_write: float      = 0.0
 
     def wire(
         self,
@@ -258,9 +269,33 @@ class GameOrchestrator(APSyncMixin, PlanetLifecycleMixin, HooksMixin):
                 self._orchestrator.poll()
                 if self._transitioning:
                     self._poll_planet_transition()
+                self._maybe_apply_quick_select()
             except Exception as exc:
                 logger.warning(f"[RAC] Poll error: {exc}")
             await asyncio.sleep(POLL_INTERVAL)
+
+    def _maybe_apply_quick_select(self) -> None:
+        """Periodic failsafe re-write of the quick select snapshot.
+
+        Skips entirely on Outpost Omega (own logic to follow) or an unknown
+        planet, and defers while writes_blocked (transitioning, planet/skyboard
+        travel menu open, or within the post-close cooldown), picking up an
+        item, the purchase vendor is open, or the player has the Quick Select
+        pause-menu tab open (writing now would fight their live edits).
+        """
+        if self._active_planet_id in _OUTPOST_OMEGA_IDS:
+            return
+        if self._active_planet_id not in PLANET_NAMES:
+            return
+        if self.writes_blocked or self.is_picking_up:
+            return
+        if self.menu.is_vendor or self.menu.is_quick_select_menu:
+            return
+        now = time.monotonic()
+        if now - self._last_quick_select_write < QUICK_SELECT_WRITE_INTERVAL_S:
+            return
+        self._last_quick_select_write = now
+        self.quick_select.apply()
 
     # -- Planet state builder -------------------------------------------------
 

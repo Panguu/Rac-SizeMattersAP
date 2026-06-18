@@ -18,13 +18,14 @@ if TYPE_CHECKING:
     from .vendor import VendorState
 
 class MenuStateValue(IntEnum):
-    CLOSED         = 0x00
-    PAUSE_MENU     = 0x03
-    WEAPONS_VENDOR = 0x09
-    MOD_VENDOR     = 0x0E
-    PLANET_MENU    = 0x10
-    SKYBOARD_MENU = 0x15
-    PRELOAD_READY  = 0x13
+    CLOSED            = 0x00
+    PAUSE_MENU        = 0x03
+    WEAPONS_VENDOR    = 0x09
+    QUICK_SELECT_MENU = 0x0A
+    MOD_VENDOR        = 0x0E
+    PLANET_MENU       = 0x10
+    SKYBOARD_MENU     = 0x15
+    PRELOAD_READY     = 0x13
 
 
 class MenuState(BaseState):
@@ -169,6 +170,10 @@ class MenuState(BaseState):
     @property
     def is_planet_menu(self) -> bool:
         return self.current == MenuStateValue.PLANET_MENU
+
+    @property
+    def is_quick_select_menu(self) -> bool:
+        return self.current == MenuStateValue.QUICK_SELECT_MENU
 
     def __repr__(self) -> str:
         return f"MenuState(current={self.current.name})"
