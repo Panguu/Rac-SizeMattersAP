@@ -18,8 +18,11 @@ class TestRegionAccess(RACSizeMatterTestBase):
     def test_pokitaru_always_reachable(self) -> None:
         self.assertTrue(self.can_reach_region("Pokitaru"))
 
-    def test_ryllus_unreachable_without_weapon(self) -> None:
-        self.assertFalse(self.can_reach_region("Ryllus"))
+    def test_ryllus_always_reachable_even_without_weapon(self) -> None:
+        # Ryllus has no entrance access_rule: the game force-unlocks it via the
+        # Pokitaru intro cutscene, so it's reachable from the start regardless
+        # of items (see core/planets.py PlanetUnlockState._ryllus_released).
+        self.assertTrue(self.can_reach_region("Ryllus"))
 
     def test_ryllus_reachable_with_projectile(self) -> None:
         self.collect_by_name([ANY_PROJECTILE])
@@ -62,12 +65,9 @@ class TestRegionAccess(RACSizeMatterTestBase):
             self.assertFalse(self.can_reach_region(planet),
                              f"{planet} reachable with no items")
 
-    def test_ryllus_not_reachable_with_hypershot_only(self) -> None:
+    def test_ryllus_reachable_with_hypershot_only(self) -> None:
         self.collect_by_name(["Hypershot"])
-        self.assertFalse(
-            self.can_reach_region("Ryllus"),
-            "Ryllus reachable with Hypershot but no projectile weapon",
-        )
+        self.assertTrue(self.can_reach_region("Ryllus"))
 
     def test_kalidon_not_reachable_without_hypershot(self) -> None:
         self.collect_by_name([ANY_PROJECTILE, "Sprout-O-Matic"])

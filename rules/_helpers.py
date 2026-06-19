@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..constants.items import RACSMITEM
+from ..constants import RACSMITEM
 from ..items import PROGRESSIVE_ARMOUR_NAME, PROGRESSIVE_WEAPON_NAME
 
 _PROJECTILE_WEAPONS = (

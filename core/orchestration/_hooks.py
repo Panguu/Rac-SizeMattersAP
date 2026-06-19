@@ -4,8 +4,7 @@ import asyncio
 
 from CommonClient import logger
 
-from ...constants.cutscenes import RacSMCutsceneLocations
-from ...constants.general import RACSMLOCATION
+from ...constants import RACSMLOCATION, RacSMCutsceneLocations
 from ...locations import (
     GADGET_INTERNAL_TO_LOCATION,
     MOD_INTERNAL_TO_LOCATION,

@@ -40,7 +40,7 @@ class TestDefaultGeneration(RACSizeMatterTestBase):
 
     def test_boss_location_present(self) -> None:
         names = {loc.name for loc in self.multiworld.get_locations(self.player)}
-        self.assertIn("Defeat Otto Destruct", names)
+        self.assertIn("Quodrona: Defeat Otto Destruct", names)
 
     def test_all_titanium_bolts_present(self) -> None:
         names = {loc.name for loc in self.multiworld.get_locations(self.player)}

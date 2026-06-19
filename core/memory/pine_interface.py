@@ -6,8 +6,10 @@ from ...pypine.pypine.pine import Pine
 
 class PineInterface(MemoryInterface):
     """
-    This is a wrapper for Pine interface. 
-    The Plan is to implement PSP interface here matchin Memory Interface and then swap out the Interface per game as There is very little logic differences in these games memory
+    This is a wrapper for Pine interface.
+    The plan is to implement a PSP interface here matching MemoryInterface, then swap
+    out the interface per game, as there is very little logic difference in these
+    games' memory.
     """
 
     def __init__(self, pine: Pine) -> None:

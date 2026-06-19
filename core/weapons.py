@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import struct as _struct
 
+from ..constants import RACSMGADGETKEY, RACSMWEAPONKEY
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
 from ..interface_orchestrator.storage.local import LocalStorage
@@ -10,8 +11,8 @@ from .structs.pickups import GadgetStruct, WeaponStruct
 
 # NOTE: ``..items`` and ``..locations`` are imported lazily (see _ensure_loc_data
 # below).  Importing them at module top would create a circular import, because
-# ``items.py`` imports ``core.data`` which re-exports the weapon constants from
-# this module, and ``locations.py`` imports ``core.weapons`` siblings + items.py.
+# ``items.py`` imports this module's weapon constants directly, and
+# ``locations.py`` imports ``core.weapons`` siblings + items.py.
 
 
 # ── Weapon data ──────────────────────────────────────────────────────────────────
@@ -20,35 +21,35 @@ WEAPON_STRUCT_SIZE = 0x58
 WEAPON_MIN_CONSECUTIVE = 4
 
 WEAPON_MOD_COUNTS: dict[str, int] = {
-    "lacerator":       2,
-    "concussion_gun":  3,
-    "acid_bomb_glove": 2,
-    "agents_of_doom":  2,
-    "bee_mine_glove":  2,
-    "static_barrier":  2,
-    "shock_rocket":    3,
-    "sniper_mine":     2,
-    "scorcher":        2,
-    "laser_tracer":    2,
-    "suck_cannon":     0,
-    "mootator":        0,
-    "ryno":            0,
+    RACSMWEAPONKEY.LACERATOR:       2,
+    RACSMWEAPONKEY.CONCUSSION_GUN:  3,
+    RACSMWEAPONKEY.ACID_BOMB_GLOVE: 2,
+    RACSMWEAPONKEY.AGENTS_OF_DOOM:  2,
+    RACSMWEAPONKEY.BEE_MINE_GLOVE:  2,
+    RACSMWEAPONKEY.STATIC_BARRIER:  2,
+    RACSMWEAPONKEY.SHOCK_ROCKET:    3,
+    RACSMWEAPONKEY.SNIPER_MINE:     2,
+    RACSMWEAPONKEY.SCORCHER:        2,
+    RACSMWEAPONKEY.LASER_TRACER:    2,
+    RACSMWEAPONKEY.SUCK_CANNON:     0,
+    RACSMWEAPONKEY.MOOTATOR:        0,
+    RACSMWEAPONKEY.RYNO:            0,
 }
 
 WEAPON_MAX_LEVELS: dict[str, int] = {
-    "lacerator":       4,
-    "concussion_gun":  4,
-    "acid_bomb_glove": 4,
-    "agents_of_doom":  4,
-    "bee_mine_glove":  4,
-    "static_barrier":  4,
-    "shock_rocket":    4,
-    "sniper_mine":     4,
-    "scorcher":        4,
-    "laser_tracer":    4,
-    "suck_cannon":     4,
-    "mootator":        1,
-    "ryno":            4,
+    RACSMWEAPONKEY.LACERATOR:       4,
+    RACSMWEAPONKEY.CONCUSSION_GUN:  4,
+    RACSMWEAPONKEY.ACID_BOMB_GLOVE: 4,
+    RACSMWEAPONKEY.AGENTS_OF_DOOM:  4,
+    RACSMWEAPONKEY.BEE_MINE_GLOVE:  4,
+    RACSMWEAPONKEY.STATIC_BARRIER:  4,
+    RACSMWEAPONKEY.SHOCK_ROCKET:    4,
+    RACSMWEAPONKEY.SNIPER_MINE:     4,
+    RACSMWEAPONKEY.SCORCHER:        4,
+    RACSMWEAPONKEY.LASER_TRACER:    4,
+    RACSMWEAPONKEY.SUCK_CANNON:     4,
+    RACSMWEAPONKEY.MOOTATOR:        1,
+    RACSMWEAPONKEY.RYNO:            4,
 }
 
 
@@ -151,32 +152,32 @@ class GadgetAddresses:
 
 
 WEAPON_ORDER: list[str | None] = [
-    "lacerator",        # slot  0
-    "concussion_gun",   # slot  1
-    "acid_bomb_glove",  # slot  2
-    "agents_of_doom",   # slot  3
-    "bee_mine_glove",   # slot  4
-    "static_barrier",   # slot  5
-    "shock_rocket",     # slot  6
-    "sniper_mine",      # slot  7
-    "scorcher",         # slot  8
-    "laser_tracer",     # slot  9
-    "suck_cannon",      # slot 10
-    "mootator",         # slot 11
-    None,               # slot 12  gap
-    "ryno",             # slot 13
+    RACSMWEAPONKEY.LACERATOR,        # slot  0
+    RACSMWEAPONKEY.CONCUSSION_GUN,   # slot  1
+    RACSMWEAPONKEY.ACID_BOMB_GLOVE,  # slot  2
+    RACSMWEAPONKEY.AGENTS_OF_DOOM,   # slot  3
+    RACSMWEAPONKEY.BEE_MINE_GLOVE,   # slot  4
+    RACSMWEAPONKEY.STATIC_BARRIER,   # slot  5
+    RACSMWEAPONKEY.SHOCK_ROCKET,     # slot  6
+    RACSMWEAPONKEY.SNIPER_MINE,      # slot  7
+    RACSMWEAPONKEY.SCORCHER,         # slot  8
+    RACSMWEAPONKEY.LASER_TRACER,     # slot  9
+    RACSMWEAPONKEY.SUCK_CANNON,      # slot 10
+    RACSMWEAPONKEY.MOOTATOR,         # slot 11
+    None,                            # slot 12  gap
+    RACSMWEAPONKEY.RYNO,             # slot 13
 ]
 
 GADGET_ORDER: list[str | None] = [
-    "hypershot",        # slot 0
-    "sprout_o_matic",   # slot 1
-    "polarizer",        # slot 2
-    "pda",              # slot 3
-    "shrink_ray",       # slot 4
-    "bolt_grabber",     # slot 5
-    None,               # slot 6  gap
-    "map_o_matic",      # slot 7
-    "box_breaker",      # slot 8
+    RACSMGADGETKEY.HYPERSHOT,        # slot 0
+    RACSMGADGETKEY.SPROUT_O_MATIC,   # slot 1
+    RACSMGADGETKEY.POLARIZER,        # slot 2
+    RACSMGADGETKEY.PDA,              # slot 3
+    RACSMGADGETKEY.SHRINK_RAY,       # slot 4
+    RACSMGADGETKEY.BOLT_GRABBER,     # slot 5
+    None,                            # slot 6  gap
+    RACSMGADGETKEY.MAP_O_MATIC,      # slot 7
+    RACSMGADGETKEY.BOX_BREAKER,      # slot 8
 ]
 
 
@@ -219,17 +220,9 @@ def _ensure_loc_data() -> None:
         return
     from ..locations import (
         GADGET_INTERNAL_TO_LOCATION as _GADGET_INTERNAL_TO_LOCATION,
-    )
-    from ..locations import (
         MOD_INTERNAL_TO_LOCATION as _MOD_INTERNAL_TO_LOCATION,
-    )
-    from ..locations import (
         VENDOR_GADGET_LOC as _VENDOR_GADGET_LOC,
-    )
-    from ..locations import (
         VENDOR_WEAPON_LOC as _VENDOR_WEAPON_LOC,
-    )
-    from ..locations import (
         WEAPON_INTERNAL_TO_LOCATION as _WEAPON_INTERNAL_TO_LOCATION,
     )
     VENDOR_WEAPON_LOC = _VENDOR_WEAPON_LOC

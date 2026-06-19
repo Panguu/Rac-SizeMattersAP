@@ -7,8 +7,8 @@ from BaseClasses import Item, ItemClassification, Location, Tutorial
 from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 
-from .constants.items import RACSMITEM
-from .core.data import WEAPON_MOD_COUNTS
+from .constants import RACSMITEM
+from .core.weapons import WEAPON_MOD_COUNTS
 from .items import (
     ALL_ITEMS,
     ARMOUR_ITEM_TABLE,

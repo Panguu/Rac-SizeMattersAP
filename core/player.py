@@ -27,11 +27,6 @@ class PlayerMovementState(IntEnum):
         return PlayerMovementState.FishDeath <= state <= PlayerMovementState.MysteriousDeath
 
 
-# Backwards-compatible alias: the death-state enum was historically exported as
-# ``PlayerState`` from ``core.data.player_states``; it is identical to
-# ``PlayerMovementState`` above.
-PlayerState_Enum = PlayerMovementState
-
 
 # ── Player state (runtime) ───────────────────────────────────────────────────────
 

@@ -5,13 +5,12 @@ from collections.abc import Callable
 
 from CommonClient import logger
 
-from ..constants.cutscenes import RacSMCutsceneLocations
+from ..constants import RacSMCutsceneLocations
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
 from ..interface_orchestrator.storage.local import LocalStorage
 from ..interface_orchestrator.structs.address_map import AddressMap
-from .address_maps import PLANET_MISSION_ADDRESSES
-from .address_maps import PLANET_MISSION_ADDRESSES as _ADDRS
+from .address_maps import PLANET_MISSION_ADDRESSES, PLANET_MISSION_ADDRESSES as _ADDRS
 from .structs.game import MissionsStruct
 
 # Maps (address, mask) -> location_name.
@@ -39,7 +38,7 @@ STORY_MISSION_MAP: dict[tuple[int, int], str] = {
 
     # Metalis
     (_ADDRS["Metalis"],       0x0002): RacSMCutsceneLocations.METALIS_WAR,
-    (_ADDRS["Metalis"],       0x0004): RacSMCutsceneLocations.METALIS_ESCAPE,
+    # (_ADDRS["Metalis"],     0x0004): RacSMCutsceneLocations.METALIS_ESCAPE,  # Giant Clank disabled — unreachable
 
     # Dreamtime
     (_ADDRS["Dreamtime"],     0x0004): RacSMCutsceneLocations.DREAMTIME_COMPLETE,

@@ -1,10 +1,12 @@
 from typing import NamedTuple
 
-from .constants.cutscenes import RacSMCutsceneLocations
-from .constants.general import RACSMLOCATION
-from .constants.planets import RACSMPLANET
-from .constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
-from .constants.vendors import RACSMVENDORLOCATION
+from .constants import (
+    RACSMLOCATION,
+    RACSMPLANET,
+    RACSMSKYBOARDCHALLENGE as RACSMSKY,
+    RACSMVENDORLOCATION,
+    RacSMCutsceneLocations,
+)
 from .core.armour import ARMOUR_PICKUPS
 from .core.challenges import (
     CHALLENGE_PICKUPS,
@@ -166,7 +168,7 @@ _MISSION_ENTRIES: list[tuple[str, str, bool]] = [
     (RacSMCutsceneLocations.KALIDON_WIN,              RACSMPLANET.KALIDON,       False),
     # Metalis
     (RacSMCutsceneLocations.METALIS_WAR,              RACSMPLANET.METALIS,       False),
-    (RacSMCutsceneLocations.METALIS_ESCAPE,           RACSMPLANET.METALIS,       False),
+    # (RacSMCutsceneLocations.METALIS_ESCAPE,         RACSMPLANET.METALIS,       False),  # Giant Clank disabled
     # Dreamtime
     (RacSMCutsceneLocations.DREAMTIME_COMPLETE,       RACSMPLANET.DREAMTIME,     False),
     # Outpost Omega

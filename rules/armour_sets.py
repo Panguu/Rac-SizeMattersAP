@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..constants.armor_sets import RACSMTARMORSET
+from ..constants import RACSMTARMORSET
 from ._helpers import has_armour_piece
 
 if TYPE_CHECKING:

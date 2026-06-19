@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..constants.planets import RACSMPLANET
-from ..constants.tbolts import RACSMTBOLT
+from ..constants import RACSMPLANET, RACSMTBOLT
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
 from ..interface_orchestrator.storage.local import LocalStorage

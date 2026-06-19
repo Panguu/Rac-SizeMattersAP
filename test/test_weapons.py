@@ -20,6 +20,7 @@ class TestProgressiveWeapons(RACSizeMatterTestBase):
         "skill_points": 2,
         "enable_clank_challenge_skill_points": 1,
         "enable_skyboard_challenge_skill_points": 1,
+        "starting_weapons": 0,
     }
 
     def test_progressive_weapon_items_in_pool(self) -> None:

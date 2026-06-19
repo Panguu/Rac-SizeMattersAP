@@ -4,10 +4,12 @@ from collections.abc import Callable
 from enum import IntFlag
 from typing import NamedTuple
 
-from ..constants.clank_challenges import RACSMTCLANK as RACSMCLANK
-from ..constants.planets import RACSMPLANET
-from ..constants.skillpoints import RACSMSKILLPOINT
-from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
+from ..constants import (
+    RACSMCLANKCHALLENGE as RACSMCLANK,
+    RACSMPLANET,
+    RACSMSKILLPOINT,
+    RACSMSKYBOARDCHALLENGE as RACSMSKY,
+)
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
 from ..interface_orchestrator.storage.local import LocalStorage

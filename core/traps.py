@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
 
-from ..constants.general import RACSMLOCATION
+from ..constants import RACSMLOCATION
 from .address_maps import BRIGHTNESS_ADDRESS, CHEATS, DREAMTIME_EFFECT
 
 if TYPE_CHECKING:

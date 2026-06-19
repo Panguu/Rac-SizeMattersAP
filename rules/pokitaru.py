@@ -2,11 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..constants.cutscenes import RacSMCutsceneLocations
-from ..constants.items import RACSMITEM
-from ..constants.skillpoints import RACSMSKILLPOINT
-from ..constants.tbolts import RACSMTBOLT
-from ..constants.vendors import RACSMVENDORLOCATION
+from ..constants import RACSMITEM, RACSMSKILLPOINT, RACSMTBOLT, RACSMVENDORLOCATION, RacSMCutsceneLocations
 from ._helpers import has_projectile_weapon, has_weapon
 
 if TYPE_CHECKING:

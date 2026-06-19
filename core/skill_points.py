@@ -4,8 +4,7 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from ..constants.planets import RACSMPLANET
-from ..constants.skillpoints import RACSMSKILLPOINT
+from ..constants import RACSMPLANET, RACSMSKILLPOINT
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
 from ..interface_orchestrator.storage.local import LocalStorage
@@ -71,7 +70,8 @@ SKILL_POINTS: dict[str, SkillPoint] = {
     RACSMSKILLPOINT.KALIDON_SKYBOARDER:      SkillPoint(0x03, 10, RACSMPLANET.KALIDON),
     # Metalis
     RACSMSKILLPOINT.METALIS_SHUTOUT:         SkillPoint(0x04, 12, RACSMPLANET.METALIS),
-    RACSMSKILLPOINT.METALIS_TERROR:          SkillPoint(0x04, 13, RACSMPLANET.METALIS),
+    # RACSMSKILLPOINT.METALIS_TERROR: SkillPoint(0x04, 13, RACSMPLANET.METALIS)
+    # Giant Clank disabled — unreachable.
     RACSMSKILLPOINT.METALIS_GLADIATOR:       SkillPoint(0x04, 14, RACSMPLANET.METALIS),
     # Dreamtime
     RACSMSKILLPOINT.DREAMTIME_FRIENDS:       SkillPoint(0x05, 16, RACSMPLANET.DREAMTIME),
@@ -100,7 +100,7 @@ SKILL_POINTS: dict[str, SkillPoint] = {
 HARD_SKILL_POINTS: frozenset[str] = frozenset({
     RACSMSKILLPOINT.RYLLUS_BURY,
     RACSMSKILLPOINT.KALIDON_SUPER_LOMBAX,
-    RACSMSKILLPOINT.METALIS_TERROR,
+    # RACSMSKILLPOINT.METALIS_TERROR,  # Giant Clank disabled — unreachable
     RACSMSKILLPOINT.DREAMTIME_FRIENDS,
     RACSMSKILLPOINT.DREAMTIME_NIGHT_TERRORS,
     RACSMSKILLPOINT.CHALLAX_MASTER,

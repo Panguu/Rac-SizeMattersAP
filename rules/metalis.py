@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..constants.clank_challenges import RACSMTCLANK as RACSMCLANK
-from ..constants.cutscenes import RacSMCutsceneLocations
-from ..constants.items import RACSMITEM
-from ..constants.skillpoints import RACSMSKILLPOINT
-from ..constants.tbolts import RACSMTBOLT
+from ..constants import (
+    RACSMCLANKCHALLENGE as RACSMCLANK,
+    RACSMITEM,
+    RACSMSKILLPOINT,
+    RACSMTBOLT,
+    RacSMCutsceneLocations,
+)
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld
@@ -17,16 +19,15 @@ def set_metalis_rules(world: RACSizeMatterWorld) -> None:
     mw = world.multiworld
 
     # ── Skill Points ──────────────────────────────────────────────────────────
-    if world.options.skill_points.value >= 2:
-        mw.get_location(RACSMSKILLPOINT.METALIS_TERROR, player).access_rule = lambda _: True
+    # METALIS_TERROR is commented out in core/skill_points.py — Giant Clank disabled.
     if world.options.enable_clank_challenge_skill_points:
         mw.get_location(RACSMSKILLPOINT.METALIS_SHUTOUT,   player).access_rule = lambda _: True
         mw.get_location(RACSMSKILLPOINT.METALIS_GLADIATOR, player).access_rule = lambda _: True
 
     # ── Missions ──────────────────────────────────────────────────────────────
+    # METALIS_ESCAPE is commented out in locations.py/missions.py — Giant Clank disabled.
     if world.options.all_missions:
         mw.get_location(RacSMCutsceneLocations.METALIS_WAR,    player).access_rule = lambda _: True
-        mw.get_location(RacSMCutsceneLocations.METALIS_ESCAPE, player).access_rule = lambda _: True
 
     # ── Titanium Bolts ────────────────────────────────────────────────────────
     mw.get_location(RACSMTBOLT.METALIS_DOOR, player).access_rule = \

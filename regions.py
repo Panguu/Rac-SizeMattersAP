@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Region
 
-from .constants.planets import RACSMPLANET
+from .constants import RACSMPLANET
 from .locations import (
     ALL_CLANK_LOCATIONS,
     ARMOUR_PICKUP_LOCATIONS,

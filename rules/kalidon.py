@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..constants.cutscenes import RacSMCutsceneLocations
-from ..constants.general import RACSMLOCATION
-from ..constants.items import RACSMITEM
-from ..constants.skillpoints import RACSMSKILLPOINT
-from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
-from ..constants.tbolts import RACSMTBOLT
-from ..constants.vendors import RACSMVENDORLOCATION
+from ..constants import (
+    RACSMITEM,
+    RACSMLOCATION,
+    RACSMSKILLPOINT,
+    RACSMSKYBOARDCHALLENGE as RACSMSKY,
+    RACSMTBOLT,
+    RACSMVENDORLOCATION,
+    RacSMCutsceneLocations,
+)
 from ._helpers import has_weapon
 
 if TYPE_CHECKING:

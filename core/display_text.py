@@ -36,8 +36,6 @@ from .address_maps import (
     MULTI_LINE_TEXT_BOX_BY_PLANET,
     PLANET_ADDRESSES,
     SMALL_TEXT_BOX_BY_PLANET,
-)
-from .address_maps import (
     STATIC_TEXT_BUFFER as _STATIC_TEXT_BUFFER,
 )
 from .structs.game import CountdownTimerStruct, VendorVisibilityStruct

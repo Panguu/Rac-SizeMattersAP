@@ -11,14 +11,6 @@ from ..address_maps import (
     PLAYER_BOLT_COUNT,
 )
 
-# Cutscene monitor addresses (source of truth; re-exported by core.cutscenes).
-# Defined here so the cutscene structs below can be built without importing the
-# higher-level core.cutscenes module (which would create an import cycle).
-CUTSCENE_BEFORE_SPROUT_O_MATIC: int = 0x5A7904
-SPROUT_O_MATIC_CUTSCENE:        int = 0x5A6EA8
-ELECTROSHOCK_GLOVES_CUTSCENE:   int = 0x1CE9C0
-
-
 # ── Player ─────────────────────────────────────────────────────────────────────
 
 class PlayerMovementStruct(MemoryStruct):
@@ -234,33 +226,6 @@ class LoadingPlanetStruct(MemoryStruct):
     BASE_ADDRESS = _LOADING_PLANET_ADDR
     _pack_ = 1
     _fields_ = [("value", ctypes.c_uint32)]
-
-
-# ── Cutscenes ──────────────────────────────────────────────────────────────────
-
-_GOAL_ADDR = 0x3D7FC8
-
-
-class CutsceneValueStruct(MemoryStruct):
-    BASE_ADDRESS = 0
-    _pack_ = 1
-    _fields_ = [("value", ctypes.c_int32)]
-
-
-class GoalCutsceneStruct(CutsceneValueStruct):
-    BASE_ADDRESS = _GOAL_ADDR
-
-
-class ElectroshockCutsceneStruct(CutsceneValueStruct):
-    BASE_ADDRESS = ELECTROSHOCK_GLOVES_CUTSCENE
-
-
-class BeforeSproutCutsceneStruct(CutsceneValueStruct):
-    BASE_ADDRESS = CUTSCENE_BEFORE_SPROUT_O_MATIC
-
-
-class SproutCutsceneStruct(CutsceneValueStruct):
-    BASE_ADDRESS = SPROUT_O_MATIC_CUTSCENE
 
 
 # ── Missions ───────────────────────────────────────────────────────────────────

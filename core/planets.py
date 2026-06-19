@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
-from ..constants.items import RACSMITEM
+from ..constants import RACSMITEM
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
 from ..interface_orchestrator.storage.local import LocalStorage
@@ -468,7 +468,7 @@ class PlanetUnlockState(BaseState):
         del address
         instance = PlanetProgressStruct.from_bytes(new_bytes)
         prev = dict(self.unlocked)
-        for field, name in zip(PlanetProgressStruct.PLANET_ORDER, PLANET_UNLOCK_ORDER):
+        for field, name in zip(PlanetProgressStruct.PLANET_ORDER, PLANET_UNLOCK_ORDER, strict=False):
             self.unlocked[name] = getattr(instance, field) == PlanetLockValue.UNLOCKED
 
         self._enforce_desired()
@@ -481,7 +481,7 @@ class PlanetUnlockState(BaseState):
 
     def sync(self) -> None:
         instance = self.accessor.read_struct(PlanetProgressStruct)
-        for field, name in zip(PlanetProgressStruct.PLANET_ORDER, PLANET_UNLOCK_ORDER):
+        for field, name in zip(PlanetProgressStruct.PLANET_ORDER, PLANET_UNLOCK_ORDER, strict=False):
             self.unlocked[name] = getattr(instance, field) == PlanetLockValue.UNLOCKED
         self._enforce_desired()
 
@@ -495,7 +495,7 @@ class PlanetUnlockState(BaseState):
 
     def _write_desired(self) -> None:
         instance = PlanetProgressStruct()
-        for field, name in zip(PlanetProgressStruct.PLANET_ORDER, PLANET_UNLOCK_ORDER):
+        for field, name in zip(PlanetProgressStruct.PLANET_ORDER, PLANET_UNLOCK_ORDER, strict=False):
             unlock_val = PlanetLockValue.UNLOCKED if self._desired[name] else PlanetLockValue.LOCKED
             setattr(instance, field, unlock_val)
             pu = PLANET_UNLOCKS.get(name)

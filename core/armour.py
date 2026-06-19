@@ -5,11 +5,13 @@ from dataclasses import dataclass
 from enum import IntEnum, IntFlag
 from typing import NamedTuple
 
-from ..constants.armor_sets import RACSMTARMORSET
-from ..constants.clank_challenges import RACSMTCLANK as RACSMCLANK
-from ..constants.general import RACSMLOCATION
-from ..constants.planets import RACSMPLANET
-from ..constants.skyboard_challenges import RACSMTCLANK as RACSMSKY
+from ..constants import (
+    RACSMCLANKCHALLENGE as RACSMCLANK,
+    RACSMLOCATION,
+    RACSMPLANET,
+    RACSMSKYBOARDCHALLENGE as RACSMSKY,
+    RACSMTARMORSET,
+)
 from ..interface_orchestrator.memory.accessor import MemoryAccessor
 from ..interface_orchestrator.state.base_state import BaseState
 from ..interface_orchestrator.storage.local import LocalStorage
@@ -72,7 +74,9 @@ class ArmourPiece(IntFlag):
     CHESTPLATE = 0x01
     HELMET     = 0x02
     GLOVES     = 0x04
-    BOOTS      = 0x10 # Boots changes it is any value with bit 4 set, this is because the game treats left and right boots as one piece, so any value with bit 4 set is considered to have boots equipped
+    # Boots changes: it's any value with bit 4 set, because the game treats left and
+    # right boots as one piece, so any value with bit 4 set is considered equipped.
+    BOOTS      = 0x10
     ALL        = 0x17
 
 
@@ -151,7 +155,8 @@ ARMOUR_PICKUPS: list[ArmourPickup] = [
     # Outpost Omega
     ArmourPickup("crystallix", ArmourPiece.BOOTS,    RACSMLOCATION.OUTPOST_OMEGA_BOOTS, RACSMPLANET.OUTPOST_OMEGA),
     # Challax
-    # ArmourPickup("electroshock", ArmourPiece.CHESTPLATE, "Challax: Electroshock Chestplate", RACSMPLANET.CHALLAX),  # not reachable
+    # ArmourPickup("electroshock", ArmourPiece.CHESTPLATE, "Challax: Electroshock Chestplate",
+    #              RACSMPLANET.CHALLAX),  # not reachable
     ArmourPickup("electroshock", ArmourPiece.HELMET, RACSMLOCATION.CHALLAX_HELMET,      RACSMPLANET.CHALLAX),
     # Dayni Moon
     ArmourPickup("mega_bomb", ArmourPiece.HELMET,    RACSMLOCATION.DAYNI_MOON_HELMET,   RACSMPLANET.DAYNI_MOON),

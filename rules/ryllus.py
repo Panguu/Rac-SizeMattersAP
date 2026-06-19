@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..constants.cutscenes import RacSMCutsceneLocations
-from ..constants.general import RACSMLOCATION
-from ..constants.items import RACSMITEM
-from ..constants.skillpoints import RACSMSKILLPOINT
-from ..constants.tbolts import RACSMTBOLT
-from ..constants.vendors import RACSMVENDORLOCATION
+from ..constants import (
+    RACSMITEM,
+    RACSMLOCATION,
+    RACSMSKILLPOINT,
+    RACSMTBOLT,
+    RACSMVENDORLOCATION,
+    RacSMCutsceneLocations,
+)
 
 if TYPE_CHECKING:
     from ..world import RACSizeMatterWorld

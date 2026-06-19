@@ -2,10 +2,10 @@ from typing import NamedTuple
 
 from BaseClasses import ItemClassification
 
-from .constants.items import RACSMITEM
-from .core.data import WEAPON_MAX_LEVELS, WEAPON_MOD_COUNTS
-from .core.data.infobots import INFOBOT_ITEM_TO_PLANET
+from .constants import RACSMGADGETKEY, RACSMITEM, RACSMWEAPONKEY
+from .core.planets import INFOBOT_ITEM_TO_PLANET
 from .core.traps import TRAP_DURATIONS
+from .core.weapons import WEAPON_MAX_LEVELS, WEAPON_MOD_COUNTS
 
 BASE_ID = 77_700_000
 
@@ -16,30 +16,30 @@ class RACItemData(NamedTuple):
 
 
 WEAPON_DISPLAY_TO_INTERNAL: dict[str, str] = {
-    RACSMITEM.LACERATOR:       "lacerator",
-    RACSMITEM.CONCUSSION_GUN:  "concussion_gun",
-    RACSMITEM.ACID_BOMB_GLOVE: "acid_bomb_glove",
-    RACSMITEM.AGENTS_OF_DOOM:  "agents_of_doom",
-    RACSMITEM.BEE_MINE_GLOVE:  "bee_mine_glove",
-    RACSMITEM.STATIC_BARRIER:  "static_barrier",
-    RACSMITEM.SHOCK_ROCKET:    "shock_rocket",
-    RACSMITEM.SNIPER_MINE:     "sniper_mine",
-    RACSMITEM.SCORCHER:        "scorcher",
-    RACSMITEM.LASER_TRACER:    "laser_tracer",
-    RACSMITEM.SUCK_CANNON:     "suck_cannon",
-    RACSMITEM.MOOTATOR:        "mootator",
-    RACSMITEM.RYNO:            "ryno",
+    RACSMITEM.LACERATOR:       RACSMWEAPONKEY.LACERATOR,
+    RACSMITEM.CONCUSSION_GUN:  RACSMWEAPONKEY.CONCUSSION_GUN,
+    RACSMITEM.ACID_BOMB_GLOVE: RACSMWEAPONKEY.ACID_BOMB_GLOVE,
+    RACSMITEM.AGENTS_OF_DOOM:  RACSMWEAPONKEY.AGENTS_OF_DOOM,
+    RACSMITEM.BEE_MINE_GLOVE:  RACSMWEAPONKEY.BEE_MINE_GLOVE,
+    RACSMITEM.STATIC_BARRIER:  RACSMWEAPONKEY.STATIC_BARRIER,
+    RACSMITEM.SHOCK_ROCKET:    RACSMWEAPONKEY.SHOCK_ROCKET,
+    RACSMITEM.SNIPER_MINE:     RACSMWEAPONKEY.SNIPER_MINE,
+    RACSMITEM.SCORCHER:        RACSMWEAPONKEY.SCORCHER,
+    RACSMITEM.LASER_TRACER:    RACSMWEAPONKEY.LASER_TRACER,
+    RACSMITEM.SUCK_CANNON:     RACSMWEAPONKEY.SUCK_CANNON,
+    RACSMITEM.MOOTATOR:        RACSMWEAPONKEY.MOOTATOR,
+    RACSMITEM.RYNO:            RACSMWEAPONKEY.RYNO,
 }
 
 GADGET_DISPLAY_TO_INTERNAL: dict[str, str] = {
-    RACSMITEM.HYPERSHOT:      "hypershot",
-    RACSMITEM.SPROUT_O_MATIC: "sprout_o_matic",
-    RACSMITEM.POLARIZER:      "polarizer",
-    RACSMITEM.PDA:            "pda",
-    RACSMITEM.SHRINK_RAY:     "shrink_ray",
-    RACSMITEM.BOLT_GRABBER:   "bolt_grabber",
-    RACSMITEM.MAP_O_MATIC:    "map_o_matic",
-    RACSMITEM.BOX_BREAKER:    "box_breaker",
+    RACSMITEM.HYPERSHOT:      RACSMGADGETKEY.HYPERSHOT,
+    RACSMITEM.SPROUT_O_MATIC: RACSMGADGETKEY.SPROUT_O_MATIC,
+    RACSMITEM.POLARIZER:      RACSMGADGETKEY.POLARIZER,
+    RACSMITEM.PDA:            RACSMGADGETKEY.PDA,
+    RACSMITEM.SHRINK_RAY:     RACSMGADGETKEY.SHRINK_RAY,
+    RACSMITEM.BOLT_GRABBER:   RACSMGADGETKEY.BOLT_GRABBER,
+    RACSMITEM.MAP_O_MATIC:    RACSMGADGETKEY.MAP_O_MATIC,
+    RACSMITEM.BOX_BREAKER:    RACSMGADGETKEY.BOX_BREAKER,
 }
 
 ARMOUR_DISPLAY_TO_INTERNAL: dict[str, tuple[str, int]] = {
@@ -76,6 +76,9 @@ ARMOUR_DISPLAY_TO_INTERNAL: dict[str, tuple[str, int]] = {
 _PROGRESSION_WEAPONS: frozenset[str] = frozenset({
     RACSMITEM.LACERATOR,
     RACSMITEM.CONCUSSION_GUN,
+    RACSMITEM.ACID_BOMB_GLOVE,
+    RACSMITEM.AGENTS_OF_DOOM,
+    RACSMITEM.BEE_MINE_GLOVE,
     RACSMITEM.SHOCK_ROCKET,
     RACSMITEM.SNIPER_MINE,
     RACSMITEM.LASER_TRACER,
@@ -146,23 +149,67 @@ WEAPON_PROGRESSIVE_MOD_ITEM_TABLE: dict[str, RACItemData] = {
     for idx, display in enumerate(_WEAPONS_WITH_MODS)
 }
 
-# Individual numbered mod items used when Progressive Mods is off — one item
-# per mod slot, each independently grants that specific slot.
+# Named mod item per mod slot, in slot order, used when Progressive Mods is off —
+# one item per mod slot, each independently grants that specific slot.
+WEAPON_MOD_SLOT_NAMES: dict[str, list[str]] = {
+    RACSMITEM.LACERATOR: [
+        RACSMITEM.LACERATOR_MOD_LOCK_ON,
+        RACSMITEM.LACERATOR_MOD_DOUBLE_BARREL,
+    ],
+    RACSMITEM.CONCUSSION_GUN: [
+        RACSMITEM.CONCUSSION_GUN_MOD_SPLIT_BARREL,
+        RACSMITEM.CONCUSSION_GUN_MOD_LOCK_ON,
+        RACSMITEM.CONCUSSION_GUN_MOD_CHARGE_UP,
+    ],
+    RACSMITEM.ACID_BOMB_GLOVE: [
+        RACSMITEM.ACID_BOMB_GLOVE_MOD_ACID_BOMB,
+        RACSMITEM.ACID_BOMB_GLOVE_MOD_EPOXY,
+    ],
+    RACSMITEM.AGENTS_OF_DOOM: [
+        RACSMITEM.AGENTS_OF_DOOM_MOD_LAUNCHER,
+        RACSMITEM.AGENTS_OF_DOOM_MOD_EXPLOSIVE,
+    ],
+    RACSMITEM.BEE_MINE_GLOVE: [
+        RACSMITEM.BEE_MINE_GLOVE_MOD_WORKER,
+        RACSMITEM.BEE_MINE_GLOVE_MOD_HIVE_BOMB,
+    ],
+    RACSMITEM.STATIC_BARRIER: [
+        RACSMITEM.STATIC_BARRIER_MOD_REFLECTION,
+        RACSMITEM.STATIC_BARRIER_MOD_MIRAGE,
+    ],
+    RACSMITEM.SHOCK_ROCKET: [
+        RACSMITEM.SHOCK_ROCKET_MOD_LOCK_ON,
+        RACSMITEM.SHOCK_ROCKET_MOD_AFTER_SHOCK,
+        RACSMITEM.SHOCK_ROCKET_MOD_MULTI_LAUNCHER,
+    ],
+    RACSMITEM.SNIPER_MINE: [
+        RACSMITEM.SNIPER_MINE_MOD_SPLIT_BEAM,
+        RACSMITEM.SNIPER_MINE_MOD_SMART_REFLECTOR,
+    ],
+    RACSMITEM.SCORCHER: [
+        RACSMITEM.SCORCHER_MOD_SPLIT_FIRE,
+        RACSMITEM.SCORCHER_MOD_SUNFLARE,
+    ],
+    RACSMITEM.LASER_TRACER: [
+        RACSMITEM.LASER_TRACER_MOD_PIERCE,
+        RACSMITEM.LASER_TRACER_MOD_RICOCHET,
+    ],
+}
+
 WEAPON_MOD_ITEM_TABLE: dict[str, RACItemData] = {
-    f"{display} Mod {i}": RACItemData(BASE_ID + 700 + idx, ItemClassification.useful)
-    for idx, (display, i) in enumerate(
-        (display, i)
+    name: RACItemData(BASE_ID + 700 + idx, ItemClassification.useful)
+    for idx, (display, i, name) in enumerate(
+        (display, i, name)
         for display in _WEAPONS_WITH_MODS
-        for i in range(1, WEAPON_MOD_COUNTS.get(WEAPON_DISPLAY_TO_INTERNAL[display], 0) + 1)
+        for i, name in enumerate(WEAPON_MOD_SLOT_NAMES[display], start=1)
     )
 }
 
-# "{Weapon} Mod {i}" item name -> (weapon display name, 1-indexed slot number)
+# mod item name -> (weapon display name, 1-indexed slot number)
 WEAPON_MOD_NAME_TO_SLOT: dict[str, tuple[str, int]] = {
     name: (display, i)
     for display in _WEAPONS_WITH_MODS
-    for i in range(1, WEAPON_MOD_COUNTS.get(WEAPON_DISPLAY_TO_INTERNAL[display], 0) + 1)
-    for name in (f"{display} Mod {i}",)
+    for i, name in enumerate(WEAPON_MOD_SLOT_NAMES[display], start=1)
 }
 
 

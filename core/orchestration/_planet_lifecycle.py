@@ -4,9 +4,8 @@ import asyncio
 import struct
 import time
 
-from ..address_maps import PLANET_MISSION_ADDRESSES
+from ..address_maps import PLANET_MISSION_ADDRESSES, POKITARU_RYLLUS_ALT_TRIGGER
 from ..address_maps.planet_map import build_combined_address_map
-from ..cutscenes import POKITARU_RYLLUS_ALT_TRIGGER
 from ..game_orchestrator import PLANET_NAMES, POLL_INTERVAL
 from ..memory import GADGETS, load_weapons_for_planet
 from ..planets import Planets

@@ -12,11 +12,9 @@ from ..core import (
     PLAYER_ADDRS,
     PLAYER_HEALTH,
     PLAYER_STATE,
+    PlayerMovementState as PlayerState,
     TextColour,
     colored_text,
-)
-from ..core import (
-    PlayerMovementState as PlayerState,
 )
 
 _DEATH_CAUSES: dict[PlayerState, list[str]] = {

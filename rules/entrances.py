@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..constants.items import RACSMITEM
+from ..constants import RACSMITEM
 from ._helpers import has_projectile_weapon, infobot
 
 if TYPE_CHECKING:

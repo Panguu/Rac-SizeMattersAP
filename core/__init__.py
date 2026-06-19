@@ -1,6 +1,6 @@
 from .address_maps import CURRENT_PLANET_ADDRESS, PLAYER_ADDRS, PLAYER_HEALTH, PLAYER_STATE
 from .armour import ARMOUR_FLAG_TO_LOCATION, ARMOUR_SET_CHECKS, ArmourPiece
-from .data.controller import ButtonState
+from .controller import ButtonState
 from .display_text import SmallTextBoxAddrs, TextColour, colored_text
 from .memory import (
     ARMOUR_ADDRESSES,
@@ -14,12 +14,10 @@ from .memory import (
 )
 from .planets import (
     AUTO_UNLOCK_ADDRESSES,
+    BY_ID as PLANETS_BY_ID,
     INFOBOT_ITEM_TO_PLANET,
     INFOBOT_UNLOCK_VALUE,
     PLANET_STATE_ADDRESSES,
-)
-from .planets import (
-    BY_ID as PLANETS_BY_ID,
 )
 from .player import PlayerMovementState
 from .skill_points import SKILL_POINT_ADDRESS, SKILL_POINTS
